@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  username      String?         @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  accounts      Account[]
+  sessions      Session[]
+  
+  // Profile information
+  bio           String?
+  location      String?
+  website       String?
+  github        String?
+  twitter       String?
+  
+  // Drone build relations
+  droneBuilds   DroneBuild[]
+  customParts   CustomPart[]
+  
+  // Social features
+  likes         Like[]
+  comments      Comment[]
+  followers     Follow[] @relation("UserFollowers")
+  following     Follow[] @relation("UserFollowing")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model DroneBuild {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isPublic    Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  tags        Json?     // Array of tags stored as JSON like ["racing", "freestyle", "5inch"]
+  category    String?   // "Racing", "Freestyle", "Cinematic", etc.
+  
+  // Component selections stored as JSON
+  motor       Json?
+  frame       Json?
+  stack       Json?
+  camera      Json?
+  prop        Json?
+  battery     Json?
+  customWeights Json?
+  
+  // Performance data
+  totalWeight           Float?
+  thrustToWeightRatio   Float?
+  estimatedTopSpeed     Int?
+  estimatedFlightTime   Float?
+  powerConsumption      Float?
+  
+  // Social features
+  likes       Like[]
+  comments    Comment[]
+  viewCount   Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([isPublic])
+  @@index([category])
+}
+
+model CustomPart {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String   // "Motors", "Frames", "Stacks", etc.
+  specifications Json   // Store all the specs as JSON
+  isPublic    Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Social features
+  likes       Like[]
+  comments    Comment[]
+  viewCount   Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([isPublic])
+  @@index([category])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Polymorphic relation - can like either builds or parts
+  buildId   String?
+  build     DroneBuild? @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  partId    String?
+  part      CustomPart? @relation(fields: [partId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, buildId])
+  @@unique([userId, partId])
+  @@index([buildId])
+  @@index([partId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Polymorphic relation - can comment on either builds or parts
+  buildId   String?
+  build     DroneBuild? @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  partId    String?
+  part      CustomPart? @relation(fields: [partId], references: [id], onDelete: Cascade)
+  
+  // Nested comments support
+  parentId  String?
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([buildId])
+  @@index([partId])
+  @@index([userId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+
+

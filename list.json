@@ -1,0 +1,1511 @@
+{
+  "Motors": {
+    "T-Motor F40 Pro IV 2207": {
+      "statorSize": "2207",
+      "kv": 1950,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "31.5g (with short wires)",
+      "maxThrust": "Approx. 1.8kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "T-Motor F40 Pro III 2207": {
+      "statorSize": "2207",
+      "kv": 2400,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "30.5g (with short wires)",
+      "maxThrust": "Approx. 1.9kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "T-Motor F40 Pro II 2207": {
+      "statorSize": "2207",
+      "kv": 2700,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "29.8g (with short wires)",
+      "maxThrust": "Approx. 2.0kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "T-Motor F60 Pro V 2207": {
+      "statorSize": "2207",
+      "kv": 1750,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "33.2g (with short wires)",
+      "maxThrust": "Approx. 1.7kg (on 5S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch, 6-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "T-Motor Velox V2 2207": {
+      "statorSize": "2207",
+      "kv": 1955,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32.1g (with short wires)",
+      "maxThrust": "Approx. 1.8kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "T-Motor F1507 2800KV": {
+      "statorSize": "1507",
+      "kv": 2800,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "12.5g (with short wires)",
+      "maxThrust": "Approx. 0.6kg (on 4S with 3-inch prop)",
+      "propCompatibility": "3-inch, 3.5-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "26AWG"
+    },
+    "Xing2 2207": {
+      "statorSize": "2207",
+      "kv": 1850,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32g (with short wires)",
+      "maxThrust": "Approx. 1.75kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H Curved Magnets",
+      "wireGauge": "20AWG"
+    },
+    "Emax Eco II 2207": {
+      "statorSize": "2207",
+      "kv": 1700,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "33.8g (with short wires)",
+      "maxThrust": "Approx. 1.6kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "EZO",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "BrotherHobby Returner R5 2306.5": {
+      "statorSize": "2306.5",
+      "kv": 1750,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "34.5g (with short wires)",
+      "maxThrust": "Approx. 1.9kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "FPVCycle 2207": {
+      "statorSize": "2207",
+      "kv": 1960,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32.5g (with short wires)",
+      "maxThrust": "Approx. 1.85kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "iFlight XING-E Pro 2207": {
+      "statorSize": "2207",
+      "kv": 1800,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "33.9g (with short wires)",
+      "maxThrust": "Approx. 1.7kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "Caddx Air Unit Propeller Motor": {
+      "statorSize": "2004",
+      "kv": 3000,
+      "voltageCompatibility": "4S LiPo",
+      "weight": "20g",
+      "maxThrust": "Approx. 0.8kg (on 4S with 3.5-inch prop)",
+      "propCompatibility": "3.5-inch, 4-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "EZO",
+      "magnetType": "N52H",
+      "wireGauge": "24AWG"
+    },
+    "T-Motor F60 Pro IV 2207.5": {
+      "statorSize": "2207.5",
+      "kv": 1750,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32.5g",
+      "maxThrust": "Approx. 1.95kg (on 6S with 5.1-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "Xing-C 2207": {
+      "statorSize": "2207",
+      "kv": 2750,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "31g",
+      "maxThrust": "Approx. 1.5kg (on 4S with 5-inch prop)",
+      "propCompatibility": "5-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H Curved Magnets",
+      "wireGauge": "20AWG"
+    },
+    "PyroDrone Hyperlite 2207.5": {
+      "statorSize": "2207.5",
+      "kv": 1722,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "34g",
+      "maxThrust": "Approx. 1.9kg (on 6S with 5.1-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "RCinPower GTS V2 2306 Plus": {
+      "statorSize": "2306",
+      "kv": 1750,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "33g",
+      "maxThrust": "Approx. 1.85kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "iFlight XING2 2506": {
+      "statorSize": "2506",
+      "kv": 1500,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "39g",
+      "maxThrust": "Approx. 2.2kg (on 6S with 7-inch prop)",
+      "propCompatibility": "6-inch, 7-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H Curved Magnets",
+      "wireGauge": "18AWG"
+    },
+    "Flywoo NIN 2806.5": {
+      "statorSize": "2806.5",
+      "kv": 1350,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "48g",
+      "maxThrust": "Approx. 2.5kg (on 6S with 7-inch prop)",
+      "propCompatibility": "7-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "18AWG"
+    },
+    "BetaFPV 0802SE": {
+      "statorSize": "0802",
+      "kv": 19500,
+      "voltageCompatibility": "1S LiPo",
+      "weight": "1.8g",
+      "maxThrust": "Approx. 35g (on 1S with 1.6-inch prop)",
+      "propCompatibility": "1.6-inch",
+      "shaftDiameter": "1mm",
+      "bearings": "Bushings",
+      "magnetType": "N52H",
+      "wireGauge": "30AWG"
+    },
+    "Happymodel EX1103": {
+      "statorSize": "1103",
+      "kv": 7000,
+      "voltageCompatibility": "2-3S LiPo",
+      "weight": "3.7g",
+      "maxThrust": "Approx. 150g (on 2S with 2.5-inch prop)",
+      "propCompatibility": "2.5-inch, 3-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "Ball Bearings",
+      "magnetType": "N52H",
+      "wireGauge": "28AWG"
+    },
+    "CineWhoop 1404": {
+      "statorSize": "1404",
+      "kv": 3800,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "12g",
+      "maxThrust": "Approx. 400g (on 4S with 3-inch prop)",
+      "propCompatibility": "3-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "26AWG"
+    },
+    "T-Motor F7 Mini 1408": {
+      "statorSize": "1408",
+      "kv": 3600,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "12.5g",
+      "maxThrust": "Approx. 420g (on 4S with 3-inch prop)",
+      "propCompatibility": "3-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H",
+      "wireGauge": "26AWG"
+    },
+    "iFlight XING NANO X1408": {
+      "statorSize": "1408",
+      "kv": 2750,
+      "voltageCompatibility": "3-6S LiPo",
+      "weight": "11.8g",
+      "maxThrust": "Approx. 380g (on 4S with 3-inch prop)",
+      "propCompatibility": "3-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H Curved Magnets",
+      "wireGauge": "26AWG"
+    },
+    "Emax Tinyhawk S 0803": {
+      "statorSize": "0803",
+      "kv": 16000,
+      "voltageCompatibility": "1-2S LiPo",
+      "weight": "2.3g",
+      "maxThrust": "Approx. 50g (on 2S with 1.6-inch prop)",
+      "propCompatibility": "1.6-inch",
+      "shaftDiameter": "1mm",
+      "bearings": "Bushings",
+      "magnetType": "N52H",
+      "wireGauge": "30AWG"
+    },
+    "T-Motor F90 2207": {
+      "statorSize": "2207",
+      "kv": 1950,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32g",
+      "maxThrust": "Approx. 1.85kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "RCinPower GTS 2207.5": {
+      "statorSize": "2207.5",
+      "kv": 1900,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "33.5g",
+      "maxThrust": "Approx. 1.92kg (on 6S with 5.1-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "HGLRC Flame 2207": {
+      "statorSize": "2207",
+      "kv": 2450,
+      "voltageCompatibility": "3-5S LiPo",
+      "weight": "31.2g",
+      "maxThrust": "Approx. 1.65kg (on 5S with 5-inch prop)",
+      "propCompatibility": "5-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "Diatone Roma MXC 2207": {
+      "statorSize": "2207",
+      "kv": 2350,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32.8g",
+      "maxThrust": "Approx. 1.75kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "TMotor F1507 2750KV": {
+      "statorSize": "1507",
+      "kv": 2750,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "14.2g",
+      "maxThrust": "Approx. 450g (on 4S with 3-inch prop)",
+      "propCompatibility": "3-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H",
+      "wireGauge": "26AWG"
+    },
+    "EMAX RS2205 2300KV": {
+      "statorSize": "2205",
+      "kv": 2300,
+      "voltageCompatibility": "3-5S LiPo",
+      "weight": "27g",
+      "maxThrust": "Approx. 1.4kg (on 4S with 5-inch prop)",
+      "propCompatibility": "5-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "HGLRC Flame 1806 2400KV": {
+      "statorSize": "1806",
+      "kv": 2400,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "18g",
+      "maxThrust": "Approx. 650g (on 4S with 4-inch prop)",
+      "propCompatibility": "4-inch",
+      "shaftDiameter": "3mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "24AWG"
+    },
+    "TMotor F2004 3000KV": {
+      "statorSize": "2004",
+      "kv": 3000,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "19g",
+      "maxThrust": "Approx. 700g (on 4S with 4-inch prop)",
+      "propCompatibility": "4-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H",
+      "wireGauge": "24AWG"
+    },
+    "iFlight XING2 2208 1700KV": {
+      "statorSize": "2208",
+      "kv": 1700,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "35g",
+      "maxThrust": "Approx. 1.9kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H Curved Magnets",
+      "wireGauge": "20AWG"
+    },
+    "Brotherhobby Tornado T2 2207 1950KV": {
+      "statorSize": "2207",
+      "kv": 1950,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32g",
+      "maxThrust": "Approx. 1.8kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "20AWG"
+    },
+    "GEPRC Speedx2 1204 5000KV": {
+      "statorSize": "1204",
+      "kv": 5000,
+      "voltageCompatibility": "2-3S LiPo",
+      "weight": "6.8g",
+      "maxThrust": "Approx. 200g (on 3S with 2.5-inch prop)",
+      "propCompatibility": "2.5-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "Ball Bearings",
+      "magnetType": "N52H",
+      "wireGauge": "28AWG"
+    },
+    "RCinPower 1507 2800KV": {
+      "statorSize": "1507",
+      "kv": 2800,
+      "voltageCompatibility": "3-4S LiPo",
+      "weight": "13.5g",
+      "maxThrust": "Approx. 420g (on 4S with 3-inch prop)",
+      "propCompatibility": "3-inch",
+      "shaftDiameter": "1.5mm",
+      "bearings": "NMB",
+      "magnetType": "N52H",
+      "wireGauge": "26AWG"
+    },
+    "iFlight XING2 2306 2450KV": {
+      "statorSize": "2306",
+      "kv": 2450,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "33.5g (with short wires)",
+      "maxThrust": "Approx. 1.95kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "iFlight XING2 2207 1855KV": {
+      "statorSize": "2207",
+      "kv": 1855,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32.8g (with short wires)",
+      "maxThrust": "Approx. 1.75kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "BrotherHobby Returner R5 2207": {
+      "statorSize": "2207",
+      "kv": 2020,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "31.8g (with short wires)",
+      "maxThrust": "Approx. 1.8kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "Emax ECO II 2207": {
+      "statorSize": "2207",
+      "kv": 1900,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "30.2g (with short wires)",
+      "maxThrust": "Approx. 1.7kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    },
+    "HypeTrain Blaster 2207": {
+      "statorSize": "2207",
+      "kv": 2550,
+      "voltageCompatibility": "4-6S LiPo",
+      "weight": "32.5g (with short wires)",
+      "maxThrust": "Approx. 1.9kg (on 6S with 5-inch prop)",
+      "propCompatibility": "5-inch, 5.1-inch",
+      "shaftDiameter": "5mm",
+      "bearings": "NSK",
+      "magnetType": "N52H Arc Magnets",
+      "wireGauge": "20AWG"
+    }
+  },
+  "Frames": {
+    "TBS Source One V5": {
+      "type": "Freestyle / All-around",
+      "weight": "125g (frame only)",
+      "wheelbase": "226mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "ImpulseRC Apex": {
+      "type": "Freestyle / Race",
+      "weight": "145g (frame only)",
+      "wheelbase": "225mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "GEPRC Mark5": {
+      "type": "Freestyle",
+      "weight": "130g (frame only)",
+      "wheelbase": "225mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "5mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "Armattan Rooster": {
+      "type": "Freestyle / Durable",
+      "weight": "135g (frame only)",
+      "wheelbase": "230mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "Carbon Fiber with Lifetime Warranty",
+      "armThickness": "4mm (unibody)",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm"
+    },
+    "iFlight Nazgul5 V3": {
+      "type": "Freestyle",
+      "weight": "120g (frame only)",
+      "wheelbase": "227mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "5mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "Lumenier QAV-S": {
+      "type": "Freestyle / Cinematic",
+      "weight": "130g (frame only)",
+      "wheelbase": "220mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "5mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "AOS 5": {
+      "type": "Freestyle / Vibration Dampening",
+      "weight": "120g (frame only)",
+      "wheelbase": "218mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "ImpulseRC Apex DC (Deadcat)": {
+      "type": "Cinematic / Long Range",
+      "weight": "150g (frame only)",
+      "wheelbase": "225mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "Five33 Switchback Pro": {
+      "type": "Race / Freestyle",
+      "weight": "115g (frame only)",
+      "wheelbase": "220mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "GEPRC CineLog25": {
+      "type": "Cinewhoop",
+      "weight": "68g (frame only)",
+      "wheelbase": "109mm (2.5-inch)",
+      "propellerSizeCompatibility": "2.5-inch",
+      "material": "Carbon Fiber + Plastic Ducts",
+      "armThickness": "2.5mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Nano (14mm)",
+      "stackMounting": "25.5x25.5mm"
+    },
+    "iFlight Chimera7 Pro": {
+      "type": "Long Range",
+      "weight": "250g (frame only)",
+      "wheelbase": "320mm (7-inch)",
+      "propellerSizeCompatibility": "7-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "Tinyhawk Freestyle 2": {
+      "type": "Micro Freestyle",
+      "weight": "28g (frame only)",
+      "wheelbase": "115mm (2.5-inch)",
+      "propellerSizeCompatibility": "2.5-inch",
+      "material": "Carbon Fiber",
+      "armThickness": "3mm",
+      "topPlateThickness": "1.5mm",
+      "bottomPlateThickness": "1.5mm",
+      "cameraMount": "Nano (14mm)",
+      "stackMounting": "25.5x25.5mm"
+    },
+    "Diatone Roma F5 V2": {
+      "type": "Freestyle",
+      "weight": "110g (frame only)",
+      "wheelbase": "218mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "5mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "Flywoo Explorer LR 4": {
+      "type": "Long Range / Micro",
+      "weight": "45g (frame only)",
+      "wheelbase": "170mm (4-inch)",
+      "propellerSizeCompatibility": "4-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "3.5mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Nano (14mm)",
+      "stackMounting": "20x20mm"
+    },
+    "GEPRC Phantom": {
+      "type": "Freestyle / Racing",
+      "weight": "118g (frame only)",
+      "wheelbase": "230mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "Armattan Badger": {
+      "type": "Micro Racing",
+      "weight": "35g (frame only)",
+      "wheelbase": "130mm (3-inch)",
+      "propellerSizeCompatibility": "3-inch",
+      "material": "Carbon Fiber with Lifetime Warranty",
+      "armThickness": "3mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Nano (14mm)",
+      "stackMounting": "20x20mm"
+    },
+    "TBS Source Two V0.1": {
+      "type": "Freestyle / All-around",
+      "weight": "140g (frame only)",
+      "wheelbase": "235mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "iFlight DC5": {
+      "type": "Cinematic / Deadcat",
+      "weight": "155g (frame only)",
+      "wheelbase": "220mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "5mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "HGLRC Veyron 3": {
+      "type": "Micro Freestyle",
+      "weight": "42g (frame only)",
+      "wheelbase": "130mm (3-inch)",
+      "propellerSizeCompatibility": "3-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "3.5mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Nano (14mm)",
+      "stackMounting": "20x20mm"
+    },
+    "Flywoo Mr. Croc-HD": {
+      "type": "HD Cinewhoop",
+      "weight": "78g (frame only)",
+      "wheelbase": "115mm (2.5-inch)",
+      "propellerSizeCompatibility": "2.5-inch",
+      "material": "Carbon Fiber + TPU Ducts",
+      "armThickness": "3mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Nano (14mm)",
+      "stackMounting": "20x20mm"
+    },
+    "GEPRC Mark4 HD5": {
+      "type": "Freestyle / HD Recording",
+      "weight": "128g (frame only)",
+      "wheelbase": "225mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "5mm",
+      "topPlateThickness": "2.5mm",
+      "bottomPlateThickness": "2.5mm",
+      "cameraMount": "Micro (19mm) + Action Cam Mount",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "iFlight Titan XL5": {
+      "type": "Long Range Freestyle",
+      "weight": "165g (frame only)",
+      "wheelbase": "243mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "6mm",
+      "topPlateThickness": "3mm",
+      "bottomPlateThickness": "3mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    },
+    "TBS Source X": {
+      "type": "Racing / X-Class",
+      "weight": "320g (frame only)",
+      "wheelbase": "294mm (7-inch)",
+      "propellerSizeCompatibility": "7-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "8mm",
+      "topPlateThickness": "3mm",
+      "bottomPlateThickness": "3mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm"
+    },
+    "Armattan Chameleon": {
+      "type": "Micro Racing",
+      "weight": "35g (frame only)",
+      "wheelbase": "110mm (2.5-inch)",
+      "propellerSizeCompatibility": "2.5-inch",
+      "material": "Carbon Fiber with Lifetime Warranty",
+      "armThickness": "3mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Nano (14mm)",
+      "stackMounting": "20x20mm"
+    },
+    "Holybro Shuriken X1": {
+      "type": "Racing",
+      "weight": "105g (frame only)",
+      "wheelbase": "210mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "4mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm"
+    },
+    "Diatone GTB 229": {
+      "type": "Racing / Freestyle",
+      "weight": "98g (frame only)",
+      "wheelbase": "229mm (5-inch)",
+      "propellerSizeCompatibility": "5-inch",
+      "material": "3K Carbon Fiber",
+      "armThickness": "4mm",
+      "topPlateThickness": "2mm",
+      "bottomPlateThickness": "2mm",
+      "cameraMount": "Micro (19mm)",
+      "stackMounting": "30.5x30.5mm, 20x20mm"
+    }
+  },
+  "Stacks": {
+    "SpeedyBee F7 V3 Stack": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "50A (Burst 60A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "BMI270",
+      "osd": "Betaflight OSD",
+      "bluetooth": "Yes",
+      "voltageInput": "3-6S LiPo"
+    },
+    "Mamba F722 App Stack": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "50A (Burst 60A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "Yes",
+      "voltageInput": "3-6S LiPo"
+    },
+    "iFlight Blitz F7 Stack": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F745",
+      "escCurrentRating": "55A (Burst 60A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "BMI270",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "HGLRC Zeus F760 Stack": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "60A (Burst 65A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "3-6S LiPo"
+    },
+    "Diatone Mamba F405 Mini Stack": {
+      "type": "FC + 4-in-1 ESC (Mini)",
+      "fcProcessor": "STM32F405",
+      "escCurrentRating": "40A (Burst 50A)",
+      "mountingSize": "20x20mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-4S LiPo"
+    },
+    "Aikon F7 Mini Stack": {
+      "type": "FC + 4-in-1 ESC (Mini)",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "35A (Burst 40A)",
+      "mountingSize": "20x20mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "Holybro Kakute H7 Mini Stack": {
+      "type": "FC + 4-in-1 ESC (Mini)",
+      "fcProcessor": "STM32H743",
+      "escCurrentRating": "40A (Burst 45A)",
+      "mountingSize": "20x20mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "GEPRC F722-45A AIO": {
+      "type": "All-in-One FC/ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "45A (Burst 50A)",
+      "mountingSize": "25.5x25.5mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "Happymodel Crazybee F4 Pro V3.0 AIO": {
+      "type": "All-in-One FC/ESC (Whoop)",
+      "fcProcessor": "STM32F411",
+      "escCurrentRating": "5A (Burst 6A)",
+      "mountingSize": "25.5x25.5mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "1-2S LiPo"
+    },
+    "BetaFPV F4 1S 5A AIO": {
+      "type": "All-in-One FC/ESC (Whoop)",
+      "fcProcessor": "STM32F411",
+      "escCurrentRating": "5A (Burst 6A)",
+      "mountingSize": "25.5x25.5mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "1S LiPo"
+    },
+    "iFlight BLITZ F7 HD Stack": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "50A (Burst 55A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "BMI270",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "GEPRC SPAN F4 AIO": {
+      "type": "All-in-One FC/ESC",
+      "fcProcessor": "STM32F405",
+      "escCurrentRating": "20A (Burst 25A)",
+      "mountingSize": "20x20mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-4S LiPo"
+    },
+    "Matek F722-SE Stack": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "45A (Burst 50A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "FETtec FC G4 v1.7": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32G473",
+      "escCurrentRating": "40A (Burst 45A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "BMI270",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "3-6S LiPo"
+    },
+    "iFlight SucceX-E F7 / 45A BLHeli32": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "45A (Burst 55A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "ICM-42688-P",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "MAMBA F722 MK3 / 50A": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "50A (Burst 65A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "SpeedyBee F7 V3 / 50A": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "50A (Burst 60A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "BMI270",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "Holybro Kakute F7 / Tekko32 35A": {
+      "type": "FC + 4-in-1 ESC",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "35A (Burst 40A)",
+      "mountingSize": "30.5x30.5mm",
+      "gyro": "ICM20689",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "GEPRC Stable F7 / 35A": {
+      "type": "FC + 4-in-1 ESC (Mini)",
+      "fcProcessor": "STM32F722",
+      "escCurrentRating": "35A (Burst 45A)",
+      "mountingSize": "20x20mm",
+      "gyro": "ICM42688-P",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-6S LiPo"
+    },
+    "Flywoo GOKU GN405 / 20A": {
+      "type": "All-in-One FC/ESC (Mini)",
+      "fcProcessor": "STM32F405",
+      "escCurrentRating": "20A (Burst 25A)",
+      "mountingSize": "20x20mm",
+      "gyro": "BMI270",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-4S LiPo"
+    },
+    "BetaFPV F4 2-4S AIO / 12A": {
+      "type": "All-in-One FC/ESC (Whoop)",
+      "fcProcessor": "STM32F411",
+      "escCurrentRating": "12A (Burst 15A)",
+      "mountingSize": "20x20mm",
+      "gyro": "MPU6000",
+      "osd": "Betaflight OSD",
+      "bluetooth": "No",
+      "voltageInput": "2-4S LiPo"
+    }
+  },
+  "Camera": {
+    "RunCam Phoenix 2": {
+      "sensorSize": "1/2 inch",
+      "resolution": "1000TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "2.1mm",
+      "weight": "8.5g",
+      "voltageInput": "DC 5-36V",
+      "minIllumination": "0.001Lux@F1.2"
+    },
+    "Caddx Ratel 2": {
+      "sensorSize": "1/1.8 inch",
+      "resolution": "1200TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "2.1mm",
+      "weight": "5.9g",
+      "voltageInput": "DC 5-40V",
+      "minIllumination": "0.0001Lux@F1.2"
+    },
+    "Foxeer Toothless 2": {
+      "sensorSize": "1/2 inch",
+      "resolution": "1200TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "1.8mm",
+      "weight": "8.7g",
+      "voltageInput": "DC 4.6-20V",
+      "minIllumination": "0.0001Lux"
+    },
+    "RunCam Nano 3": {
+      "sensorSize": "1/3 inch",
+      "resolution": "800TVL",
+      "aspectRatio": "4:3",
+      "lens": "2.1mm",
+      "weight": "3.2g",
+      "voltageInput": "DC 3.3-5.5V",
+      "minIllumination": "0.01Lux@F1.2"
+    },
+    "Caddx Vista Digital HD System": {
+      "type": "Digital FPV System (Camera + VTX)",
+      "resolution": "720p/120fps (Digital)",
+      "aspectRatio": "16:9 / 4:3 Switchable",
+      "lens": "2.1mm (Caddx Nebula Pro camera)",
+      "weight": "29g (Vista + camera)",
+      "voltageInput": "DC 7.4-17.6V (2S-4S)",
+      "features": "Low Latency, HD Video"
+    },
+    "DJI O3 Air Unit": {
+      "type": "Digital FPV System (Camera + VTX)",
+      "resolution": "1080p/100fps (Digital)",
+      "aspectRatio": "16:9 / 4:3 Switchable",
+      "lens": "2.3mm",
+      "weight": "36.4g",
+      "voltageInput": "DC 7.4-26.4V (2S-6S)",
+      "features": "Low Latency, HD Video, RockSteady Stabilization"
+    },
+    "Walksnail Avatar HD Mini 1S Kit": {
+      "type": "Digital FPV System (Camera + VTX)",
+      "resolution": "1080p/60fps (Digital)",
+      "aspectRatio": "16:9 / 4:3 Switchable",
+      "lens": "2.1mm",
+      "weight": "6.8g (camera) + 6.8g (VTX)",
+      "voltageInput": "DC 3.1-5V (1S)",
+      "features": "Low Latency, HD Video, Lightweight"
+    },
+    "RunCam Split 3 Nano": {
+      "type": "HD Recording + FPV Camera",
+      "sensorSize": "1/3 inch",
+      "resolution": "1080p@60fps (HD) / 800TVL (FPV)",
+      "aspectRatio": "16:9 / 4:3 Switchable",
+      "lens": "2.1mm",
+      "weight": "10g",
+      "voltageInput": "DC 5-20V",
+      "features": "Simultaneous HD Recording and FPV Feed"
+    },
+    "Foxeer Razer Mini": {
+      "sensorSize": "1/3 inch",
+      "resolution": "1200TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "2.1mm",
+      "weight": "6.3g",
+      "voltageInput": "DC 4.5-25V",
+      "minIllumination": "0.01Lux"
+    },
+    "Caddx Baby Ratel 2": {
+      "sensorSize": "1/1.8 inch",
+      "resolution": "1200TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "1.8mm",
+      "weight": "4.9g",
+      "voltageInput": "DC 5-40V",
+      "minIllumination": "0.0001Lux@F1.2"
+    },
+    "RunCam Phoenix 2 Josh Edition": {
+      "sensorSize": "1/2 inch",
+      "resolution": "1000TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "2.1mm",
+      "weight": "8.7g",
+      "voltageInput": "DC 5-36V",
+      "minIllumination": "0.001Lux@F1.2"
+    },
+    "HDZero Freestyle V2": {
+      "type": "Digital FPV System (Camera + VTX)",
+      "resolution": "720p/90fps (Digital)",
+      "aspectRatio": "16:9 / 4:3 Switchable",
+      "lens": "2.1mm",
+      "weight": "12.5g",
+      "voltageInput": "DC 5.5-26.4V (2S-6S)",
+      "features": "Ultra Low Latency, HD Video, Glass Lens"
+    },
+    "Foxeer Predator V5": {
+      "sensorSize": "1/2.8 inch",
+      "resolution": "1000TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "1.8mm",
+      "weight": "8.2g",
+      "voltageInput": "DC 5-40V",
+      "minIllumination": "0.01Lux"
+    },
+    "Caddx Turtle V2": {
+      "sensorSize": "1/2.8 inch",
+      "resolution": "1000TVL",
+      "aspectRatio": "4:3",
+      "lens": "2.1mm",
+      "weight": "13.5g",
+      "voltageInput": "DC 5-40V",
+      "minIllumination": "0.01Lux",
+      "features": "HD Recording, DVR"
+    },
+    "RunCam Racer Nano 2": {
+      "sensorSize": "1/3 inch",
+      "resolution": "700TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "2.1mm",
+      "weight": "3.9g",
+      "voltageInput": "DC 5-17V",
+      "minIllumination": "0.1Lux"
+    },
+    "RunCam Phoenix 2 Joshua Bardwell": {
+      "sensorSize": "1/2 inch",
+      "resolution": "1000TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "2.1mm",
+      "weight": "8.5g",
+      "voltageInput": "DC 5-36V",
+      "minIllumination": "0.001Lux@F1.2",
+      "features": "JB Edition Tuning"
+    },
+    "Caddx Ant Lite": {
+      "sensorSize": "1/3 inch",
+      "resolution": "1200TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "2.1mm",
+      "weight": "3.9g",
+      "voltageInput": "DC 5-40V",
+      "minIllumination": "0.01Lux"
+    },
+    "Foxeer Micro Predator 5": {
+      "sensorSize": "1/2.8 inch",
+      "resolution": "1000TVL",
+      "aspectRatio": "4:3 / 16:9 Switchable",
+      "lens": "1.8mm",
+      "weight": "4.5g",
+      "voltageInput": "DC 5-40V",
+      "minIllumination": "0.01Lux"
+    }
+  },
+  "Props": {
+    "Gemfan 51433 (5.1x4.33x3)": {
+      "size": "5.1 inch",
+      "pitch": "4.33 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "3.8g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306"
+    },
+    "HQProp Ethix S5 (5x4x3)": {
+      "size": "5 inch",
+      "pitch": "4 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "3.6g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306"
+    },
+    "Dalprop Cyclone T5046C (5x4.6x3)": {
+      "size": "5 inch",
+      "pitch": "4.6 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "4.1g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306.5"
+    },
+    "Azure Power JohnnyFPV 5.1x4.6x3": {
+      "size": "5.1 inch",
+      "pitch": "4.6 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "4.2g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306.5"
+    },
+    "Ethix S3 (3x3x3)": {
+      "size": "3 inch",
+      "pitch": "3 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "1.8g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "1404, 1507"
+    },
+    "Gemfan D63 (2.5x2.5x5)": {
+      "size": "2.5 inch",
+      "pitch": "2.5 inch",
+      "blades": 5,
+      "material": "Polycarbonate",
+      "weight": "1.7g (per prop)",
+      "hubID": "1.5mm",
+      "recommendedMotorSize": "1103, 1104"
+    },
+    "HQProp 7x4x3": {
+      "size": "7 inch",
+      "pitch": "4 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "7.5g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2506, 2806.5"
+    },
+    "Gemfan Flash 4024 (4x2.4x3)": {
+      "size": "4 inch",
+      "pitch": "2.4 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "2.2g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "1404, 1507"
+    },
+    "Avan Rush 2.5 inch (2.5x1.9x3)": {
+      "size": "2.5 inch",
+      "pitch": "1.9 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "1.3g (per prop)",
+      "hubID": "1.5mm",
+      "recommendedMotorSize": "1103, 1104"
+    },
+    "Gemfan Hurricane 51499 (5.1x4.99x3)": {
+      "size": "5.1 inch",
+      "pitch": "4.99 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "4.0g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306"
+    },
+    "HQProp DP 5x4.3x3": {
+      "size": "5 inch",
+      "pitch": "4.3 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "3.9g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306"
+    },
+    "Gemfan Hulkie 5040": {
+      "size": "5 inch",
+      "pitch": "4.0 inch",
+      "blades": 4,
+      "material": "Polycarbonate",
+      "weight": "4.5g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306"
+    },
+    "Azure Power 5051 Tri-Blade": {
+      "size": "5 inch",
+      "pitch": "5.1 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "4.3g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "2207, 2306.5"
+    },
+    "Dalprop Cyclone T3045C": {
+      "size": "3 inch",
+      "pitch": "4.5 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "2.1g (per prop)",
+      "hubID": "5mm",
+      "recommendedMotorSize": "1404, 1408"
+    },
+    "Gemfan 2540": {
+      "size": "2.5 inch",
+      "pitch": "4.0 inch",
+      "blades": 3,
+      "material": "Polycarbonate",
+      "weight": "1.5g (per prop)",
+      "hubID": "1.5mm",
+      "recommendedMotorSize": "1103, 1104"
+    },
+    "HQProp 65mmX4 Ducted": {
+      "size": "2.5 inch",
+      "pitch": "3.0 inch",
+      "blades": 4,
+      "material": "Polycarbonate",
+      "weight": "2.2g (per prop)",
+      "hubID": "1.5mm",
+      "recommendedMotorSize": "1103, 1104"
+    }
+  },
+  "Batteries": {
+    "Tattu R-Line Version 5.0 1300mAh 6S 120C": {
+      "capacity": "1300mAh",
+      "voltage": "6S (22.2V)",
+      "cRating": "120C",
+      "weight": "210g",
+      "connector": "XT60",
+      "dimensions": "75x39x43mm"
+    },
+    "GNB 1500mAh 4S 100C": {
+      "capacity": "1500mAh",
+      "voltage": "4S (14.8V)",
+      "cRating": "100C",
+      "weight": "170g",
+      "connector": "XT60",
+      "dimensions": "75x35x35mm"
+    },
+    "CNHL Black Series 1200mAh 6S 100C": {
+      "capacity": "1200mAh",
+      "voltage": "6S (22.2V)",
+      "cRating": "100C",
+      "weight": "195g",
+      "connector": "XT60",
+      "dimensions": "70x38x40mm"
+    },
+    "RDQ Series 1100mAh 6S 100C": {
+      "capacity": "1100mAh",
+      "voltage": "6S (22.2V)",
+      "cRating": "100C",
+      "weight": "180g",
+      "connector": "XT60",
+      "dimensions": "68x37x38mm"
+    },
+    "Tattu R-Line Version 4.0 850mAh 4S 95C": {
+      "capacity": "850mAh",
+      "voltage": "4S (14.8V)",
+      "cRating": "95C",
+      "weight": "105g",
+      "connector": "XT30",
+      "dimensions": "58x30x30mm"
+    },
+    "GNB 300mAh 1S 80C": {
+      "capacity": "300mAh",
+      "voltage": "1S (3.7V)",
+      "cRating": "80C",
+      "weight": "8g",
+      "connector": "PH2.0",
+      "dimensions": "65x12x6mm"
+    },
+    "Tattu R-Line 1050mAh 4S 95C": {
+      "capacity": "1050mAh",
+      "voltage": "4S (14.8V)",
+      "cRating": "95C",
+      "weight": "130g",
+      "connector": "XT60",
+      "dimensions": "65x30x30mm"
+    },
+    "CNHL G+Plus 2200mAh 6S 120C": {
+      "capacity": "2200mAh",
+      "voltage": "6S (22.2V)",
+      "cRating": "120C",
+      "weight": "340g",
+      "connector": "XT60",
+      "dimensions": "105x45x45mm"
+    },
+    "Lumenier 1500mAh 5S 95C": {
+      "capacity": "1500mAh",
+      "voltage": "5S (18.5V)",
+      "cRating": "95C",
+      "weight": "230g",
+      "connector": "XT60",
+      "dimensions": "70x38x40mm"
+    },
+    "RDQ Series 650mAh 4S 100C": {
+      "capacity": "650mAh",
+      "voltage": "4S (14.8V)",
+      "cRating": "100C",
+      "weight": "75g",
+      "connector": "XT30",
+      "dimensions": "55x25x20mm"
+    },
+    "CNHL MiniStar 450mAh 3S 70C": {
+      "capacity": "450mAh",
+      "voltage": "3S (11.1V)",
+      "cRating": "70C",
+      "weight": "45g",
+      "connector": "XT30",
+      "dimensions": "50x20x15mm"
+    },
+    "Tattu R-Line 550mAh 3S 95C": {
+      "capacity": "550mAh",
+      "voltage": "3S (11.1V)",
+      "cRating": "95C",
+      "weight": "55g",
+      "connector": "XT30",
+      "dimensions": "52x22x18mm"
+    },
+    "GNB 1800mAh 5S 120C": {
+      "capacity": "1800mAh",
+      "voltage": "5S (18.5V)",
+      "cRating": "120C",
+      "weight": "275g",
+      "connector": "XT60",
+      "dimensions": "85x40x42mm"
+    },
+    "HGLRC 520mAh 2S 80C": {
+      "capacity": "520mAh",
+      "voltage": "2S (7.4V)",
+      "cRating": "80C",
+      "weight": "35g",
+      "connector": "PH2.0",
+      "dimensions": "55x18x10mm"
+    },
+    "BetaFPV 350mAh 2S 75C": {
+      "capacity": "350mAh",
+      "voltage": "2S (7.4V)",
+      "cRating": "75C",
+      "weight": "25g",
+      "connector": "PH2.0",
+      "dimensions": "50x15x8mm"
+    },
+    "Turnigy Graphene 1000mAh 4S 65C": {
+      "capacity": "1000mAh",
+      "voltage": "4S (14.8V)",
+      "cRating": "65C",
+      "weight": "115g",
+      "connector": "XT60",
+      "dimensions": "70x35x25mm"
+    },
+    "CNHL Black Series 1100mAh 6S 100C": {
+      "capacity": "1100mAh",
+      "voltage": "6S (22.2V)",
+      "cRating": "100C",
+      "weight": "195g",
+      "connector": "XT60",
+      "dimensions": "70x35x35mm"
+    },
+    "Lipo King 1800mAh 4S 90C": {
+      "capacity": "1800mAh",
+      "voltage": "4S (14.8V)",
+      "cRating": "90C",
+      "weight": "185g",
+      "connector": "XT60",
+      "dimensions": "105x35x30mm"
+    },
+    "ISDT 300mAh 1S 40C HV": {
+      "capacity": "300mAh",
+      "voltage": "1S (3.8V HV)",
+      "cRating": "40C",
+      "weight": "8g",
+      "connector": "BT2.0",
+      "dimensions": "35x15x6mm"
+    },
+    "Ruko 850mAh 3S 80C": {
+      "capacity": "850mAh",
+      "voltage": "3S (11.1V)",
+      "cRating": "80C",
+      "weight": "85g",
+      "connector": "XT30",
+      "dimensions": "65x25x20mm"
+    },
+    "Ovonic 2200mAh 4S 50C": {
+      "capacity": "2200mAh",
+      "voltage": "4S (14.8V)",
+      "cRating": "50C",
+      "weight": "245g",
+      "connector": "XT60",
+      "dimensions": "110x40x35mm"
+    }
+  },
+  "Simple Weight": {
+    "Example Custom Weight": {
+      "weight": "10g",
+      "description": "Example custom component"
+    }
+  }
+}
