@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 
 interface Comment {
@@ -106,7 +107,7 @@ export default function Comments({ buildId, partId, className = '' }: CommentsPr
       <div className="flex gap-3">
         <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
           {comment.user.image ? (
-            <img src={comment.user.image} alt={comment.user.username} className="w-8 h-8 rounded-full" />
+            <Image src={comment.user.image} alt={comment.user.username} width={32} height={32} className="w-8 h-8 rounded-full" />
           ) : (
             comment.user.username?.[0]?.toUpperCase() || 'U'
           )}
@@ -152,7 +153,7 @@ export default function Comments({ buildId, partId, className = '' }: CommentsPr
             <div className="flex gap-3">
               <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
                 {session.user?.image ? (
-                  <img src={session.user.image} alt="Your avatar" className="w-8 h-8 rounded-full" />
+                  <Image src={session.user.image} alt="Your avatar" width={32} height={32} className="w-8 h-8 rounded-full" />
                 ) : (
                   'U'
                 )}
