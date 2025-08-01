@@ -17,9 +17,9 @@ interface UserProfile {
 }
 
 interface ProfileEditPageProps {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 }
 
 export default function ProfileEditPage({ params }: ProfileEditPageProps) {
@@ -28,6 +28,16 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [username, setUsername] = useState<string>('');
+
+  // Resolve params Promise
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setUsername(resolvedParams.username);
+    };
+    resolveParams();
+  }, [params]);
   const [formData, setFormData] = useState({
     bio: '',
     location: '',
@@ -39,8 +49,10 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
+      if (!username) return; // Wait for username to be resolved
+      
       try {
-        const response = await fetch(`/api/users/${params.username}`);
+        const response = await fetch(`/api/users/${username}`);
         if (response.ok) {
           const data = await response.json();
           const userData = data.profile;
@@ -62,14 +74,14 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
     };
 
     fetchUser();
-  }, [params.username]);
+  }, [username]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
     try {
-      const response = await fetch(`/api/users/${params.username}`, {
+      const response = await fetch(`/api/users/${username}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +92,7 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
       if (response.ok) {
         const data = await response.json();
         // If username was changed, redirect to new username URL
-        const newUsername = data.profile.username || params.username;
+        const newUsername = data.profile.username || username;
         router.push(`/profile/${newUsername}`);
       } else {
         alert('Failed to update profile');
@@ -139,7 +151,7 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
               <p className="text-gray-600 mt-1">Update your public profile information</p>
             </div>
             <button
-              onClick={() => router.push(`/profile/${params.username}`)}
+              onClick={() => router.push(`/profile/${username}`)}
               className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               Cancel
@@ -243,7 +255,7 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={() => router.push(`/profile/${params.username}`)}
+              onClick={() => router.push(`/profile/${username}`)}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
             >
               Cancel
