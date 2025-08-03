@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 
 interface UserProfile {
   id: string;
-  name: string; // This will now be the username
+  name: string; 
   username?: string;
   bio?: string;
   location?: string;

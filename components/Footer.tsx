@@ -15,15 +15,9 @@ export default function Footer() {
               The ultimate platform for FPV drone builders. Compare components, 
               estimate performance, and share your builds with the community.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-1">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 GitHub
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Discord
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Reddit
               </a>
             </div>
           </div>
@@ -43,14 +37,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a href="/components" className="text-gray-400 hover:text-white transition-colors">
                   Components
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Calculator
-                </a>
               </li>
             </ul>
           </div>
@@ -69,26 +60,17 @@ export default function Footer() {
                   Privacy Policy
                 </a>
               </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Cookie Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Contact Us
-                </a>
-              </li>
+
             </ul>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} DronePartPicker. All rights reserved.
+            © {new Date().getFullYear()} CodeZ. All rights reserved.
           </p>
           <p className="text-gray-400 text-sm mt-2 md:mt-0">
-            Made with ❤️ for the FPV community
+            Made with ❤️ by CodeZ for the FPV community
           </p>
         </div>
       </div>

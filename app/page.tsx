@@ -153,7 +153,6 @@ export default function Home() {
         // Check if this weight is already selected
         const isAlreadySelected = existingWeights.some(w => w.name === name);
         if (isAlreadySelected) {
-          // Remove it if already selected
           return {
             ...prev,
             customWeights: existingWeights.filter(w => w.name !== name)
@@ -207,7 +206,6 @@ export default function Home() {
         } else {
           window.location.href = `/dashboard`;
         }
-        // Optionally clear the build after saving
         // handleClearBuild();
       } else {
         throw new Error('Failed to save build');
