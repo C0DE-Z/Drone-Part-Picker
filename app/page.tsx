@@ -228,7 +228,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-2xl font-bold text-gray-900">DronePartPicker</h1>
             <AuthControls />
@@ -237,18 +237,18 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Performance Panel */}
         {performance && (
-          <div className="mb-6">
+          <div className="mb-6 w-full">
             <h2 className="text-2xl font-bold mb-4">Performance Analysis</h2>
             <PerformancePanel performance={performance} />
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-5 lg:grid-cols-4 gap-6">
           {/* Component Selection */}
-          <div className="lg:col-span-3">
+          <div className="xl:col-span-4 lg:col-span-3">
             <div className="bg-white rounded-lg shadow border">
               <div className="p-4 border-b">
                 <h3 className="text-xl font-bold">Component Selection</h3>
@@ -256,44 +256,46 @@ export default function Home() {
 
               {/* Component Tabs */}
               <div className="border-b bg-gray-50">
-                <nav className="flex overflow-x-auto p-2">
+                <nav className="flex overflow-x-auto p-2 scrollbar-hide">
                   {tabs.map((tab) => (
                     <button
                       key={String(tab.key)}
                       onClick={() => setActiveTab(tab.key)}
-                      className={`flex items-center gap-2 px-4 py-3 mx-1 rounded-lg transition-colors ${
+                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 mx-1 rounded-lg transition-colors whitespace-nowrap text-sm sm:text-base ${
                         activeTab === tab.key
                           ? 'bg-black text-white'
                           : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                       }`}
                     >
-                      <span>{tab.icon}</span>
-                      <span>{tab.label}</span>
+                      <span className="text-sm sm:text-base">{tab.icon}</span>
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className="sm:hidden text-xs">{tab.label.split(' ')[0]}</span>
                     </button>
                   ))}
                 </nav>
               </div>
 
               {/* Search */}
-              <div className="p-4 border-b flex gap-4">
+              <div className="p-4 border-b flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <input
                   type="text"
                   placeholder={`Search ${tabs.find(t => t.key === activeTab)?.label.toLowerCase()}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 px-4 py-2 bg-gray-50 border rounded-lg"
+                  className="flex-1 px-4 py-2 bg-gray-50 border rounded-lg text-sm sm:text-base"
                 />
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black"
+                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black whitespace-nowrap text-sm sm:text-base"
                 >
-                  + Add Custom
+                  <span className="sm:hidden">+ Add</span>
+                  <span className="hidden sm:inline">+ Add Custom</span>
                 </button>
               </div>
 
               {/* Component Grid */}
               <div className="p-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                   {Object.entries(getFilteredComponents(activeTab)).map(([name, component]) => {
                     const tabKeys: TabKey[] = ['Motors', 'Frames', 'Stacks', 'Camera', 'Props', 'Batteries', 'Simple Weight'];
                     if (!tabKeys.includes(activeTab as TabKey)) return null;
@@ -330,7 +332,7 @@ export default function Home() {
 
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="xl:col-span-1 lg:col-span-1">
             <BuildSummary
               selectedComponents={selectedComponents}
               onClearBuild={handleClearBuild}

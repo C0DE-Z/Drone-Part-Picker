@@ -85,7 +85,7 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
       </div>
 
       {/* Primary Flight Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
         <StatCard
           title="Max Thrust"
           value={performance.maxThrust}
@@ -112,16 +112,15 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
         />
         <StatCard
           title="Flight Time"
-          value={performance.estimatedFlightTime}
+          value={performance.hovering.hoverTime}
           unit="min"
-          subtitle={`Hover: ${performance.hovering.hoverTime}min`}
           icon="⏱️"
           color="text-green-600"
         />
       </div>
 
       {/* Detailed Performance Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Power & Performance */}
         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -177,7 +176,7 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
           🔋 Battery Information
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           <StatCard
             title="Voltage"
             value={`${performance.battery.cells}S`}
@@ -219,7 +218,7 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
           />
           <ProgressBar
             label="Flight Endurance"
-            value={performance.estimatedFlightTime}
+            value={performance.hovering.hoverTime}
             max={15}
             color="bg-green-500"
             unit=" min"
@@ -232,7 +231,7 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
           🔧 Compatibility Check
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {Object.entries({
             'Motor & Prop': performance.compatibility.propMotorMatch,
             'Voltage Match': performance.compatibility.voltageMatch,

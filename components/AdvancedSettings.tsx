@@ -8,26 +8,25 @@ interface AdvancedSettingsProps {
   onSettingsChange: (settings: AdvancedSettings) => void;
   isOpen: boolean;
   onToggle: () => void;
+  throttleMapUpload?: React.ReactNode;
 }
-
-export default function AdvancedSettingsComponent({ 
-  settings, 
-  onSettingsChange, 
-  isOpen, 
-  onToggle 
+export default function AdvancedSettingsComponent({
+  settings,
+  onSettingsChange,
+  isOpen,
+  onToggle,
+  throttleMapUpload
 }: AdvancedSettingsProps) {
   const [activeTab, setActiveTab] = useState<string>('environment');
 
   const handleNumberChange = (path: string, value: number) => {
     const pathArray = path.split('.');
     const newSettings = JSON.parse(JSON.stringify(settings));
-    
     let current = newSettings;
     for (let i = 0; i < pathArray.length - 1; i++) {
       current = current[pathArray[i]];
     }
     current[pathArray[pathArray.length - 1]] = value;
-    
     onSettingsChange(newSettings);
   };
 
@@ -119,6 +118,7 @@ export default function AdvancedSettingsComponent({
             </button>
           </div>
         </div>
+        {throttleMapUpload}
 
         {/* Tabs */}
         <div className="flex border-b bg-gray-50">

@@ -19,9 +19,9 @@ export class DroneCalculator {
     const powerConsumption = Math.round(this.estimatePowerConsumption(components, advancedSettings) * 10) / 10;
     const estimatedFlightTime = Math.round(this.estimateFlightTime(components, powerConsumption, advancedSettings) * 10) / 10;
     
-    const hovering = this.calculateHoveringMetrics(components, weights.total, thrust, advancedSettings);
-    const motors = this.getMotorMetrics(components, advancedSettings);
-    const battery = this.getBatteryMetrics(components, advancedSettings);
+    const hovering = this.calculateHoveringMetrics(components, weights.total, thrust);
+    const motors = this.getMotorMetrics(components);
+    const battery = this.getBatteryMetrics(components);
     
     const pricing = this.calculatePricing(components);
     const compatibility = this.checkCompatibility(components);
@@ -276,88 +276,75 @@ export class DroneCalculator {
     else if (twr >= 2.5) correctionFactor *= 1.05;
     else if (twr < 2.0) correctionFactor *= 0.9;
     
-    // Frame size influence
-    if (frameWheelbase <= 150) correctionFactor *= 1.15; // Tiny whoops are faster
-    else if (frameWheelbase <= 180) correctionFactor *= 1.1; // 3-4 inch
-    else if (frameWheelbase <= 220) correctionFactor *= 1.05; // 5 inch
-    else if (frameWheelbase <= 280) correctionFactor *= 1.0; // 6-7 inch
-    else correctionFactor *= 0.9; // Large frames
+    if (frameWheelbase <= 150) correctionFactor *= 1.15;
+    else if (frameWheelbase <= 180) correctionFactor *= 1.1;
+    else if (frameWheelbase <= 220) correctionFactor *= 1.05;
+    else if (frameWheelbase <= 280) correctionFactor *= 1.0;
+    else correctionFactor *= 0.9;
     
-    // Propeller optimization factor
     const pitchTooDiameterRatio = propPitch / propDiameter;
     if (pitchTooDiameterRatio >= 0.8 && pitchTooDiameterRatio <= 1.2) {
-      correctionFactor *= 1.1; // Well-matched prop
+      correctionFactor *= 1.1;
     } else if (pitchTooDiameterRatio < 0.6 || pitchTooDiameterRatio > 1.4) {
-      correctionFactor *= 0.85; // Poorly matched prop
+      correctionFactor *= 0.85;
     }
     
-    // Convert to km/h and apply corrections
     const topSpeedKmh = finalSpeed * 3.6 * correctionFactor;
     
-    // Realistic caps based on drone class
-    let maxRealisticSpeed = 200; // km/h
-    if (frameWheelbase <= 100) maxRealisticSpeed = 120; // Tiny whoop
-    else if (frameWheelbase <= 150) maxRealisticSpeed = 150; // 3 inch
-    else if (frameWheelbase <= 180) maxRealisticSpeed = 180; // 4 inch
-    else if (frameWheelbase <= 220) maxRealisticSpeed = 200; // 5 inch racing
-    else if (frameWheelbase <= 280) maxRealisticSpeed = 170; // 6-7 inch
-    else maxRealisticSpeed = 140; // Large frames
+    let maxRealisticSpeed = 200;
+    if (frameWheelbase <= 100) maxRealisticSpeed = 120;
+    else if (frameWheelbase <= 150) maxRealisticSpeed = 150;
+    else if (frameWheelbase <= 180) maxRealisticSpeed = 180;
+    else if (frameWheelbase <= 220) maxRealisticSpeed = 200;
+    else if (frameWheelbase <= 280) maxRealisticSpeed = 170;
+    else maxRealisticSpeed = 140;
     
     return Math.round(Math.min(topSpeedKmh, maxRealisticSpeed));
   }
 
   private static estimatePowerConsumption(components: SelectedComponents, settings: AdvancedSettings = defaultAdvancedSettings): number {
-    if (!components.motor || !components.stack) return 25; // Default fallback
+    if (!components.motor || !components.stack) return 25;
     
     const escRating = components.stack.data.escCurrentRating;
-    if (!escRating) return 25; // Default fallback
+    if (!escRating) return 25;
     
     const currentMatch = escRating.match(/(\d+)A/);
-    if (!currentMatch) return 25; // Default fallback
+    if (!currentMatch) return 25;
     
     const escMaxCurrent = parseInt(currentMatch[1]);
     const motorKV = components.motor.data.kv || 2000;
     const voltage = components.battery ? this.getBatteryVoltage(components.battery.data.voltage || '4S') : 14.8;
     
-    // Advanced motor and propeller specifications
-    const propDiameter = this.parseWeight(components.prop?.data.size) || 5; // inches
-    const propPitch = this.parseWeight(components.prop?.data.pitch) || 4.5; // inches
-    const motorStatorSize = this.parseWeight(components.motor.data.statorSize) || 22; // mm
-    const totalWeight = this.calculateWeights(components).total; // grams
+    const propDiameter = this.parseWeight(components.prop?.data.size) || 5;
+    const propPitch = this.parseWeight(components.prop?.data.pitch) || 4.5;
+    const motorStatorSize = this.parseWeight(components.motor.data.statorSize) || 22;
+    const totalWeight = this.calculateWeights(components).total;
     const frameWheelbase = this.parseWeight(components.frame?.data.wheelbase) || 220;
     
-    // Environmental factors
-    const airDensity = 1.225; // kg/m³ at sea level
-    const temperature = 20; // °C ambient temperature
-    const altitude = 0; // meters above sea level
+    const airDensity = 1.225;
+    const temperature = 20;
+    const altitude = 0;
     
-    // Advanced motor physics calculation
-    const diskArea = Math.PI * Math.pow((propDiameter * 0.0254) / 2, 2); // m²
-    const torqueConstant = (60 / (2 * Math.PI * motorKV)); // Nm/A
+    const diskArea = Math.PI * Math.pow((propDiameter * 0.0254) / 2, 2);
     
-    // Calculate required power for different flight phases
-    // 1. Hover power requirement
     const hoverThrustGrams = totalWeight;
     const hoverThrustNewtons = hoverThrustGrams * 0.001 * 9.81;
-    const hoverVelocity = Math.sqrt(hoverThrustNewtons / (2 * airDensity * diskArea)); // m/s
-    const idealHoverPower = hoverThrustNewtons * hoverVelocity; // Watts per motor
-    const figureOfMerit = 0.75; // Typical quadcopter hover efficiency
-    const realHoverPower = (idealHoverPower / figureOfMerit) / 4; // Watts per motor
+    const hoverVelocity = Math.sqrt(hoverThrustNewtons / (2 * airDensity * diskArea));
+    const idealHoverPower = hoverThrustNewtons * hoverVelocity;
+    const figureOfMerit = 0.75;
+    const realHoverPower = (idealHoverPower / figureOfMerit) / 4;
     
-    // 2. Sport/aggressive flying power requirement
-    const aggressiveThrustFactor = 2.2; // Sport flying thrust factor
-    const aggressivePower = realHoverPower * Math.pow(aggressiveThrustFactor, 1.5); // Non-linear power scaling
+    const aggressiveThrustFactor = 2.2;
+    const aggressivePower = realHoverPower * Math.pow(aggressiveThrustFactor, 1.5);
     
-    // 3. Mixed flying pattern (realistic usage)
-    const hoverTimeRatio = 0.30; // 30% hover
-    const cruiseTimeRatio = 0.45; // 45% cruise
-    const sportTimeRatio = 0.20; // 20% sport
-    const aggressiveTimeRatio = 0.05; // 5% aggressive
+    const hoverTimeRatio = 0.30;
+    const cruiseTimeRatio = 0.45;
+    const sportTimeRatio = 0.20;
+    const aggressiveTimeRatio = 0.05;
     
-    const cruisePower = realHoverPower * 1.4; // Cruise power
-    const sportPower = realHoverPower * 1.8; // Sport power
+    const cruisePower = realHoverPower * 1.4;
+    const sportPower = realHoverPower * 1.8;
     
-    // Weighted average power consumption
     const averageMechanicalPower = (
       realHoverPower * hoverTimeRatio +
       cruisePower * cruiseTimeRatio +
@@ -365,98 +352,76 @@ export class DroneCalculator {
       aggressivePower * aggressiveTimeRatio
     );
     
-    // Advanced motor efficiency modeling
-    let motorEfficiency = 0.85; // Base efficiency
+    let motorEfficiency = 0.85;
+    if (motorStatorSize >= 28) motorEfficiency = 0.90;
+    else if (motorStatorSize >= 25) motorEfficiency = 0.88;
+    else if (motorStatorSize >= 22) motorEfficiency = 0.85;
+    else if (motorStatorSize >= 20) motorEfficiency = 0.82;
+    else motorEfficiency = 0.78;
     
-    // Stator size efficiency curve
-    if (motorStatorSize >= 28) motorEfficiency = 0.90; // Large motors
-    else if (motorStatorSize >= 25) motorEfficiency = 0.88; // Medium-large motors
-    else if (motorStatorSize >= 22) motorEfficiency = 0.85; // Standard motors
-    else if (motorStatorSize >= 20) motorEfficiency = 0.82; // Small motors
-    else motorEfficiency = 0.78; // Very small motors
-    
-    // KV efficiency optimization
-    const optimalKV = 1400 + (voltage - 14.8) * 180; // Optimal KV for voltage
+    const optimalKV = 1400 + (voltage - 14.8) * 180;
     const kvDeviation = Math.abs(motorKV - optimalKV) / optimalKV;
-    if (kvDeviation > 0.4) motorEfficiency *= 0.88; // Significant efficiency penalty
-    else if (kvDeviation > 0.3) motorEfficiency *= 0.92; // Moderate penalty
-    else if (kvDeviation > 0.2) motorEfficiency *= 0.96; // Small penalty
-    else if (kvDeviation < 0.1) motorEfficiency *= 1.02; // Efficiency bonus for optimal KV
+    if (kvDeviation > 0.4) motorEfficiency *= 0.88;
+    else if (kvDeviation > 0.3) motorEfficiency *= 0.92;
+    else if (kvDeviation > 0.2) motorEfficiency *= 0.96;
+    else if (kvDeviation < 0.1) motorEfficiency *= 1.02;
     
-    // Propeller efficiency based on loading and design
-    const propLoading = totalWeight / (Math.PI * Math.pow(propDiameter * 0.0254 / 2, 2) * 4); // g/m² per prop
-    let propEfficiency = 0.80; // Base prop efficiency
+    const propLoading = totalWeight / (Math.PI * Math.pow(propDiameter * 0.0254 / 2, 2) * 4);
+    let propEfficiency = 0.80;
     
-    // Optimal prop loading curve
-    if (propLoading < 15) propEfficiency = 0.85; // Light loading
-    else if (propLoading < 25) propEfficiency = 0.82; // Optimal loading
-    else if (propLoading < 35) propEfficiency = 0.80; // Standard loading
-    else if (propLoading < 45) propEfficiency = 0.77; // High loading
-    else propEfficiency = 0.73; // Very high loading
+    if (propLoading < 15) propEfficiency = 0.85;
+    else if (propLoading < 25) propEfficiency = 0.82;
+    else if (propLoading < 35) propEfficiency = 0.80;
+    else if (propLoading < 45) propEfficiency = 0.77;
+    else propEfficiency = 0.73;
     
-    // Pitch-to-diameter ratio optimization
     const pitchToDiameterRatio = propPitch / propDiameter;
     let propDesignFactor = 1.0;
     if (pitchToDiameterRatio >= 0.85 && pitchToDiameterRatio <= 1.15) {
-      propDesignFactor = 1.08; // Optimal design
+      propDesignFactor = 1.08;
     } else if (pitchToDiameterRatio >= 0.75 && pitchToDiameterRatio <= 1.25) {
-      propDesignFactor = 1.04; // Good design
+      propDesignFactor = 1.04;
     } else if (pitchToDiameterRatio < 0.6 || pitchToDiameterRatio > 1.4) {
-      propDesignFactor = 0.92; // Poor design
+      propDesignFactor = 0.92;
     }
     propEfficiency *= propDesignFactor;
     
-    // Calculate electrical power requirement
     const mechanicalPowerPerMotor = averageMechanicalPower / propEfficiency;
     const electricalPowerPerMotor = mechanicalPowerPerMotor / motorEfficiency;
-    
-    // Current calculation with advanced losses
     const baseCurrentPerMotor = electricalPowerPerMotor / voltage;
     
-    // ESC efficiency modeling
-    let escEfficiency = 0.95; // Modern ESC efficiency
-    if (escMaxCurrent >= 60) escEfficiency = 0.96; // High-end ESCs
-    else if (escMaxCurrent >= 40) escEfficiency = 0.95; // Standard ESCs
-    else if (escMaxCurrent >= 25) escEfficiency = 0.93; // Budget ESCs
-    else escEfficiency = 0.90; // Low-end ESCs
+    let escEfficiency = 0.95;
+    if (escMaxCurrent >= 60) escEfficiency = 0.96;
+    else if (escMaxCurrent >= 40) escEfficiency = 0.95;
+    else if (escMaxCurrent >= 25) escEfficiency = 0.93;
+    else escEfficiency = 0.90;
     
-    // System losses (wiring, connectors, etc.)
     const systemEfficiency = 0.92;
     const totalSystemEfficiency = escEfficiency * systemEfficiency;
-    
     const currentPerMotor = baseCurrentPerMotor / totalSystemEfficiency;
     
-    // Flight style multipliers based on build characteristics
     let flightStyleMultiplier = 1.0;
-    const powerToWeightRatio = (electricalPowerPerMotor * 4) / (totalWeight / 1000); // W/kg
+    const powerToWeightRatio = (electricalPowerPerMotor * 4) / (totalWeight / 1000);
     
-    // Advanced flight style modeling
     if (motorKV >= 2600 && frameWheelbase <= 200) {
-      // Racing builds - aggressive flying capability
       flightStyleMultiplier = 1.12;
     } else if (motorKV >= 2400 && frameWheelbase <= 220) {
-      // High-performance freestyle
       flightStyleMultiplier = 1.08;
     } else if (motorKV >= 2200 && frameWheelbase <= 250) {
-      // Freestyle builds
       flightStyleMultiplier = 1.05;
     } else if (motorKV >= 2000 && frameWheelbase <= 280) {
-      // Sport builds
       flightStyleMultiplier = 1.02;
     } else if (motorKV >= 1600) {
-      // Cinematic/efficient builds
       flightStyleMultiplier = 0.95;
     } else if (motorKV >= 1200) {
-      // Long-range builds
       flightStyleMultiplier = 0.90;
     } else {
-      // Ultra long-range builds
       flightStyleMultiplier = 0.85;
     }
     
-    if (powerToWeightRatio > 200) flightStyleMultiplier *= 1.05; // Very powerful builds
+    if (powerToWeightRatio > 200) flightStyleMultiplier *= 1.05;
     else if (powerToWeightRatio > 150) flightStyleMultiplier *= 1.02;
-    else if (powerToWeightRatio < 80) flightStyleMultiplier *= 0.95; // Low power builds
+    else if (powerToWeightRatio < 80) flightStyleMultiplier *= 0.95;
     
     let environmentalFactor = 1.0;
     if (altitude > 2000) environmentalFactor *= 1.08; // High altitude = more power needed
@@ -467,10 +432,8 @@ export class DroneCalculator {
     
     // Apply all factors
     const adjustedCurrentPerMotor = currentPerMotor * flightStyleMultiplier * environmentalFactor;
-    const totalCurrent = adjustedCurrentPerMotor * 4; // 4 motors
     
-    // Safety limits and ESC constraints
-    const escSafeLimit = escMaxCurrent * 0.85; // 85% of ESC rating for safety
+    const escSafeLimit = escMaxCurrent * 0.85;
     const cappedCurrentPerMotor = Math.min(adjustedCurrentPerMotor, escSafeLimit);
     const finalTotalCurrent = cappedCurrentPerMotor * 4;
     
@@ -508,30 +471,25 @@ export class DroneCalculator {
     const capacityMatch = components.battery.data.capacity.match(/(\d+)/);
     if (!capacityMatch) return 0;
     
-    const capacity = parseInt(capacityMatch[1]); // mAh
+    const capacity = parseInt(capacityMatch[1]);
     const cRatingStr = components.battery.data.cRating || '50C';
     const cRating = parseInt(cRatingStr.match(/(\d+)/)?.[1] || '50');
     const cells = parseInt(components.battery.data.voltage?.match(/(\d+)S/)?.[1] || '4');
     const validPowerConsumption = powerConsumption > 0 ? powerConsumption : 25;
     
-    // Use configurable environmental factors
     const { altitude, temperature, windSpeed } = settings.environment;
     
-    // 1. Advanced usable capacity calculation
     let usableCapacityFactor = settings.battery.usableCapacityFactor;
     
-    // Discharge rate factor with advanced curve modeling
-    const dischargeRate = validPowerConsumption / capacity; // C rate
-    if (dischargeRate > 4.0) usableCapacityFactor *= 0.70; // Extreme discharge
-    else if (dischargeRate > 3.0) usableCapacityFactor *= 0.75; // Very high discharge
-    else if (dischargeRate > 2.0) usableCapacityFactor *= 0.80; // High discharge
-    else if (dischargeRate > 1.5) usableCapacityFactor *= 0.83; // Moderate-high discharge
-    else if (dischargeRate > 1.0) usableCapacityFactor *= 0.87; // Moderate discharge
-    else if (dischargeRate > 0.5) usableCapacityFactor *= 0.90; // Low discharge
-    else usableCapacityFactor *= 0.93; // Very low discharge
+    const dischargeRate = validPowerConsumption / capacity;
+    if (dischargeRate > 4.0) usableCapacityFactor *= 0.70;
+    else if (dischargeRate > 3.0) usableCapacityFactor *= 0.75;
+    else if (dischargeRate > 2.0) usableCapacityFactor *= 0.80;
+    else if (dischargeRate > 1.5) usableCapacityFactor *= 0.83;
+    else if (dischargeRate > 1.0) usableCapacityFactor *= 0.87;
+    else if (dischargeRate > 0.5) usableCapacityFactor *= 0.90;
+    else usableCapacityFactor *= 0.93;
     
-    // 2. Advanced environmental factors using settings
-    // Temperature effects on battery chemistry
     let temperatureFactor = 1.0;
     const tempSettings = settings.battery.temperatureEfficiency;
     if (temperature < 0) temperatureFactor = tempSettings.freezing;
@@ -542,22 +500,18 @@ export class DroneCalculator {
     else if (temperature <= 45) temperatureFactor = tempSettings.hot;
     else temperatureFactor = tempSettings.extreme;
     
-    // Altitude effects (air density and motor efficiency)
     let altitudeFactor = 1.0;
-    if (altitude > 3000) altitudeFactor = 0.85; // High altitude (reduced air density)
+    if (altitude > 3000) altitudeFactor = 0.85;
     else if (altitude > 2000) altitudeFactor = 0.92;
     else if (altitude > 1000) altitudeFactor = 0.96;
     
-    // Wind resistance factor
     let windFactor = 1.0;
-    if (windSpeed > 30) windFactor = 0.75; // Strong winds
-    else if (windSpeed > 20) windFactor = 0.85; // Moderate winds
-    else if (windSpeed > 10) windFactor = 0.95; // Light winds
+    if (windSpeed > 30) windFactor = 0.75;
+    else if (windSpeed > 20) windFactor = 0.85;
+    else if (windSpeed > 10) windFactor = 0.95;
     
-    // Battery age modeling (configurable)
     const batteryAge = settings.battery.ageFactor;
     
-    // 3. Advanced battery chemistry modeling
     let chemistryFactor = 1.0;
     
     // Capacity-based chemistry quality
@@ -682,15 +636,12 @@ export class DroneCalculator {
     else if (frameWheelbase <= 280) systemEfficiencyFactor *= 0.98; // 6-7 inch
     else systemEfficiencyFactor *= 0.94; // Large frame drag
     
-    // Motor efficiency at cruise power
     const motorStatorSize = this.parseWeight(components.motor?.data.statorSize) || 22;
-    const cruisePowerRatio = validPowerConsumption / (motorKV * 0.1); // Rough cruise efficiency
     
-    if (motorStatorSize >= 28) systemEfficiencyFactor *= 1.04; // Large efficient motors
-    else if (motorStatorSize >= 25) systemEfficiencyFactor *= 1.02; // Medium-large motors
-    else if (motorStatorSize <= 18) systemEfficiencyFactor *= 0.96; // Small motors less efficient
+    if (motorStatorSize >= 28) systemEfficiencyFactor *= 1.04;
+    else if (motorStatorSize >= 25) systemEfficiencyFactor *= 1.02;
+    else if (motorStatorSize <= 18) systemEfficiencyFactor *= 0.96;
     
-    // Calculate effective capacity with all factors
     const effectiveCapacity = capacity * 
       usableCapacityFactor * 
       temperatureFactor * 
@@ -703,47 +654,40 @@ export class DroneCalculator {
       voltageSagFactor * 
       systemEfficiencyFactor;
     
-    // Calculate base flight time
     const baseFlightTimeMinutes = (effectiveCapacity / 1000) / validPowerConsumption * 60;
     
-    // Apply flight style factor
     const adjustedFlightTime = baseFlightTimeMinutes * flightStyleFactor;
     
-    // Advanced realistic caps with build-specific considerations
-    let maxRealisticTime = 35; // Base realistic maximum
+    let maxRealisticTime = 35;
     
-    // Capacity-based maximums with quality considerations
-    if (capacity >= 2500) maxRealisticTime = 55; // Very large batteries
-    else if (capacity >= 2200) maxRealisticTime = 50; // Large premium batteries
-    else if (capacity >= 1800) maxRealisticTime = 45; // Large batteries
-    else if (capacity >= 1500) maxRealisticTime = 40; // Medium-large batteries
-    else if (capacity >= 1300) maxRealisticTime = 38; // Standard large batteries
-    else if (capacity >= 1100) maxRealisticTime = 32; // Medium batteries
-    else if (capacity >= 850) maxRealisticTime = 25; // Small-medium batteries
-    else if (capacity >= 650) maxRealisticTime = 20; // Small batteries
-    else if (capacity >= 450) maxRealisticTime = 15; // Tiny batteries
-    else maxRealisticTime = 10; // Very small batteries
+    if (capacity >= 2500) maxRealisticTime = 55;
+    else if (capacity >= 2200) maxRealisticTime = 50;
+    else if (capacity >= 1800) maxRealisticTime = 45;
+    else if (capacity >= 1500) maxRealisticTime = 40;
+    else if (capacity >= 1300) maxRealisticTime = 38;
+    else if (capacity >= 1100) maxRealisticTime = 32;
+    else if (capacity >= 850) maxRealisticTime = 25;
+    else if (capacity >= 650) maxRealisticTime = 20;
+    else if (capacity >= 450) maxRealisticTime = 15;
+    else maxRealisticTime = 10;
     
-    // Build type and usage pattern adjustments
     if (motorKV >= 2600 && frameWheelbase <= 200) {
-      maxRealisticTime *= 0.75; // Racing builds - very aggressive
+      maxRealisticTime *= 0.75;
     } else if (motorKV >= 2400 && frameWheelbase <= 220) {
-      maxRealisticTime *= 0.82; // High-performance freestyle
+      maxRealisticTime *= 0.82;
     } else if (motorKV >= 2200 && frameWheelbase <= 250) {
-      maxRealisticTime *= 0.88; // Freestyle builds
+      maxRealisticTime *= 0.88;
     } else if (motorKV >= 2000) {
-      maxRealisticTime *= 0.92; // Sport builds
+      maxRealisticTime *= 0.92;
     } else if (motorKV <= 1600) {
-      maxRealisticTime *= 1.08; // Long-range efficient builds
+      maxRealisticTime *= 1.08;
     } else if (motorKV <= 1200) {
-      maxRealisticTime *= 1.15; // Ultra long-range builds
+      maxRealisticTime *= 1.15;
     }
     
-    // Power-to-weight final adjustment
-    if (powerToWeightRatio > 180) maxRealisticTime *= 0.90; // Very high power builds
-    else if (powerToWeightRatio < 100) maxRealisticTime *= 1.10; // Efficient builds
+    if (powerToWeightRatio > 180) maxRealisticTime *= 0.90;
+    else if (powerToWeightRatio < 100) maxRealisticTime *= 1.10;
     
-    // Final result with realistic bounds
     const finalTime = Math.min(adjustedFlightTime, maxRealisticTime);
     
     return Math.max(0.5, Math.round(finalTime * 10) / 10);
@@ -836,15 +780,15 @@ export class DroneCalculator {
       customWeights: 0
     };
 
-    // Calculate motor price (4 motors)
+    
     if (components.motor?.data.price) {
       breakdown.motor = components.motor.data.price * 4;
     } else if (components.motor) {
-      // Estimate price based on component type if no price data
+      
       breakdown.motor = this.estimateComponentPrice('motor', components.motor.data as unknown as ComponentData) * 4;
     }
 
-    // Calculate other component prices
+    
     if (components.frame?.data.price) {
       breakdown.frame = components.frame.data.price;
     } else if (components.frame) {
@@ -864,9 +808,9 @@ export class DroneCalculator {
     }
 
     if (components.prop?.data.price) {
-      breakdown.prop = components.prop.data.price * 4; // 4 props
+  breakdown.prop = components.prop.data.price * 4;
     } else if (components.prop) {
-      breakdown.prop = this.estimateComponentPrice('prop', components.prop.data as unknown as ComponentData) * 4;
+  breakdown.prop = this.estimateComponentPrice('prop', components.prop.data as unknown as ComponentData) * 4;
     }
 
     if (components.battery?.data.price) {
@@ -875,67 +819,67 @@ export class DroneCalculator {
       breakdown.battery = this.estimateComponentPrice('battery', components.battery.data as unknown as ComponentData);
     }
 
-    // Calculate custom weights price
+    
     if (components.customWeights) {
       breakdown.customWeights = components.customWeights.reduce((total, weight) => {
         return total + (weight.data.price || this.estimateComponentPrice('customWeight', weight.data as unknown as ComponentData));
       }, 0);
     }
 
-    const total = Object.values(breakdown).reduce((sum, price) => sum + price, 0);
+  const total = Object.values(breakdown).reduce((sum, price) => sum + price, 0);
 
     return {
-      total: Math.round(total * 100) / 100, // Round to 2 decimals
+      total: Math.round(total * 100) / 100,
       breakdown
     };
   }
 
   private static estimateComponentPrice(type: string, data: ComponentData): number {
-    // Basic price estimation logic based on component specifications
+    
     switch (type) {
       case 'motor':
         const kv = data.kv || 2000;
         const statorSizeStr = typeof data.statorSize === 'string' ? data.statorSize : String(data.statorSize || '20');
         const statorSize = parseFloat(statorSizeStr.replace(/[^\d.]/g, '') || '20');
-        return Math.round((statorSize * 2 + Number(kv) * 0.01) * 0.8); // Rough estimation
+  return Math.round((statorSize * 2 + Number(kv) * 0.01) * 0.8);
 
       case 'frame':
         const materialStr = typeof data.material === 'string' ? data.material : String(data.material || '');
         const material = materialStr.toLowerCase();
         const wheelbaseStr = typeof data.wheelbase === 'string' ? data.wheelbase : String(data.wheelbase || '220');
         const wheelbase = parseFloat(wheelbaseStr.replace(/[^\d]/g, '') || '220');
-        let framePrice = wheelbase * 0.2;
-        if (material.includes('carbon')) framePrice *= 1.5;
-        if (material.includes('titanium')) framePrice *= 2;
-        return Math.round(framePrice);
+  let framePrice = wheelbase * 0.2;
+  if (material.includes('carbon')) framePrice *= 1.5;
+  if (material.includes('titanium')) framePrice *= 2;
+  return Math.round(framePrice);
 
       case 'stack':
         const processorStr = typeof data.fcProcessor === 'string' ? data.fcProcessor : String(data.fcProcessor || '');
         const processor = processorStr.toLowerCase();
         const escRatingStr = typeof data.escCurrentRating === 'string' ? data.escCurrentRating : String(data.escCurrentRating || '30');
         const escRating = parseFloat(escRatingStr.replace(/[^\d]/g, '') || '30');
-        let stackPrice = escRating * 2;
-        if (processor.includes('f7')) stackPrice *= 1.5;
-        if (processor.includes('f4')) stackPrice *= 1.2;
-        return Math.round(stackPrice);
+  let stackPrice = escRating * 2;
+  if (processor.includes('f7')) stackPrice *= 1.5;
+  if (processor.includes('f4')) stackPrice *= 1.2;
+  return Math.round(stackPrice);
 
       case 'camera':
         const resolutionStr = typeof data.resolution === 'string' ? data.resolution : String(data.resolution || '');
         const resolution = resolutionStr.toLowerCase();
-        let cameraPrice = 25;
-        if (resolution.includes('4k')) cameraPrice = 45;
-        if (resolution.includes('1080p')) cameraPrice = 30;
-        if (resolution.includes('720p')) cameraPrice = 20;
-        return cameraPrice;
+  let cameraPrice = 25;
+  if (resolution.includes('4k')) cameraPrice = 45;
+  if (resolution.includes('1080p')) cameraPrice = 30;
+  if (resolution.includes('720p')) cameraPrice = 20;
+  return cameraPrice;
 
       case 'prop':
         const sizeStr = typeof data.size === 'string' ? data.size : String(data.size || '5');
         const propSize = parseFloat(sizeStr.replace(/[^\d.]/g, '') || '5');
         const materialPropStr = typeof data.material === 'string' ? data.material : String(data.material || '');
         const material_prop = materialPropStr.toLowerCase();
-        let propPrice = propSize * 0.8;
-        if (material_prop.includes('carbon')) propPrice *= 2;
-        return Math.round(propPrice * 100) / 100;
+  let propPrice = propSize * 0.8;
+  if (material_prop.includes('carbon')) propPrice *= 2;
+  return Math.round(propPrice * 100) / 100;
 
       case 'battery':
         const capacityStr = typeof data.capacity === 'string' ? data.capacity : String(data.capacity || '1300');
@@ -946,14 +890,14 @@ export class DroneCalculator {
         return Math.round((capacity / 100) * cells * 0.5);
 
       case 'customWeight':
-        return data.price || 5; // Default small price for custom weights
+  return data.price || 5;
 
       default:
         return 0;
     }
   }
 
-  private static calculateHoveringMetrics(components: SelectedComponents, totalWeight: number, maxThrust: number, settings: AdvancedSettings = defaultAdvancedSettings): {
+  private static calculateHoveringMetrics(components: SelectedComponents, totalWeight: number, maxThrust: number): {
     throttlePercentage: number;
     currentDraw: number;
     hoverTime: number;
@@ -1063,11 +1007,11 @@ export class DroneCalculator {
     return {
       throttlePercentage: Math.round(hoverThrottlePercentage),
       currentDraw: finalHoverCurrent,
-      hoverTime: Math.round(Math.max(0.5, hoverTime) * 10) / 10
+      hoverTime: Math.round(Math.max(0.0, hoverTime) * 10) / 10
     };
   }
 
-  private static getMotorMetrics(components: SelectedComponents, settings: AdvancedSettings = defaultAdvancedSettings): {
+  private static getMotorMetrics(components: SelectedComponents): {
     kv: number;
     voltage: number;
     estimatedRPM: number;
@@ -1086,7 +1030,7 @@ export class DroneCalculator {
     };
   }
 
-  private static getBatteryMetrics(components: SelectedComponents, settings: AdvancedSettings = defaultAdvancedSettings): {
+  private static getBatteryMetrics(components: SelectedComponents): {
     voltage: number;
     capacity: number;
     cells: number;

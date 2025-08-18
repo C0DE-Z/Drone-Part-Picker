@@ -126,13 +126,12 @@ model CustomPart {
   id          String   @id @default(cuid())
   name        String
   description String?
-  category    String   // "Motors", "Frames", "Stacks", etc.
-  specifications Json   // Store all the specs as JSON
+  category    String   
+  specifications Json   
   isPublic    Boolean  @default(false)
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Social features
   likes       Like[]
   comments    Comment[]
   viewCount   Int      @default(0)
@@ -170,13 +169,11 @@ model Comment {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Polymorphic relation - can comment on either builds or parts
   buildId   String?
   build     DroneBuild? @relation(fields: [buildId], references: [id], onDelete: Cascade)
   partId    String?
   part      CustomPart? @relation(fields: [partId], references: [id], onDelete: Cascade)
   
-  // Nested comments support
   parentId  String?
   parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[] @relation("CommentReplies")

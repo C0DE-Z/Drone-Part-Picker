@@ -211,7 +211,7 @@ export default function BuildDetails({ params }: { params: Promise<{ id: string 
                 {build.performance.flightTime && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Flight Time:</span>
-                    <span className="text-gray-900 font-medium">{build.performance.flightTime.toFixed(1)}min</span>
+                    <span className="text-gray-900 font-medium">{build.performance.flightTime.toFixed(1)} min</span>
                   </div>
                 )}
                 {build.performance.powerConsumption && (

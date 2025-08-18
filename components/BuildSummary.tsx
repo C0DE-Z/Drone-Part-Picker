@@ -43,74 +43,74 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
 
       <div className="space-y-4">
         {selectedComponents.motor && (
-          <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+            <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
               <span className="text-lg">⚡</span>
               <span className="font-semibold text-black">Motor</span>
             </div>
-            <span className="text-sm text-gray-600 font-medium truncate max-w-40 text-right ml-2">{selectedComponents.motor.name}</span>
+            <span className="text-sm text-gray-600 font-medium break-words whitespace-normal w-full sm:w-auto mt-2 sm:mt-0">{selectedComponents.motor.name}</span>
           </div>
         )}
 
         {selectedComponents.frame && (
-          <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+            <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
               <span className="text-lg">🔧</span>
               <span className="font-semibold text-black">Frame</span>
             </div>
-            <span className="text-sm text-gray-600 font-medium truncate max-w-40 text-right ml-2">{selectedComponents.frame.name}</span>
+            <span className="text-sm text-gray-600 font-medium break-words whitespace-normal w-full sm:w-auto mt-2 sm:mt-0">{selectedComponents.frame.name}</span>
           </div>
         )}
 
         {selectedComponents.stack && (
-          <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+            <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
               <span className="text-lg">💻</span>
               <span className="font-semibold text-black">Flight Controller</span>
             </div>
-            <span className="text-sm text-gray-600 font-medium truncate max-w-40 text-right ml-2">{selectedComponents.stack.name}</span>
+            <span className="text-sm text-gray-600 font-medium break-words whitespace-normal w-full sm:w-auto mt-2 sm:mt-0">{selectedComponents.stack.name}</span>
           </div>
         )}
 
         {selectedComponents.camera && (
-          <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+            <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
               <span className="text-lg">📹</span>
               <span className="font-semibold text-black">Camera</span>
             </div>
-            <span className="text-sm text-gray-600 font-medium truncate max-w-40 text-right ml-2">{selectedComponents.camera.name}</span>
+            <span className="text-sm text-gray-600 font-medium break-words whitespace-normal w-full sm:w-auto mt-2 sm:mt-0">{selectedComponents.camera.name}</span>
           </div>
         )}
 
         {selectedComponents.prop && (
-          <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+            <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
               <span className="text-lg">🌀</span>
               <span className="font-semibold text-black">Propeller</span>
             </div>
-            <span className="text-sm text-gray-600 font-medium truncate max-w-40 text-right ml-2">{selectedComponents.prop.name}</span>
+            <span className="text-sm text-gray-600 font-medium break-words whitespace-normal w-full sm:w-auto mt-2 sm:mt-0">{selectedComponents.prop.name}</span>
           </div>
         )}
 
         {selectedComponents.battery && (
-          <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+            <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
               <span className="text-lg">🔋</span>
               <span className="font-semibold text-black">Battery</span>
             </div>
-            <span className="text-sm text-gray-600 font-medium truncate max-w-40 text-right ml-2">{selectedComponents.battery.name}</span>
+            <span className="text-sm text-gray-600 font-medium break-words whitespace-normal w-full sm:w-auto mt-2 sm:mt-0">{selectedComponents.battery.name}</span>
           </div>
         )}
 
         {selectedComponents.customWeights && selectedComponents.customWeights.length > 0 && (
           <div className="space-y-2">
             {selectedComponents.customWeights.map((weight, index) => (
-              <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div key={index} className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+                <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
                   <span className="text-lg">⚖️</span>
                   <span className="font-semibold text-black">Weight</span>
                 </div>
-                <span className="text-sm text-gray-600 font-medium truncate max-w-40 text-right ml-2">{weight.name}</span>
+                <span className="text-sm text-gray-600 font-medium break-words whitespace-normal w-full sm:w-auto mt-2 sm:mt-0">{weight.name}</span>
               </div>
             ))}
           </div>
