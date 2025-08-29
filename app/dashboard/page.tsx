@@ -109,7 +109,7 @@ export default function Dashboard() {
           </div>
         ) : builds.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-300 text-6xl mb-4">🚁</div>
+            <div className="text-gray-400 text-6xl mb-4">🚁</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No builds yet</h3>
             <p className="text-gray-500 mb-6">Create your first drone build to see it here</p>
             <Link

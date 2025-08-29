@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Motor, Frame, Stack, Camera, Prop, Battery, CustomWeight } from '@/types/drone';
 
 interface ComponentCardProps {
@@ -18,10 +18,21 @@ export default function ComponentCard({
   onSelect,
   isCompatible = true 
 }: ComponentCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSelect();
+  };
+
+  const handleExpandClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
   const getCardColor = () => {
-    if (isSelected) return 'border-black bg-gray-50 ring-2 ring-gray-200 shadow-md';
+    if (isSelected) return 'border-black bg-gray-50 ring-2 ring-gray-200 shadow-lg scale-105';
     if (!isCompatible) return 'border-gray-300 bg-gray-100 opacity-60';
-    return 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-sm';
+    return 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-lg hover:scale-102';
   };
 
   const getTypeIcon = () => {
@@ -41,82 +52,98 @@ export default function ComponentCard({
     switch (type) {
       case 'motor':
         const motor = component as Motor;
-        return (
-          <div className="space-y-2 text-xs text-gray-600">
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">KV:</span> <span className="font-semibold text-gray-900 text-right ml-2">{motor.kv}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Stator:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{motor.statorSize}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Weight:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{motor.weight}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Thrust:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate text-xs">{motor.maxThrust}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Voltage:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate text-xs">{motor.voltageCompatibility}</span></div>
-          </div>
-        );
+        const basicSpecs = [
+          { label: 'KV', value: motor.kv },
+          { label: 'Stator', value: motor.statorSize },
+          { label: 'Weight', value: motor.weight },
+          { label: 'Thrust', value: motor.maxThrust }
+        ];
+        const detailedSpecs = [
+          { label: 'Voltage', value: motor.voltageCompatibility },
+          { label: 'Shaft Diameter', value: motor.shaftDiameter || 'N/A' }
+        ];
+        return renderSpecList(basicSpecs, detailedSpecs);
       
       case 'frame':
         const frame = component as Frame;
-        return (
-          <div className="space-y-2 text-xs text-gray-600">
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Type:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{frame.type}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Weight:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{frame.weight}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Wheelbase:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{frame.wheelbase}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Props:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{frame.propellerSizeCompatibility}</span></div>
-            <div className="truncate"><span className="font-medium text-gray-500">Material:</span> <span className="font-semibold text-gray-900 ml-1">{frame.material}</span></div>
-          </div>
-        );
+        const frameBasic = [
+          { label: 'Type', value: frame.type },
+          { label: 'Weight', value: frame.weight },
+          { label: 'Wheelbase', value: frame.wheelbase },
+          { label: 'Props', value: frame.propellerSizeCompatibility }
+        ];
+        const frameDetailed = [
+          { label: 'Material', value: frame.material },
+          { label: 'Stack Mount', value: frame.stackMounting || 'N/A' }
+        ];
+        return renderSpecList(frameBasic, frameDetailed);
       
       case 'stack':
         const stack = component as Stack;
-        return (
-          <div className="space-y-2 text-xs text-gray-600">
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Processor:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{stack.fcProcessor}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">ESC:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{stack.escCurrentRating}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Mounting:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{stack.mountingSize}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Gyro:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{stack.gyro}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Voltage:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{stack.voltageInput}</span></div>
-          </div>
-        );
+        const stackBasic = [
+          { label: 'Processor', value: stack.fcProcessor },
+          { label: 'ESC', value: stack.escCurrentRating },
+          { label: 'Mounting', value: stack.mountingSize },
+          { label: 'Gyro', value: stack.gyro }
+        ];
+        const stackDetailed = [
+          { label: 'Voltage', value: stack.voltageInput },
+          { label: 'Bluetooth', value: stack.bluetooth ? 'Yes' : 'No' }
+        ];
+        return renderSpecList(stackBasic, stackDetailed);
       
       case 'camera':
         const camera = component as Camera;
-        return (
-          <div className="space-y-2 text-xs text-gray-600">
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Resolution:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{camera.resolution}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Weight:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{camera.weight}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Lens:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{camera.lens}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Voltage:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{camera.voltageInput}</span></div>
-            {camera.type && <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Type:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{camera.type}</span></div>}
-          </div>
-        );
+        const cameraBasic = [
+          { label: 'Resolution', value: camera.resolution },
+          { label: 'Weight', value: camera.weight },
+          { label: 'Lens', value: camera.lens },
+          { label: 'Voltage', value: camera.voltageInput }
+        ];
+        const cameraDetailed = [
+          { label: 'Type', value: camera.type || 'N/A' }
+        ];
+        return renderSpecList(cameraBasic, cameraDetailed);
       
       case 'prop':
         const prop = component as Prop;
-        return (
-          <div className="space-y-2 text-xs text-gray-600">
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Size:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{prop.size}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Pitch:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{prop.pitch}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Blades:</span> <span className="font-semibold text-gray-900 text-right ml-2">{prop.blades}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Weight:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{prop.weight}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Motor:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate text-xs">{prop.recommendedMotorSize}</span></div>
-          </div>
-        );
+        const propBasic = [
+          { label: 'Size', value: prop.size },
+          { label: 'Pitch', value: prop.pitch },
+          { label: 'Blades', value: prop.blades },
+          { label: 'Weight', value: prop.weight }
+        ];
+        const propDetailed = [
+          { label: 'Motor', value: prop.recommendedMotorSize },
+          { label: 'Material', value: prop.material || 'N/A' }
+        ];
+        return renderSpecList(propBasic, propDetailed);
       
       case 'battery':
         const battery = component as Battery;
-        return (
-          <div className="space-y-2 text-xs text-gray-600">
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Capacity:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{battery.capacity}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Voltage:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{battery.voltage}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">C-Rating:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{battery.cRating}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Weight:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{battery.weight}</span></div>
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Connector:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{battery.connector}</span></div>
-          </div>
-        );
+        const batteryBasic = [
+          { label: 'Capacity', value: battery.capacity },
+          { label: 'Voltage', value: battery.voltage },
+          { label: 'C-Rating', value: battery.cRating },
+          { label: 'Weight', value: battery.weight }
+        ];
+        const batteryDetailed = [
+          { label: 'Connector', value: battery.connector },
+          { label: 'Dimensions', value: battery.dimensions || 'N/A' }
+        ];
+        return renderSpecList(batteryBasic, batteryDetailed);
       
       case 'customWeight':
         const customWeight = component as CustomWeight;
         return (
-          <div className="space-y-2 text-xs text-gray-600">
-            <div className="flex justify-between items-center"><span className="font-medium text-gray-500 truncate">Weight:</span> <span className="font-semibold text-gray-900 text-right ml-2 truncate">{customWeight.weight}</span></div>
-            {customWeight.description && <div className="text-gray-500 text-xs mt-2 truncate">{customWeight.description}</div>}
+          <div className="space-y-2 text-xs text-gray-700">
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-gray-600 truncate">Weight:</span> 
+              <span className="font-semibold text-gray-900 text-right ml-2 truncate">{customWeight.weight}</span>
+            </div>
+            {customWeight.description && (
+              <div className="text-gray-600 text-xs mt-2 break-words">{customWeight.description}</div>
+            )}
           </div>
         );
       
@@ -125,25 +152,63 @@ export default function ComponentCard({
     }
   };
 
+  const renderSpecList = (basicSpecs: { label: string; value: string | number }[], detailedSpecs: { label: string; value: string | number }[]) => {
+    const displaySpecs = isExpanded ? [...basicSpecs, ...detailedSpecs] : basicSpecs;
+    
+    return (
+      <div className="space-y-2 text-xs text-gray-700">
+        {displaySpecs.map((spec) => (
+          <div key={spec.label} className="flex justify-between items-center">
+            <span className="font-medium text-gray-600 truncate">{spec.label}:</span> 
+            <span className="font-semibold text-gray-900 text-right ml-2 truncate">{spec.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div 
-      className={`relative p-4 rounded-xl border cursor-pointer transition-all duration-200 ${getCardColor()}`}
-      onClick={onSelect}
+      className={`relative p-5 rounded-xl border cursor-pointer transition-all duration-300 ease-out h-full transform hover:-translate-y-1 active:scale-95 ${getCardColor()}`}
+      onClick={handleCardClick}
     >
       {!isCompatible && (
-        <div className="absolute top-3 right-3 text-red-500 text-lg">⚠️</div>
+        <div className="absolute top-3 right-3 text-red-500 text-lg animate-pulse">⚠️</div>
       )}
       
-      <div className="flex items-start gap-3">
-        <div className="text-2xl opacity-70">{getTypeIcon()}</div>
+      <div className="flex items-start gap-4">
+        <div className="text-3xl opacity-70 transition-transform duration-300 hover:scale-110">{getTypeIcon()}</div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-base text-gray-900 mb-3 truncate">{name}</h3>
+          <div className="flex items-start justify-between mb-4">
+            <h3 className="font-semibold text-lg text-gray-900 leading-tight transition-colors duration-200 hover:text-black pr-2">{name}</h3>
+            {type !== 'customWeight' && (
+              <button
+                onClick={handleExpandClick}
+                className="ml-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 group flex-shrink-0"
+                title={isExpanded ? 'Show less details' : 'Show more details'}
+              >
+                <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200">
+                  {isExpanded ? (
+                    // Collapse icon (minimize)
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+                    </svg>
+                  ) : (
+                    // Expand icon (maximize)
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                    </svg>
+                  )}
+                </div>
+              </button>
+            )}
+          </div>
           {renderSpecs()}
         </div>
       </div>
       
       {isSelected && (
-        <div className="absolute top-3 left-3 w-2 h-2 bg-black rounded-full"></div>
+        <div className="absolute top-3 left-3 w-2 h-2 bg-black rounded-full animate-pulse"></div>
       )}
     </div>
   );

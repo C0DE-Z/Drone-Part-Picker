@@ -35,15 +35,15 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
     icon: string;
     color?: string;
   }) => (
-    <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-gray-600">{title}</span>
-        <span className="text-lg">{icon}</span>
+        <span className="text-xs sm:text-sm font-medium text-gray-600 truncate pr-2">{title}</span>
+        <span className="text-base sm:text-lg flex-shrink-0">{icon}</span>
       </div>
-      <div className={`text-2xl font-bold ${color} mb-1`}>
-        {value}{unit && <span className="text-lg text-gray-500 ml-1">{unit}</span>}
+      <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${color} mb-1 break-words`}>
+        {value}{unit && <span className="text-sm sm:text-base lg:text-lg text-gray-500 ml-1">{unit}</span>}
       </div>
-      {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+      {subtitle && <p className="text-xs text-gray-500 break-words">{subtitle}</p>}
     </div>
   );
 
@@ -55,9 +55,9 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
     unit?: string;
   }) => (
     <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium text-gray-600">{label}</span>
-        <span className="text-sm font-semibold text-gray-900">{value}{unit}</span>
+      <div className="flex justify-between items-center gap-2">
+        <span className="text-xs sm:text-sm font-medium text-gray-600 truncate">{label}</span>
+        <span className="text-xs sm:text-sm font-semibold text-gray-900 flex-shrink-0">{value.toFixed(1)}{unit}</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div
@@ -69,23 +69,23 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
   );
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0">
       {/* Flight Classification Banner */}
-      <div className={`${flightClass.color} rounded-xl p-6 text-white`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-1">{flightClass.class} Quad</h2>
-            <p className="text-white/90">{flightClass.description}</p>
+      <div className={`${flightClass.color} rounded-xl p-4 sm:p-6 text-white mx-auto`}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1">
+            <h2 className="text-xl sm:text-2xl font-bold mb-1">{flightClass.class} Quad</h2>
+            <p className="text-white/90 text-sm sm:text-base">{flightClass.description}</p>
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold mb-1">{performance.thrustToWeightRatio.toFixed(2)}:1</div>
-            <div className="text-white/90 text-sm">Thrust-to-Weight</div>
+          <div className="text-left sm:text-right flex-shrink-0">
+            <div className="text-2xl sm:text-3xl font-bold mb-1">{performance.thrustToWeightRatio.toFixed(2)}:1</div>
+            <div className="text-white/90 text-xs sm:text-sm">Thrust-to-Weight</div>
           </div>
         </div>
       </div>
 
       {/* Primary Flight Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mx-auto">
         <StatCard
           title="Max Thrust"
           value={performance.maxThrust}
@@ -114,16 +114,51 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
           title="Flight Time"
           value={performance.hovering.hoverTime}
           unit="min"
+          subtitle={`Hover mode`}
           icon="⏱️"
           color="text-green-600"
         />
+        <StatCard
+          title="Power-to-Weight"
+          value={((performance.powerConsumption * performance.motors.voltage * 4) / (performance.totalWeight / 1000)).toFixed(0)}
+          unit="W/kg"
+          subtitle="Total system power"
+          icon="⚡"
+          color="text-yellow-600"
+        />
+        <StatCard
+          title="Hover Efficiency"
+          value={((performance.totalWeight / 1000) / (performance.hovering.currentDraw * performance.motors.voltage)).toFixed(2)}
+          unit="g/W"
+          subtitle="Weight per watt"
+          icon="📊"
+          color="text-indigo-600"
+        />
+        <StatCard
+          title="Propeller Loading"
+          value={(() => {
+            const propDiameter = parseFloat(performance.motors.propSize.split('x')[0] || '5');
+            return ((performance.totalWeight) / (Math.PI * Math.pow(propDiameter * 0.0254 / 2, 2) * 4)).toFixed(1);
+          })()}
+          unit="g/m²"
+          subtitle="Disc loading"
+          icon="🌀"
+          color="text-cyan-600"
+        />
+        <StatCard
+          title="Battery C-Rate"
+          value={(performance.powerConsumption / (performance.battery.capacity / 1000)).toFixed(1)}
+          unit="C"
+          subtitle="Discharge rate"
+          icon="🔋"
+          color="text-orange-600"
+        />
       </div>
-
       {/* Detailed Performance Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {/* Power & Performance */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
             ⚡ Power & Performance
           </h3>
           <div className="space-y-4">
@@ -170,13 +205,12 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
           </div>
         </div>
       </div>
-
       {/* Battery Information */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
           🔋 Battery Information
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <StatCard
             title="Voltage"
             value={`${performance.battery.cells}S`}
@@ -223,15 +257,117 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
             color="bg-green-500"
             unit=" min"
           />
+          <ProgressBar
+            label="Power Efficiency"
+            value={performance.thrustToWeightRatio}
+            max={5}
+            color="bg-blue-500"
+            unit=":1 TWR"
+          />
+          <ProgressBar
+            label="Battery C-Rate"
+            value={Math.max(0, (performance.hovering.currentDraw / (performance.battery.capacity / 1000)))}
+            max={30}
+            color="bg-orange-500"
+            unit="C"
+          />
+        </div>
+      </div>
+
+      {/* Flight Characteristics */}
+      <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          🎯 Flight Characteristics
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3 text-sm sm:text-base">Agility Metrics</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Roll Rate Potential</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {(performance.thrustToWeightRatio * 180).toFixed(0)}°/s
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Acceleration</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {((performance.thrustToWeightRatio - 1) * 9.81).toFixed(1)} m/s²
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Response Time</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {(100 / performance.thrustToWeightRatio).toFixed(0)}ms
+                </span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3">Efficiency Metrics</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Hover Power Loading</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {(performance.totalWeight / (performance.hovering.currentDraw * performance.motors.voltage * 4)).toFixed(1)} g/W
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Energy Density</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {((performance.battery.capacity * performance.battery.voltage) / performance.totalWeight * 1000).toFixed(1)} Wh/kg
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Thrust Loading</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {(performance.maxThrustGrams / performance.totalWeight).toFixed(1)}x weight
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Motor Analysis */}
+      <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          ⚙️ Motor & Propulsion Analysis
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <StatCard
+            title="Motor RPM @ Hover"
+            value={(performance.motors.kv * performance.motors.voltage * (performance.hovering.throttlePercentage / 100)).toFixed(0)}
+            unit="RPM"
+            subtitle="Hover throttle speed"
+            icon="🔄"
+            color="text-blue-600"
+          />
+          <StatCard
+            title="Tip Speed @ Max"
+            value={(((performance.motors.estimatedRPM / 60) * Math.PI * parseFloat(performance.motors.propSize.split('x')[0] || '5') * 0.0254) * 3.6).toFixed(0)}
+            unit="km/h"
+            subtitle="Propeller tip velocity"
+            icon="💨"
+            color="text-red-600"
+          />
+          <StatCard
+            title="Motor Efficiency"
+            value={((performance.motors.voltage * 0.85) * 100 / performance.motors.voltage).toFixed(0)}
+            unit="%"
+            subtitle="Estimated at hover"
+            icon="⚡"
+            color="text-green-600"
+          />
         </div>
       </div>
 
       {/* Compatibility Check */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
           🔧 Compatibility Check
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.entries({
             'Motor & Prop': performance.compatibility.propMotorMatch,
             'Voltage Match': performance.compatibility.voltageMatch,
@@ -249,15 +385,15 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
       </div>
 
       {/* Pilot Notes & Recommendations */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
           💡 Pilot Notes & Recommendations
         </h3>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {/* TWR Analysis */}
           <div className="flex items-start space-x-2">
-            <span className="text-blue-600 mt-1">•</span>
-            <p className="text-sm text-gray-700">
+            <span className="text-blue-600 mt-1 flex-shrink-0">•</span>
+            <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
               <strong>Performance:</strong> {getTWRDescription(performance.thrustToWeightRatio)}
             </p>
           </div>

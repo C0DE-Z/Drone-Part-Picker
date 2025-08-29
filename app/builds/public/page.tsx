@@ -155,7 +155,7 @@ export default function PublicBuilds() {
           </div>
         ) : sortedBuilds.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-300 text-6xl mb-4">🚁</div>
+            <div className="text-gray-500 text-6xl mb-4">🚁</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               {searchTerm ? 'No builds found' : 'No public builds yet'}
             </h3>
@@ -284,12 +284,20 @@ export default function PublicBuilds() {
                     </button>
                   </div>
                   
-                  <Link 
-                    href={`/builds/${build.id}`}
-                    className="w-full px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors text-sm font-medium text-center block"
-                  >
-                    View Build Details
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link 
+                      href={`/?loadBuild=${build.id}`}
+                      className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium text-center"
+                    >
+                      Load Build
+                    </Link>
+                    <Link 
+                      href={`/builds/${build.id}`}
+                      className="flex-1 px-3 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors text-sm font-medium text-center"
+                    >
+                      View Details
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

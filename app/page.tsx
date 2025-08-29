@@ -5,11 +5,12 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { DroneComponents, SelectedComponents, PerformanceEstimate, Motor, Frame, Stack, Camera, Prop, Battery, CustomWeight } from '@/types/drone';
 import { DroneCalculator } from '@/utils/droneCalculator';
-import ComponentCard from '@/components/ComponentCard';
+import ComponentGrid from '@/components/ComponentGrid';
 import PerformancePanel from '@/components/PerformancePanel';
 import BuildSummary from '@/components/BuildSummary';
 import AddComponentModal from '@/components/AddComponentModal';
 import Footer from '@/components/Footer';
+import Toast from '@/components/Toast';
 import AdvancedSettingsComponent from '@/components/AdvancedSettings';
 import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
 import droneData from '../list.json';
@@ -36,15 +37,15 @@ function AuthControls() {
   if (session) {
     return (
       <div className="flex items-center gap-4">
-        <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+        <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
           My Builds
         </Link>
         {userProfile?.username && (
           <>
-            <Link href={`/profile/${userProfile.username}`} className="text-gray-600 hover:text-gray-900">
+            <Link href={`/profile/${userProfile.username}`} className="text-gray-700 hover:text-gray-900">
               Profile
             </Link>
-            <span className="text-gray-600">Hi, {userProfile.username}</span>
+            <span className="text-gray-700">Hi, {userProfile.username}</span>
           </>
         )}
         <button
@@ -59,7 +60,7 @@ function AuthControls() {
 
   return (
     <div className="flex gap-2">
-      <Link href="/auth/signin" className="px-4 py-2 text-gray-600 hover:text-gray-900">
+      <Link href="/auth/signin" className="px-4 py-2 text-gray-700 hover:text-gray-900">
         Sign In
       </Link>
       <Link href="/auth/signup" className="px-4 py-2 bg-black text-white rounded">
@@ -87,6 +88,28 @@ export default function Home() {
     Batteries: {},
     'Simple Weight': {}
   });
+  
+  // Toast state
+  const [showBuildCompleteToast, setShowBuildCompleteToast] = useState(false);
+  const [previousBuildComplete, setPreviousBuildComplete] = useState(false);
+  const [showPerformanceIndicator, setShowPerformanceIndicator] = useState(true);
+
+  // Load saved advanced settings from localStorage
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('dronepartpicker-advanced-settings');
+    if (savedSettings) {
+      try {
+        setAdvancedSettings(JSON.parse(savedSettings));
+      } catch (error) {
+        console.error('Failed to load saved settings:', error);
+      }
+    }
+  }, []);
+
+  // Save advanced settings to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('dronepartpicker-advanced-settings', JSON.stringify(advancedSettings));
+  }, [advancedSettings]);
 
   const handleAddCustomComponent = (category: string, name: string, specs: Record<string, string | number>) => {
     setCustomComponents(prev => ({
@@ -103,26 +126,75 @@ export default function Home() {
     setPerformance(DroneCalculator.calculatePerformance(selectedComponents, advancedSettings));
   }, [selectedComponents, advancedSettings]);
 
+  // Check if build is complete and show toast
+  useEffect(() => {
+    const requiredComponents = ['Motors', 'Frames', 'Stacks', 'Props', 'Batteries'];
+    const isCurrentlyComplete = requiredComponents.every(component => 
+      selectedComponents[component as keyof SelectedComponents]
+    );
+    
+    // Show toast only when build becomes complete (not on initial load)
+    if (isCurrentlyComplete && !previousBuildComplete && Object.keys(selectedComponents).length > 0) {
+      setShowBuildCompleteToast(true);
+    }
+    
+    setPreviousBuildComplete(isCurrentlyComplete);
+  }, [selectedComponents, previousBuildComplete]);
+
   // Load build from URL if present
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const buildId = urlParams.get('loadBuild');
-    if (buildId && session) {
+    if (buildId) {
       loadBuild(buildId);
     }
-  }, [session]);
+  }, []);
+
+  // Function to scroll to performance section
+  const scrollToPerformance = () => {
+    const performanceSection = document.querySelector('[data-section="performance"]');
+    if (performanceSection) {
+      performanceSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+      setShowPerformanceIndicator(false);
+    }
+  };
+
+  // Check if performance section is in view
+  useEffect(() => {
+    const handleScroll = () => {
+      const performanceSection = document.querySelector('[data-section="performance"]');
+      if (performanceSection) {
+        const rect = performanceSection.getBoundingClientRect();
+        const isInView = rect.top <= window.innerHeight && rect.bottom >= 0;
+        setShowPerformanceIndicator(!isInView);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const loadBuild = async (buildId: string) => {
     try {
       const response = await fetch(`/api/builds/${buildId}`);
       if (response.ok) {
         const build = await response.json();
-        setSelectedComponents(build.components || {});
-        window.history.replaceState({}, '', window.location.pathname);
+        if (build.components) {
+          setSelectedComponents(build.components);
+          // Clear the URL parameter after loading
+          window.history.replaceState({}, '', window.location.pathname);
+          // Show success message
+          alert(`Successfully loaded build: ${build.name || 'Unnamed Build'}`);
+        }
+      } else {
+        throw new Error('Build not found');
       }
     } catch (error) {
       console.error('Error loading build:', error);
-      alert('Failed to load build');
+      alert('Failed to load build. Please make sure the build exists and try again.');
     }
   };
 
@@ -227,49 +299,77 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm">
+      <header className="bg-white border-b shadow-sm transition-shadow duration-300 hover:shadow-md">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-gray-900">DronePartPicker</h1>
-            <AuthControls />
+            <div className="flex items-center space-x-8">
+              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-gray-700 transition-all duration-300 transform hover:scale-105">
+                DronePartPicker
+              </Link>
+              <nav className="hidden md:flex space-x-6">
+                <Link href="/builds/public" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
+                  Public Builds
+                </Link>
+                <Link href="/parts/custom" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
+                  Custom Parts
+                </Link>
+
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+                  className="text-gray-700 hover:text-gray-900 p-2 transition-all duration-200 hover:scale-110"
+                >
+                  ⚙️
+                </button>
+              </div>
+              <AuthControls />
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
-        {/* Performance Panel */}
-        {performance && (
-          <div className="mb-6 w-full">
-            <h2 className="text-2xl font-bold mb-4">Performance Analysis</h2>
-            <PerformancePanel performance={performance} />
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 xl:grid-cols-5 lg:grid-cols-4 gap-6">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 gap-6">
           {/* Component Selection */}
-          <div className="xl:col-span-4 lg:col-span-3">
-            <div className="bg-white rounded-lg shadow border">
+          <div className="xl:col-span-2 lg:col-span-2">
+            <div className="bg-white rounded-lg shadow border transition-all duration-300 hover:shadow-lg">
               <div className="p-4 border-b">
-                <h3 className="text-xl font-bold">Component Selection</h3>
+                <h3 className="text-xl font-bold text-gray-900">Component Selection</h3>
               </div>
 
               {/* Component Tabs */}
-              <div className="border-b bg-gray-50">
-                <nav className="flex overflow-x-auto p-2 scrollbar-hide">
-                  {tabs.map((tab) => (
+              <div className="border-b bg-gray-50 relative">
+                {/* Scroll indicators with arrows */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none flex items-center">
+                  <div className="text-gray-600 text-xs ml-1">‹</div>
+                </div>
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none flex items-center justify-end">
+                  <div className="text-gray-600 text-xs mr-1">›</div>
+                </div>
+                
+                <nav className="flex overflow-x-auto px-2 pt-2 pb-3 scroll-smooth custom-scrollbar" style={{ scrollBehavior: 'smooth' }}>
+                  {tabs.map((tab, index) => (
                     <button
                       key={String(tab.key)}
                       onClick={() => setActiveTab(tab.key)}
-                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 mx-1 rounded-lg transition-colors whitespace-nowrap text-sm sm:text-base ${
+                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 mx-1 rounded-lg transition-all duration-300 ease-in-out whitespace-nowrap text-sm sm:text-base transform hover:scale-105 ${
                         activeTab === tab.key
-                          ? 'bg-black text-white'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                          ? 'bg-black text-white shadow-lg scale-105'
+                          : 'text-gray-700 hover:text-gray-900 hover:bg-white hover:shadow-md'
                       }`}
+                      style={{ 
+                        minWidth: 'fit-content',
+                        animationDelay: `${index * 50}ms`
+                      }}
                     >
-                      <span className="text-sm sm:text-base">{tab.icon}</span>
-                      <span className="hidden sm:inline">{tab.label}</span>
-                      <span className="sm:hidden text-xs">{tab.label.split(' ')[0]}</span>
+                      <span className="text-sm sm:text-base transition-transform duration-200">{tab.icon}</span>
+                      <span className="hidden sm:inline font-medium">{tab.label}</span>
+                      <span className="sm:hidden text-xs font-medium">{tab.label.split(' ')[0]}</span>
                     </button>
                   ))}
                 </nav>
@@ -282,11 +382,11 @@ export default function Home() {
                   placeholder={`Search ${tabs.find(t => t.key === activeTab)?.label.toLowerCase()}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 px-4 py-2 bg-gray-50 border rounded-lg text-sm sm:text-base"
+                  className="flex-1 px-4 py-2 bg-gray-50 border text-gray-400 rounded-lg text-sm sm:text-base transition-all duration-300 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-white"
                 />
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black whitespace-nowrap text-sm sm:text-base"
+                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black whitespace-nowrap text-sm sm:text-base transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
                 >
                   <span className="sm:hidden">+ Add</span>
                   <span className="hidden sm:inline">+ Add Custom</span>
@@ -294,37 +394,14 @@ export default function Home() {
               </div>
 
               {/* Component Grid */}
-              <div className="p-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                  {Object.entries(getFilteredComponents(activeTab)).map(([name, component]) => {
-                    const tabKeys: TabKey[] = ['Motors', 'Frames', 'Stacks', 'Camera', 'Props', 'Batteries', 'Simple Weight'];
-                    if (!tabKeys.includes(activeTab as TabKey)) return null;
-                    const type = getComponentType(activeTab as TabKey);
-                    return (
-                      <ComponentCard
-                        key={name}
-                        name={name}
-                        component={component}
-                        type={type}
-                        isSelected={
-                          type === 'customWeight' 
-                            ? (selectedComponents.customWeights || []).some(w => w.name === name)
-                            : selectedComponents[type as keyof Omit<SelectedComponents, 'customWeights'>]?.name === name
-                        }
-                        onSelect={() => handleComponentSelect(type, name, component)}
-                        isCompatible={checkComponentCompatibility()}
-                      />
-                    );
-                  })}
-                </div>
-                
-                {Object.keys(getFilteredComponents(activeTab)).length === 0 && (
-                  <div className="text-center py-16">
-                    <div className="text-gray-300 text-4xl mb-4">🔍</div>
-                    <p className="text-gray-500">No components found matching &quot;{searchTerm}&quot;</p>
-                  </div>
-                )}
-              </div>
+              <ComponentGrid
+                components={getFilteredComponents(activeTab)}
+                type={getComponentType(activeTab as TabKey)}
+                selectedComponents={selectedComponents}
+                onComponentSelect={handleComponentSelect}
+                checkCompatibility={checkComponentCompatibility}
+                searchTerm={searchTerm}
+              />
             </div>
           </div>
 
@@ -333,13 +410,51 @@ export default function Home() {
 
           {/* Sidebar */}
           <div className="xl:col-span-1 lg:col-span-1">
-            <BuildSummary
-              selectedComponents={selectedComponents}
-              onClearBuild={handleClearBuild}
-              onSaveBuild={handleSaveBuild}
-            />
+            <div className="transition-all duration-500 ease-out transform hover:scale-102">
+              <BuildSummary
+                selectedComponents={selectedComponents}
+                onClearBuild={handleClearBuild}
+                onSaveBuild={handleSaveBuild}
+              />
+            </div>
           </div>
         </div>
+
+        {/* Modern Fixed Performance Indicator */}
+        {showPerformanceIndicator && 
+         performance && 
+         selectedComponents.motor && 
+         selectedComponents.frame && 
+         selectedComponents.stack && 
+         selectedComponents.prop && 
+         selectedComponents.battery && (
+          <div className="fixed bottom-6 right-6 z-50 animate-in">
+            <div 
+              onClick={scrollToPerformance}
+              className="group bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-full p-3 sm:p-4 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 flex items-center gap-2 sm:gap-3 hover:bg-white"
+              style={{ 
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2)' 
+              }}
+            >
+              <div className="text-gray-700 text-xs sm:text-sm font-medium hidden sm:block group-hover:text-green-600 transition-colors duration-200">
+                View Performance
+              </div>
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-all duration-200 group-hover:shadow-sm">
+                <div className="text-green-600 text-base sm:text-lg animate-bounce-arrow">📊</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Performance Panel */}
+        {performance && (
+          <div className="mt-6 transition-all duration-700 ease-out animate-in" data-section="performance">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 transition-all duration-500">Performance Analysis</h2>
+            <div className="transition-all duration-700 ease-out transform">
+              <PerformancePanel performance={performance} />
+            </div>
+          </div>
+        )}
 
         {/* Advanced Settings */}
         <AdvancedSettingsComponent
@@ -354,6 +469,20 @@ export default function Home() {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onAdd={handleAddCustomComponent}
+        />
+
+        <Toast
+          message="🎉 Your drone build is complete! Check out the performance analysis below."
+          type="success"
+          isVisible={showBuildCompleteToast}
+          onClose={() => setShowBuildCompleteToast(false)}
+          action={{
+            label: "View Performance →",
+            onClick: () => {
+              scrollToPerformance();
+              setShowBuildCompleteToast(false);
+            }
+          }}
         />
 
         <Footer />
