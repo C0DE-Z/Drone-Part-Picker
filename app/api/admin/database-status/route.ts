@@ -6,7 +6,6 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // Check if user is logged in first
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -40,11 +39,9 @@ export async function GET() {
       userBadgeSystemStatus = 'missing';
     }
 
-    // Check if CustomPart table has 3D model fields
     let partModelStatus = 'unknown';
     
     try {
-      // Try to query with model fields to see if they exist
       await prisma.customPart.findFirst({
         select: {
           id: true,
@@ -58,7 +55,6 @@ export async function GET() {
       partModelStatus = 'missing';
     }
 
-    // Determine overall database status
     let overallStatus = 'healthy';
     let statusMessage = '✅ All database features are available';
     let statusColor = 'text-green-600';

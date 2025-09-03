@@ -9,12 +9,12 @@ type ComponentData = {
 export class DroneCalculator {
   static calculatePerformance(components: SelectedComponents, advancedSettings: AdvancedSettings = defaultAdvancedSettings): PerformanceEstimate {
     const weights = this.calculateWeights(components);
-    const totalWeight = Math.round(weights.total * 10) / 10; // Weight in grams
+  const totalWeight = Math.round(weights.total * 10) / 10;
     
-    const thrust = this.calculateThrust(components); // Thrust in grams
-    const maxThrustKg = Math.round((thrust / 1000) * 100) / 100; // Convert to kg for display
+  const thrust = this.calculateThrust(components);
+  const maxThrustKg = Math.round((thrust / 1000) * 100) / 100;
     
-    // Debug logging to check actual values
+    
     console.log('Debug - Thrust calculation:', {
       totalWeight: weights.total,
       thrust: thrust,
@@ -29,11 +29,10 @@ export class DroneCalculator {
       }
     });
     
-    // Fix thrust-to-weight ratio calculation: both values should be in same units (grams)
-    // Ensure we have reasonable bounds for thrust-to-weight ratio (typical FPV drones: 2:1 to 10:1)
+    
     const thrustToWeightRatio = Math.round((thrust / weights.total) * 100) / 100;
     
-    // Clamp to realistic values (if calculation is way off, something is wrong with input data)
+    
     const clampedTWR = Math.max(1.0, Math.min(15.0, thrustToWeightRatio));
     
     const estimatedTopSpeed = Math.round(this.estimateTopSpeed(components, clampedTWR));
@@ -445,33 +444,33 @@ export class DroneCalculator {
     else if (powerToWeightRatio < 80) flightStyleMultiplier *= 0.95;
     
     let environmentalFactor = 1.0;
-    if (altitude > 2000) environmentalFactor *= 1.08; // High altitude = more power needed
+  if (altitude > 2000) environmentalFactor *= 1.08;
     else if (altitude > 1000) environmentalFactor *= 1.04;
     
-    if (temperature > 35) environmentalFactor *= 1.03; // Hot weather = less efficient
-    else if (temperature < 5) environmentalFactor *= 1.05; // Cold weather = more power
+  if (temperature > 35) environmentalFactor *= 1.03;
+  else if (temperature < 5) environmentalFactor *= 1.05;
     
-    // Apply all factors
+    
     const adjustedCurrentPerMotor = currentPerMotor * flightStyleMultiplier * environmentalFactor;
     
     const escSafeLimit = escMaxCurrent * 0.85;
     const cappedCurrentPerMotor = Math.min(adjustedCurrentPerMotor, escSafeLimit);
     const finalTotalCurrent = cappedCurrentPerMotor * 4;
     
-    // Frame aerodynamic efficiency corrections
+    
     let aerodynamicFactor = 1.0;
-    if (frameWheelbase <= 120) aerodynamicFactor = 0.88; // Tiny whoop - very efficient
-    else if (frameWheelbase <= 150) aerodynamicFactor = 0.92; // Small frames
-    else if (frameWheelbase <= 180) aerodynamicFactor = 0.96; // 4-inch frames
-    else if (frameWheelbase <= 220) aerodynamicFactor = 1.00; // 5-inch standard
-    else if (frameWheelbase <= 280) aerodynamicFactor = 1.04; // 6-7 inch frames
-    else aerodynamicFactor = 1.08; // Large frames = more drag
+  if (frameWheelbase <= 120) aerodynamicFactor = 0.88;
+  else if (frameWheelbase <= 150) aerodynamicFactor = 0.92;
+  else if (frameWheelbase <= 180) aerodynamicFactor = 0.96;
+  else if (frameWheelbase <= 220) aerodynamicFactor = 1.00;
+  else if (frameWheelbase <= 280) aerodynamicFactor = 1.04;
+  else aerodynamicFactor = 1.08;
     
     const aerodynamicallyAdjustedCurrent = finalTotalCurrent * aerodynamicFactor;
     
-    // Final realistic bounds with advanced constraints
-    const minRealistic = Math.max(8, totalWeight * 0.020); // Minimum based on physics
-    const maxRealistic = Math.min(85, escMaxCurrent * 4 * 0.75); // Maximum based on ESC limits
+    
+  const minRealistic = Math.max(8, totalWeight * 0.020);
+  const maxRealistic = Math.min(85, escMaxCurrent * 4 * 0.75);
     const thrustToWeightRatio = this.calculateThrust(components) / totalWeight;
     
     // TWR-based adjustments for realism

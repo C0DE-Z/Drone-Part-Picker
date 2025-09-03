@@ -17,7 +17,6 @@ import droneData from '../list.json';
 
 const componentData: DroneComponents = droneData as DroneComponents;
 
-// Auth Controls Component
 function AuthControls() {
   const { data: session, status } = useSession();
   const [userProfile, setUserProfile] = useState<{username?: string} | null>(null);
@@ -25,13 +24,11 @@ function AuthControls() {
 
   useEffect(() => {
     if (session?.user?.email) {
-      // Generate username for the user
       fetch('/api/users/generate-username', { method: 'POST' })
         .then(res => res.json())
         .then(data => setUserProfile({ username: data.username }))
         .catch(err => console.error('Error:', err));
 
-      // Check admin status
       fetch('/api/auth/check-admin')
         .then(res => res.json())
         .then(data => setIsAdmin(data.isAdmin))
@@ -267,7 +264,7 @@ export default function Home() {
       alert('Failed to save build. Please try again.');
     }
   };
-
+unn
   // Merge regular and custom components
   const getAllComponents = (category: keyof DroneComponents) => {
     return { ...componentData[category], ...customComponents[category] };
