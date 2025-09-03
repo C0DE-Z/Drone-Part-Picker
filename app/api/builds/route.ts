@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { buildSchema, validateAndSanitize, buildRateLimiter } from '@/lib/validation';
+import { Prisma } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +13,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, description, components, performance, isPublic, tags } = await request.json();
+    // Get client IP for rate limiting
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || session.user.email;
+    
+    // Check rate limit
+    if (!buildRateLimiter.isAllowed(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
+    const body = await request.json();
+
+    // Validate and sanitize input
+    let validatedData;
+    try {
+      validatedData = validateAndSanitize(buildSchema, body);
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid build data' },
+        { status: 400 }
+      )
+    }
+
+    const { name, description, components, performance, isPublic, tags } = validatedData;
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
@@ -28,12 +54,12 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         isPublic: isPublic || false,
         tags: tags || [],
-        motor: components.motor || null,
-        frame: components.frame || null,
-        stack: components.stack || null,
-        camera: components.camera || null,
-        prop: components.prop || null,
-        battery: components.battery || null,
+        motor: components?.motor ? (components.motor as Prisma.InputJsonValue) : undefined,
+        frame: components?.frame ? (components.frame as Prisma.InputJsonValue) : undefined,
+        stack: components?.stack ? (components.stack as Prisma.InputJsonValue) : undefined,
+        camera: components?.camera ? (components.camera as Prisma.InputJsonValue) : undefined,
+        prop: components?.prop ? (components.prop as Prisma.InputJsonValue) : undefined,
+        battery: components?.battery ? (components.battery as Prisma.InputJsonValue) : undefined,
         totalWeight: performance?.totalWeight || null,
         thrustToWeightRatio: performance?.thrustToWeightRatio || null,
         estimatedTopSpeed: performance?.estimatedTopSpeed || null,

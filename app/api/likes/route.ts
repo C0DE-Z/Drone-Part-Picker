@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { validateAndSanitize, RateLimiter } from '@/lib/validation';
+import { z } from 'zod';
+
+const likesRateLimit = new RateLimiter(30, 60 * 1000); // 30 likes per minute
+
+const likeSchema = z.object({
+  buildId: z.string().uuid().optional(),
+  partId: z.string().uuid().optional(),
+}).refine(data => data.buildId || data.partId, {
+  message: "Either buildId or partId must be provided",
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,11 +22,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { buildId, partId } = await request.json();
+    // Rate limiting
+    const clientIp = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    const rateLimitKey = `${session.user.email}-${clientIp}`;
     
-    if (!buildId && !partId) {
-      return NextResponse.json({ error: 'Either buildId or partId is required' }, { status: 400 });
+    if (!likesRateLimit.isAllowed(rateLimitKey)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
+
+    const body = await request.json();
+    const validation = likeSchema.safeParse(body);
+    
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validation.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { buildId, partId } = validation.data;
 
     // Get user from database
     const user = await prisma.user.findUnique({
@@ -24,6 +54,37 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Verify the item exists and is accessible
+    if (buildId) {
+      const build = await prisma.droneBuild.findUnique({
+        where: { id: buildId },
+        select: { isPublic: true, userId: true }
+      });
+      
+      if (!build) {
+        return NextResponse.json({ error: 'Build not found' }, { status: 404 });
+      }
+      
+      if (!build.isPublic && build.userId !== user.id) {
+        return NextResponse.json({ error: 'Build not accessible' }, { status: 403 });
+      }
+    }
+
+    if (partId) {
+      const part = await prisma.customPart.findUnique({
+        where: { id: partId },
+        select: { isPublic: true, userId: true }
+      });
+      
+      if (!part) {
+        return NextResponse.json({ error: 'Part not found' }, { status: 404 });
+      }
+      
+      if (!part.isPublic && part.userId !== user.id) {
+        return NextResponse.json({ error: 'Part not accessible' }, { status: 403 });
+      }
     }
 
     // Check if like already exists
@@ -62,7 +123,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error toggling like:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to toggle like' }, { status: 500 });
   }
 }
     //     }

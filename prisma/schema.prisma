@@ -14,6 +14,12 @@ datasource db {
 }
 
 
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
 model User {
   id            String          @id @default(cuid())
   name          String?
@@ -22,6 +28,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  role          UserRole        @default(USER)
   accounts      Account[]
   sessions      Session[]
   
@@ -42,8 +49,58 @@ model User {
   followers     Follow[] @relation("UserFollowers")
   following     Follow[] @relation("UserFollowing")
   
+  // Badge system
+  userBadges    UserBadge[]
+  
+  // Report relations
+  reports       Report[] @relation("UserReports")
+  reportedBy    Report[] @relation("ReportedUser")
+  adminReviews  Report[] @relation("AdminReviews")
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  reason      String
+  description String?
+  status      ReportStatus @default(PENDING)
+  reporterId  String
+  reporter    User     @relation("UserReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  
+  // Polymorphic relation - can report builds, parts, comments, or users
+  buildId     String?
+  build       DroneBuild? @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  partId      String?
+  part        CustomPart? @relation(fields: [partId], references: [id], onDelete: Cascade)
+  commentId   String?
+  comment     Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reportedUserId String?
+  reportedUser   User? @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  
+  // Admin actions
+  reviewedById String?
+  reviewedBy   User?   @relation("AdminReviews", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?
+  adminNotes   String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([status])
+  @@index([reporterId])
+  @@index([buildId])
+  @@index([partId])
+  @@index([commentId])
+  @@index([reportedUserId])
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  DISMISSED
 }
 
 model Account {
@@ -112,6 +169,7 @@ model DroneBuild {
   // Social features
   likes       Like[]
   comments    Comment[]
+  reports     Report[]
   viewCount   Int      @default(0)
   
   createdAt DateTime @default(now())
@@ -132,8 +190,14 @@ model CustomPart {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
+  // 3D Model support
+  modelFile   String?  // File path/URL to the 3D model file
+  modelFormat String?  // File format (glb, gltf, obj, stl, etc.)
+  modelSize   Int?     // File size in bytes (max 40MB = 41943040 bytes)
+  
   likes       Like[]
   comments    Comment[]
+  reports     Report[]
   viewCount   Int      @default(0)
   
   createdAt DateTime @default(now())
@@ -177,6 +241,7 @@ model Comment {
   parentId  String?
   parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[] @relation("CommentReplies")
+  reports   Report[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -198,6 +263,54 @@ model Follow {
   @@unique([followerId, followingId])
   @@index([followerId])
   @@index([followingId])
+}
+
+enum BadgeType {
+  ADMIN
+  MODERATOR
+  VERIFIED
+  EARLY_USER
+  TOP_CONTRIBUTOR
+  DRONE_EXPERT
+  CUSTOM
+}
+
+model Badge {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  type        BadgeType
+  icon        String    // Emoji or icon identifier
+  color       String    // Hex color code
+  rarity      String    @default("common") // common, rare, epic, legendary
+  isActive    Boolean   @default(true)
+  
+  // User badge assignments
+  userBadges  UserBadge[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([type])
+  @@index([isActive])
+}
+
+model UserBadge {
+  id       String @id @default(cuid())
+  userId   String
+  badgeId  String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge  @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  
+  // Badge assignment details
+  awardedBy   String?  // User ID who awarded the badge (for admin-awarded badges)
+  awardedAt   DateTime @default(now())
+  reason      String?  // Reason for awarding the badge
+  isVisible   Boolean  @default(true) // User can choose to hide badges
+  
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
 }
 
 

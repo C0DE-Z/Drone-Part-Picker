@@ -9,14 +9,35 @@ type ComponentData = {
 export class DroneCalculator {
   static calculatePerformance(components: SelectedComponents, advancedSettings: AdvancedSettings = defaultAdvancedSettings): PerformanceEstimate {
     const weights = this.calculateWeights(components);
-    const totalWeight = Math.round(weights.total * 10) / 10;
+    const totalWeight = Math.round(weights.total * 10) / 10; // Weight in grams
     
-    const thrust = this.calculateThrust(components, advancedSettings);
-    const maxThrustKg = Math.round((thrust / 1000) * 100) / 100;
+    const thrust = this.calculateThrust(components); // Thrust in grams
+    const maxThrustKg = Math.round((thrust / 1000) * 100) / 100; // Convert to kg for display
+    
+    // Debug logging to check actual values
+    console.log('Debug - Thrust calculation:', {
+      totalWeight: weights.total,
+      thrust: thrust,
+      rawTWR: thrust / weights.total,
+      componentWeights: {
+        motor: weights.motor,
+        frame: weights.frame,
+        stack: weights.stack,
+        camera: weights.camera,
+        prop: weights.prop,
+        battery: weights.battery
+      }
+    });
+    
+    // Fix thrust-to-weight ratio calculation: both values should be in same units (grams)
+    // Ensure we have reasonable bounds for thrust-to-weight ratio (typical FPV drones: 2:1 to 10:1)
     const thrustToWeightRatio = Math.round((thrust / weights.total) * 100) / 100;
     
-    const estimatedTopSpeed = Math.round(this.estimateTopSpeed(components, thrustToWeightRatio));
-    const powerConsumption = Math.round(this.estimatePowerConsumption(components, advancedSettings) * 10) / 10;
+    // Clamp to realistic values (if calculation is way off, something is wrong with input data)
+    const clampedTWR = Math.max(1.0, Math.min(15.0, thrustToWeightRatio));
+    
+    const estimatedTopSpeed = Math.round(this.estimateTopSpeed(components, clampedTWR));
+    const powerConsumption = Math.round(this.estimatePowerConsumption(components) * 10) / 10;
     const estimatedFlightTime = Math.round(this.estimateFlightTime(components, powerConsumption, advancedSettings) * 10) / 10;
     
     const hovering = this.calculateHoveringMetrics(components, weights.total, thrust);
@@ -28,7 +49,7 @@ export class DroneCalculator {
 
     return {
       totalWeight,
-      thrustToWeightRatio,
+      thrustToWeightRatio: clampedTWR,
       maxThrust: maxThrustKg,
       maxThrustGrams: thrust,
       estimatedTopSpeed,
@@ -102,7 +123,7 @@ export class DroneCalculator {
     return match ? parseFloat(match[1]) : 0;
   }
 
-  private static calculateThrust(components: SelectedComponents, settings: AdvancedSettings = defaultAdvancedSettings): number {
+  private static calculateThrust(components: SelectedComponents): number {
     if (!components.motor || !components.prop) return 0;
     
     const thrustStr = components.motor.data.maxThrust;
@@ -302,7 +323,7 @@ export class DroneCalculator {
     return Math.round(Math.min(topSpeedKmh, maxRealisticSpeed));
   }
 
-  private static estimatePowerConsumption(components: SelectedComponents, settings: AdvancedSettings = defaultAdvancedSettings): number {
+  private static estimatePowerConsumption(components: SelectedComponents): number {
     if (!components.motor || !components.stack) return 25;
     
     const escRating = components.stack.data.escCurrentRating;

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function SignUp() {
-  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -24,8 +24,21 @@ export default function SignUp() {
       return
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
+    // Username basic client validation
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+      setError('Username must be 3-20 characters, letters/numbers/underscore only')
+      setLoading(false)
+      return
+    }
+
+    // Password strength: at least 8 chars, one upper, one lower, one number
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters')
+      setLoading(false)
+      return
+    }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      setError('Password must include uppercase, lowercase, and a number')
       setLoading(false)
       return
     }
@@ -37,7 +50,7 @@ export default function SignUp() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name,
+          username,
           email,
           password,
         }),
@@ -72,26 +85,26 @@ export default function SignUp() {
         <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10 border border-gray-200">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full name
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
               </label>
               <div className="mt-1">
                 <input
-                  id="name"
-                  name="name"
+                  id="username"
+                  name="username"
                   type="text"
-                  autoComplete="name"
+                  autoComplete="username"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500"
-                  placeholder="Enter your full name"
+                  placeholder="Choose a username (3-20 chars, letters/numbers/_)"
                 />
               </div>
             </div>
@@ -129,9 +142,10 @@ export default function SignUp() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500"
-                  placeholder="Create a password"
+                  placeholder="8+ chars, upper/lower/number"
                 />
               </div>
+              <p className="mt-1 text-xs text-gray-500">Use at least 8 characters with a mix of uppercase, lowercase, and numbers.</p>
             </div>
 
             <div>

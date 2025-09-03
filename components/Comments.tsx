@@ -113,7 +113,7 @@ export default function Comments({ buildId, partId, className = '' }: CommentsPr
           )}
         </div>
         <div className="flex-1">
-          <div className="bg-gray-50 rounded-lg p-3">
+          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-medium text-sm text-gray-900">{comment.user.username}</span>
               <span className="text-xs text-gray-500">{formatTimeAgo(comment.createdAt)}</span>
@@ -134,8 +134,8 @@ export default function Comments({ buildId, partId, className = '' }: CommentsPr
 
   if (loading) {
     return (
-      <div className={`${className}`}>
-        <div className="text-center py-8 text-gray-500">Loading comments...</div>
+    <div className={`${className}`}>
+  <div className="text-center py-8 text-gray-500">Loading comments...</div>
       </div>
     );
   }
@@ -163,14 +163,14 @@ export default function Comments({ buildId, partId, className = '' }: CommentsPr
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Add a comment..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-400"
                   rows={3}
                 />
                 <div className="flex justify-end mt-2">
                   <button
                     type="submit"
                     disabled={!newComment.trim() || submitting}
-                    className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                   >
                     {submitting ? 'Posting...' : 'Post Comment'}
                   </button>
@@ -179,7 +179,7 @@ export default function Comments({ buildId, partId, className = '' }: CommentsPr
             </div>
           </form>
         ) : (
-          <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg mb-6">
+          <div className="text-center py-4 text-gray-500 bg-gray-50 border border-gray-200 rounded-lg mb-6">
             <p>Please sign in to add comments</p>
           </div>
         )}

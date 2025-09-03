@@ -30,9 +30,9 @@ export default function ComponentCard({
     setIsExpanded(!isExpanded);
   };
   const getCardColor = () => {
-    if (isSelected) return 'border-black bg-gray-50 ring-2 ring-gray-200 shadow-lg scale-105';
-    if (!isCompatible) return 'border-gray-300 bg-gray-100 opacity-60';
-    return 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-lg hover:scale-102';
+  if (isSelected) return 'border-black bg-gray-50 ring-2 ring-gray-200 shadow-lg scale-105';
+  if (!isCompatible) return 'border-gray-300 bg-gray-100 opacity-60';
+  return 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-lg hover:scale-102';
   };
 
   const getTypeIcon = () => {
@@ -180,14 +180,14 @@ export default function ComponentCard({
         <div className="text-3xl opacity-70 transition-transform duration-300 hover:scale-110">{getTypeIcon()}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-4">
-            <h3 className="font-semibold text-lg text-gray-900 leading-tight transition-colors duration-200 hover:text-black pr-2">{name}</h3>
+      <h3 className="font-semibold text-lg text-gray-900 leading-tight transition-colors duration-200 hover:text-gray-950 pr-2">{name}</h3>
             {type !== 'customWeight' && (
               <button
                 onClick={handleExpandClick}
-                className="ml-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 group flex-shrink-0"
+        className="ml-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 group flex-shrink-0"
                 title={isExpanded ? 'Show less details' : 'Show more details'}
               >
-                <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200">
+        <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200">
                   {isExpanded ? (
                     // Collapse icon (minimize)
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -208,7 +208,7 @@ export default function ComponentCard({
       </div>
       
       {isSelected && (
-        <div className="absolute top-3 left-3 w-2 h-2 bg-black rounded-full animate-pulse"></div>
+        <div className="absolute top-3 left-3 w-2 h-2 bg-gray-900 rounded-full animate-pulse"></div>
       )}
     </div>
   );

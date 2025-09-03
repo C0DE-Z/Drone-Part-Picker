@@ -49,17 +49,17 @@ export default function TagInput({
 
   return (
     <div className={`${className}`}>
-      <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+  <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
         {tags.map((tag, index) => (
           <span
             key={index}
-            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
           >
             #{tag}
             <button
               type="button"
               onClick={() => removeTag(index)}
-              className="text-blue-600 hover:text-blue-800 ml-1"
+      className="text-blue-600 hover:text-blue-800 ml-1"
             >
               ×
             </button>
@@ -73,19 +73,19 @@ export default function TagInput({
           onKeyDown={handleKeyDown}
           onBlur={handleInputBlur}
           placeholder={tags.length === 0 ? placeholder : ''}
-          className="flex-1 min-w-[120px] outline-none bg-transparent text-sm"
+      className="flex-1 min-w-[120px] outline-none bg-transparent text-sm text-gray-900 placeholder-gray-400"
           disabled={tags.length >= maxTags}
         />
       </div>
       
-      <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+  <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
         <div>Press Enter or comma to add tags</div>
         <div>{tags.length}/{maxTags} tags</div>
       </div>
       
       {/* Popular tags suggestions */}
       <div className="mt-2 flex flex-wrap gap-1">
-        <span className="text-xs text-gray-500 mr-2">Popular:</span>
+    <span className="text-xs text-gray-500 mr-2">Popular:</span>
         {['racing', 'freestyle', '5inch', 'fpv', 'mini', 'cinematic'].map((suggestedTag) => (
           !tags.includes(suggestedTag) && tags.length < maxTags && (
             <button
@@ -94,7 +94,7 @@ export default function TagInput({
               onClick={() => {
                 onChange([...tags, suggestedTag]);
               }}
-              className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded transition-colors"
+      className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded transition-colors"
             >
               #{suggestedTag}
             </button>

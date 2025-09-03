@@ -98,7 +98,7 @@ export default function CustomParts() {
                   </Link>
                   <button
                     onClick={() => setShowCreateModal(true)}
-                    className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                   >
                     Add Part
                   </button>
@@ -126,7 +126,7 @@ export default function CustomParts() {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category
-                    ? 'bg-black text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-white text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -163,14 +163,14 @@ export default function CustomParts() {
             {session ? (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 Create Custom Part
               </button>
             ) : (
               <Link
                 href="/auth/signin"
-                className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors inline-block"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors inline-block"
               >
                 Sign In
               </Link>
@@ -233,7 +233,7 @@ export default function CustomParts() {
                     <button className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium">
                       View Details
                     </button>
-                    <button className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors text-sm font-medium">
+                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium">
                       Use in Build
                     </button>
                   </div>
@@ -246,9 +246,9 @@ export default function CustomParts() {
 
       {/* Create Part Modal - Placeholder */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Create Custom Part</h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+          <div className="bg-white border border-gray-200 rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">Create Custom Part</h3>
             <p className="text-gray-600 mb-4">
               Custom part creation coming soon! This feature will allow you to create and share custom drone parts with the community.
             </p>

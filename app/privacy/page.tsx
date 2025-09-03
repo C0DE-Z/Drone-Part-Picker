@@ -5,9 +5,9 @@ import Link from 'next/link';
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-8">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
@@ -74,7 +74,7 @@ export default function PrivacyPolicy() {
             <div className="mt-12 pt-8 border-t border-gray-200">
               <Link
                 href="/"
-                className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 ← Back to Home
               </Link>

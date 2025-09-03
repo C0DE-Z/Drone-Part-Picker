@@ -1,9 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { RateLimiter } from '@/lib/validation';
 
-export async function GET() {
+const publicBuildsRateLimit = new RateLimiter(60, 60 * 1000); // 60 requests per minute for public endpoint
+
+export async function GET(request: NextRequest) {
   try {
-    // Fetch all public builds from database
+    // Rate limiting for public endpoint to prevent abuse
+    const clientIp = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    
+    if (!publicBuildsRateLimit.isAllowed(clientIp)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // Fetch all public builds from database with limit
     const builds = await prisma.droneBuild.findMany({
       where: { isPublic: true },
       include: {
@@ -22,7 +37,8 @@ export async function GET() {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      take: 100 // Limit results to prevent excessive data transfer
     });
 
     // Transform builds to match the expected format
@@ -33,7 +49,7 @@ export async function GET() {
       createdAt: build.createdAt.toISOString(),
       user: {
         username: build.user.username || 'Anonymous',
-        email: build.user.email
+        // Don't expose email in public endpoint for privacy
       },
       components: {
         motor: build.motor,
@@ -59,6 +75,6 @@ export async function GET() {
     return NextResponse.json({ builds: transformedBuilds });
   } catch (error) {
     console.error('Error fetching public builds:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch builds' }, { status: 500 });
   }
 }

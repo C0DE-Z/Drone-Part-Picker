@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { commentSchema, validateAndSanitize, commentRateLimiter } from '@/lib/validation';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,6 +12,14 @@ export async function GET(request: NextRequest) {
     
     if (!buildId && !partId) {
       return NextResponse.json({ error: 'Either buildId or partId is required' }, { status: 400 });
+    }
+
+    // Validate ID format (basic validation)
+    if (buildId && typeof buildId !== 'string') {
+      return NextResponse.json({ error: 'Invalid buildId format' }, { status: 400 });
+    }
+    if (partId && typeof partId !== 'string') {
+      return NextResponse.json({ error: 'Invalid partId format' }, { status: 400 });
     }
 
     const comments = await prisma.comment.findMany({
@@ -28,6 +37,7 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc',
       },
+      take: 100, // Limit comments to prevent excessive data transfer
     });
 
     return NextResponse.json({ comments });
@@ -45,11 +55,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { content, buildId, partId } = await request.json();
+    // Get client IP for rate limiting
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || session.user.email;
     
-    if (!content || (!buildId && !partId)) {
-      return NextResponse.json({ error: 'Content and either buildId or partId are required' }, { status: 400 });
+    // Check rate limit
+    if (!commentRateLimiter.isAllowed(ip)) {
+      return NextResponse.json(
+        { error: 'Too many comments. Please try again later.' },
+        { status: 429 }
+      )
     }
+
+    const body = await request.json();
+    const { buildId, partId } = body;
+    
+    if (!buildId && !partId) {
+      return NextResponse.json({ error: 'Either buildId or partId is required' }, { status: 400 });
+    }
+
+    // Validate and sanitize comment content
+    let validatedData;
+    try {
+      validatedData = validateAndSanitize(commentSchema, { content: body.content });
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid comment content' },
+        { status: 400 }
+      )
+    }
+
+    const { content } = validatedData;
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
@@ -57,6 +92,18 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Verify that the build/part exists and is accessible
+    if (buildId) {
+      const build = await prisma.droneBuild.findUnique({
+        where: { id: buildId },
+        select: { isPublic: true, userId: true }
+      });
+      
+      if (!build || (!build.isPublic && build.userId !== user.id)) {
+        return NextResponse.json({ error: 'Build not found or not accessible' }, { status: 404 });
+      }
     }
 
     const comment = await prisma.comment.create({

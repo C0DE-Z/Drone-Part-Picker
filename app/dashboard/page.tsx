@@ -72,7 +72,7 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Please Sign In</h1>
           <Link
             href="/auth/signin"
-            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             Sign In
           </Link>
@@ -114,7 +114,7 @@ export default function Dashboard() {
             <p className="text-gray-500 mb-6">Create your first drone build to see it here</p>
             <Link
               href="/"
-              className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               Start Building
             </Link>
@@ -169,7 +169,7 @@ export default function Dashboard() {
                 <div className="mt-4 pt-4 border-t border-gray-200 flex gap-2">
                   <Link 
                     href={`/?loadBuild=${build.id}`}
-                    className="flex-1 px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors text-sm font-medium text-center"
+                    className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium text-center"
                   >
                     Load Build
                   </Link>

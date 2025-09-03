@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { RateLimiter } from '@/lib/validation';
+
+const usernameRateLimit = new RateLimiter(5, 60 * 1000); // 5 username generations per minute
 
 // Function to generate a simple username from email
 function generateUsername(email: string): string {
@@ -19,6 +22,14 @@ export async function POST() {
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limiting
+    if (!usernameRateLimit.isAllowed(session.user.email)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Find the current user
@@ -55,6 +66,12 @@ export async function POST() {
       username = `${generateUsername(user.email).split(/\d+/)[0]}${suffix}`;
     }
 
+    // If we couldn't find a unique username after 10 attempts, generate a random one
+    if (attempts >= 10) {
+      const randomSuffix = Math.floor(Math.random() * 100000);
+      username = `user${randomSuffix}`;
+    }
+
     // Update the user with the new username
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -64,6 +81,6 @@ export async function POST() {
     return NextResponse.json({ username: updatedUser.username });
   } catch (error) {
     console.error('Error generating username:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to generate username' }, { status: 500 });
   }
 }

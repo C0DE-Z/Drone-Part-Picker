@@ -60,7 +60,9 @@ export default function Navbar() {
                     <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4" />
                     </div>
-                    <span className="font-medium">{session.user?.name?.split(' ')[0]}</span>
+                    <span className="font-medium">
+                      {session.user?.name || (session.user?.email ? session.user.email.split('@')[0] : 'Account')}
+                    </span>
                   </button>
                   
                   {/* Dropdown Menu */}

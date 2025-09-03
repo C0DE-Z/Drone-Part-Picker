@@ -275,52 +275,52 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
       </div>
 
       {/* Flight Characteristics */}
-      <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+  <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
           🎯 Flight Characteristics
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3 text-sm sm:text-base">Agility Metrics</h4>
+  <h4 className="font-semibold text-gray-700 mb-3 text-sm sm:text-base">Agility Metrics</h4>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Roll Rate Potential</span>
-                <span className="text-sm font-semibold text-gray-900">
+  <span className="text-sm text-gray-600">Roll Rate Potential</span>
+  <span className="text-sm font-semibold text-gray-900">
                   {(performance.thrustToWeightRatio * 180).toFixed(0)}°/s
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Acceleration</span>
-                <span className="text-sm font-semibold text-gray-900">
+  <span className="text-sm text-gray-600">Acceleration</span>
+  <span className="text-sm font-semibold text-gray-900">
                   {((performance.thrustToWeightRatio - 1) * 9.81).toFixed(1)} m/s²
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Response Time</span>
-                <span className="text-sm font-semibold text-gray-900">
+  <span className="text-sm text-gray-600">Response Time</span>
+  <span className="text-sm font-semibold text-gray-900">
                   {(100 / performance.thrustToWeightRatio).toFixed(0)}ms
                 </span>
               </div>
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3">Efficiency Metrics</h4>
+  <h4 className="font-semibold text-gray-700 mb-3">Efficiency Metrics</h4>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Hover Power Loading</span>
-                <span className="text-sm font-semibold text-gray-900">
+  <span className="text-sm text-gray-600">Hover Power Loading</span>
+  <span className="text-sm font-semibold text-gray-900">
                   {(performance.totalWeight / (performance.hovering.currentDraw * performance.motors.voltage * 4)).toFixed(1)} g/W
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Energy Density</span>
-                <span className="text-sm font-semibold text-gray-900">
+  <span className="text-sm text-gray-600">Energy Density</span>
+  <span className="text-sm font-semibold text-gray-900">
                   {((performance.battery.capacity * performance.battery.voltage) / performance.totalWeight * 1000).toFixed(1)} Wh/kg
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Thrust Loading</span>
-                <span className="text-sm font-semibold text-gray-900">
+  <span className="text-sm text-gray-600">Thrust Loading</span>
+  <span className="text-sm font-semibold text-gray-900">
                   {(performance.maxThrustGrams / performance.totalWeight).toFixed(1)}x weight
                 </span>
               </div>

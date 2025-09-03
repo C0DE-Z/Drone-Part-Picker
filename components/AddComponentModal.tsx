@@ -107,7 +107,7 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({ isOpen, onClose, 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
       <div className="bg-white border border-gray-200 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
         <div className="p-6 border-b border-gray-100 bg-gray-50">
           <div className="flex justify-between items-center">
@@ -174,17 +174,17 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({ isOpen, onClose, 
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 rounded-lg transition-all duration-150 font-medium"
+        className="px-6 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 rounded-lg transition-all duration-150 font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-all duration-150 font-medium"
+        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-150 font-medium"
             >
               Add Component
             </button>

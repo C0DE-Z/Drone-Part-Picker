@@ -56,8 +56,8 @@ export default function ComponentGrid({
   if (totalItems === 0) {
     return (
       <div className="text-center py-16 transition-all duration-500 ease-out">
-        <div className="text-gray-400 text-4xl mb-4 animate-bounce">🔍</div>
-        <p className="text-gray-600 animate-fade-in">No components found matching &quot;{searchTerm}&quot;</p>
+  <div className="text-gray-400 text-4xl mb-4 animate-bounce">🔍</div>
+  <p className="text-gray-600 animate-fade-in">No components found matching &quot;{searchTerm}&quot;</p>
       </div>
     );
   }
@@ -124,8 +124,8 @@ export default function ComponentGrid({
                       onClick={() => handlePageChange(pageNum)}
                       className={`px-3 py-1 rounded-lg border transition-colors ${
                         currentPage === pageNum
-                          ? 'bg-black text-gray-300 border-black'
-                          : 'border-gray-300 hover:bg-gray-50 '
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'border-gray-300 text-gray-600 hover:bg-gray-50'
                       }`}
                     >
                       {pageNum}

@@ -21,6 +21,7 @@ const componentData: DroneComponents = droneData as DroneComponents;
 function AuthControls() {
   const { data: session, status } = useSession();
   const [userProfile, setUserProfile] = useState<{username?: string} | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -29,6 +30,12 @@ function AuthControls() {
         .then(res => res.json())
         .then(data => setUserProfile({ username: data.username }))
         .catch(err => console.error('Error:', err));
+
+      // Check admin status
+      fetch('/api/auth/check-admin')
+        .then(res => res.json())
+        .then(data => setIsAdmin(data.isAdmin))
+        .catch(err => console.error('Error checking admin status:', err));
     }
   }, [session]);
 
@@ -37,7 +44,7 @@ function AuthControls() {
   if (session) {
     return (
       <div className="flex items-center gap-4">
-        <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
+  <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
           My Builds
         </Link>
         {userProfile?.username && (
@@ -47,6 +54,14 @@ function AuthControls() {
             </Link>
             <span className="text-gray-700">Hi, {userProfile.username}</span>
           </>
+        )}
+        {isAdmin && (
+          <Link 
+            href="/admin" 
+            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 font-medium"
+          >
+            Admin
+          </Link>
         )}
         <button
           onClick={() => signOut()}
@@ -60,10 +75,10 @@ function AuthControls() {
 
   return (
     <div className="flex gap-2">
-      <Link href="/auth/signin" className="px-4 py-2 text-gray-700 hover:text-gray-900">
+  <Link href="/auth/signin" className="px-4 py-2 text-gray-700 hover:text-gray-900">
         Sign In
       </Link>
-      <Link href="/auth/signup" className="px-4 py-2 bg-black text-white rounded">
+  <Link href="/auth/signup" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
         Sign Up
       </Link>
     </div>
@@ -297,9 +312,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50 transition-colors">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm transition-shadow duration-300 hover:shadow-md">
+  <header className="bg-white border-b border-gray-200 shadow-sm transition-all duration-300 hover:shadow-md">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
@@ -313,7 +328,6 @@ export default function Home() {
                 <Link href="/parts/custom" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
                   Custom Parts
                 </Link>
-
               </nav>
             </div>
             <div className="flex items-center space-x-4">
@@ -337,13 +351,13 @@ export default function Home() {
         <div className="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 gap-6">
           {/* Component Selection */}
           <div className="xl:col-span-2 lg:col-span-2">
-            <div className="bg-white rounded-lg shadow border transition-all duration-300 hover:shadow-lg">
-              <div className="p-4 border-b">
+            <div className="bg-white rounded-lg shadow border border-gray-200 transition-all duration-300 hover:shadow-lg">
+              <div className="p-4 border-b border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900">Component Selection</h3>
               </div>
 
               {/* Component Tabs */}
-              <div className="border-b bg-gray-50 relative">
+              <div className="border-b border-gray-200 bg-gray-50 relative">
                 {/* Scroll indicators with arrows */}
                 <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none flex items-center">
                   <div className="text-gray-600 text-xs ml-1">‹</div>
@@ -357,11 +371,11 @@ export default function Home() {
                     <button
                       key={String(tab.key)}
                       onClick={() => setActiveTab(tab.key)}
-                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 mx-1 rounded-lg transition-all duration-300 ease-in-out whitespace-nowrap text-sm sm:text-base transform hover:scale-105 ${
-                        activeTab === tab.key
-                          ? 'bg-black text-white shadow-lg scale-105'
-                          : 'text-gray-700 hover:text-gray-900 hover:bg-white hover:shadow-md'
-                      }`}
+      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 mx-1 rounded-lg transition-all duration-300 ease-in-out whitespace-nowrap text-sm sm:text-base transform hover:scale-105 ${
+            activeTab === tab.key
+        ? 'bg-blue-600 text-white shadow-lg scale-105'
+              : 'text-gray-700 hover:text-gray-900 hover:bg-white hover:shadow-md'
+            }`}
                       style={{ 
                         minWidth: 'fit-content',
                         animationDelay: `${index * 50}ms`
@@ -376,17 +390,17 @@ export default function Home() {
               </div>
 
               {/* Search */}
-              <div className="p-4 border-b flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <input
                   type="text"
                   placeholder={`Search ${tabs.find(t => t.key === activeTab)?.label.toLowerCase()}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 px-4 py-2 bg-gray-50 border text-gray-400 rounded-lg text-sm sm:text-base transition-all duration-300 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-white"
+                  className="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg text-sm sm:text-base transition-all duration-300 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-white"
                 />
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black whitespace-nowrap text-sm sm:text-base transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg whitespace-nowrap text-sm sm:text-base transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
                 >
                   <span className="sm:hidden">+ Add</span>
                   <span className="hidden sm:inline">+ Add Custom</span>
@@ -428,18 +442,18 @@ export default function Home() {
          selectedComponents.stack && 
          selectedComponents.prop && 
          selectedComponents.battery && (
-          <div className="fixed bottom-6 right-6 z-50 animate-in">
+      <div className="fixed bottom-6 right-6 z-50 animate-in">
             <div 
               onClick={scrollToPerformance}
-              className="group bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-full p-3 sm:p-4 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 flex items-center gap-2 sm:gap-3 hover:bg-white"
+        className="group bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-full p-3 sm:p-4 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 flex items-center gap-2 sm:gap-3 hover:bg-white"
               style={{ 
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2)' 
               }}
             >
-              <div className="text-gray-700 text-xs sm:text-sm font-medium hidden sm:block group-hover:text-green-600 transition-colors duration-200">
+        <div className="text-gray-700 text-xs sm:text-sm font-medium hidden sm:block group-hover:text-green-600 transition-colors duration-200">
                 View Performance
               </div>
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-all duration-200 group-hover:shadow-sm">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-all duration-200 group-hover:shadow-sm">
                 <div className="text-green-600 text-base sm:text-lg animate-bounce-arrow">📊</div>
               </div>
             </div>
@@ -457,7 +471,7 @@ export default function Home() {
         )}
 
         {/* Advanced Settings */}
-        <AdvancedSettingsComponent
+  <AdvancedSettingsComponent
           settings={advancedSettings}
           onSettingsChange={setAdvancedSettings}
           isOpen={isAdvancedSettingsOpen}

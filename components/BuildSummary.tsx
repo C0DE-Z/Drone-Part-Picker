@@ -33,9 +33,9 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 border border-gray-200 w-full h-fit">
+  <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 border border-gray-200 w-full h-fit">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-2">
-        <h2 className="text-xl sm:text-2xl font-bold text-black">Build Summary</h2>
+  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Build Summary</h2>
         <div className="text-sm text-gray-600 font-medium whitespace-nowrap">
           {componentCount}/6 components
         </div>
@@ -47,7 +47,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
                 <span className="text-base sm:text-lg">⚡</span>
-                <span className="font-semibold text-black text-sm sm:text-base">Motor</span>
+                <span className="font-semibold text-gray-900 text-sm sm:text-base">Motor</span>
               </div>
             </div>
             <span className="text-xs sm:text-sm text-gray-600 font-medium break-words whitespace-normal w-full">{selectedComponents.motor.name}</span>
@@ -59,7 +59,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
                 <span className="text-base sm:text-lg">🔧</span>
-                <span className="font-semibold text-black text-sm sm:text-base">Frame</span>
+                <span className="font-semibold text-gray-900 text-sm sm:text-base">Frame</span>
               </div>
             </div>
             <span className="text-xs sm:text-sm text-gray-600 font-medium break-words whitespace-normal w-full">{selectedComponents.frame.name}</span>
@@ -71,7 +71,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
                 <span className="text-base sm:text-lg">💻</span>
-                <span className="font-semibold text-black text-sm sm:text-base">Flight Controller</span>
+                <span className="font-semibold text-gray-900 text-sm sm:text-base">Flight Controller</span>
               </div>
             </div>
             <span className="text-xs sm:text-sm text-gray-600 font-medium break-words whitespace-normal w-full">{selectedComponents.stack.name}</span>
@@ -83,7 +83,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
                 <span className="text-base sm:text-lg">📹</span>
-                <span className="font-semibold text-black text-sm sm:text-base">Camera</span>
+                <span className="font-semibold text-gray-900 text-sm sm:text-base">Camera</span>
               </div>
             </div>
             <span className="text-xs sm:text-sm text-gray-600 font-medium break-words whitespace-normal w-full">{selectedComponents.camera.name}</span>
@@ -95,7 +95,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
                 <span className="text-base sm:text-lg">🌀</span>
-                <span className="font-semibold text-black text-sm sm:text-base">Propeller</span>
+                <span className="font-semibold text-gray-900 text-sm sm:text-base">Propeller</span>
               </div>
             </div>
             <span className="text-xs sm:text-sm text-gray-600 font-medium break-words whitespace-normal w-full">{selectedComponents.prop.name}</span>
@@ -107,7 +107,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
                 <span className="text-base sm:text-lg">🔋</span>
-                <span className="font-semibold text-black text-sm sm:text-base">Battery</span>
+                <span className="font-semibold text-gray-900 text-sm sm:text-base">Battery</span>
               </div>
             </div>
             <span className="text-xs sm:text-sm text-gray-600 font-medium break-words whitespace-normal w-full">{selectedComponents.battery.name}</span>
@@ -121,7 +121,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
                     <span className="text-base sm:text-lg">⚖️</span>
-                    <span className="font-semibold text-black text-sm sm:text-base">Weight</span>
+                    <span className="font-semibold text-gray-900 text-sm sm:text-base">Weight</span>
                   </div>
                 </div>
                 <span className="text-xs sm:text-sm text-gray-600 font-medium break-words whitespace-normal w-full">{weight.name}</span>
@@ -148,7 +148,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
         <button
           onClick={() => setShowSaveOptions(!showSaveOptions)}
           disabled={!isComplete}
-          className="w-full px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-black hover:bg-gray-800 border border-transparent rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-full px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           {isComplete ? 'Save Build' : 'Need More Parts'}
         </button>
@@ -156,7 +156,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
 
       {/* Save Options Panel */}
       {showSaveOptions && isComplete && (
-        <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
+  <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
           <div className="space-y-3 sm:space-y-4">
             {/* Build Name Input */}
             <div>
@@ -169,7 +169,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
                 value={buildName}
                 onChange={(e) => setBuildName(e.target.value)}
                 placeholder="Enter a catchy name for your build..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 maxLength={50}
               />
               <p className="text-xs text-gray-500 mt-1">Give your build a unique name that others will remember</p>
@@ -185,7 +185,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Tell the community about your build, its purpose, flight characteristics..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                 rows={3}
                 maxLength={300}
               />
@@ -231,7 +231,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             {/* Save Button */}
             <button
               onClick={handleSave}
-              className="w-full px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors text-sm font-medium"
+              className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
             >
               Save Build
             </button>
@@ -240,7 +240,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
       )}
 
       {!isComplete && componentCount > 0 && (
-        <p className="text-xs text-gray-500 mt-4 text-center font-medium">
+  <p className="text-xs text-gray-500 mt-4 text-center font-medium">
           Add at least a motor, frame, flight controller, and battery to save your build
         </p>
       )}
