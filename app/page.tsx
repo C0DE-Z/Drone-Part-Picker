@@ -264,7 +264,7 @@ export default function Home() {
       alert('Failed to save build. Please try again.');
     }
   };
-unn
+
   // Merge regular and custom components
   const getAllComponents = (category: keyof DroneComponents) => {
     return { ...componentData[category], ...customComponents[category] };
