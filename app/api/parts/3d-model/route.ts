@@ -146,7 +146,8 @@ export async function GET(request: NextRequest) {
         user: {
           select: {
             username: true,
-            name: true
+            name: true,
+            email: true
           }
         }
       }
@@ -158,7 +159,7 @@ export async function GET(request: NextRequest) {
 
     // Check if part is public or user has access
     const session = await getServerSession(authOptions);
-    if (!part.isPublic && (!session?.user?.email || session.user.email !== part.user)) {
+  if (!part.isPublic && (!session?.user?.email || session.user.email !== part.user.email)) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
