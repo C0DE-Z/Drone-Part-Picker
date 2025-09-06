@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SessionProvider from '@/components/SessionProvider';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,16 +20,18 @@ export const metadata: Metadata = {
   description: "Build and share your FPV drone configurations",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+  
   return (
     <html lang="en" suppressHydrationWarning>
   <head></head>
   <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}>
-        <SessionProvider session={null}>
+        <SessionProvider session={session}>
           {children}
         </SessionProvider>
       </body>

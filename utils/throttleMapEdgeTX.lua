@@ -1,47 +1,52 @@
-local logFile = nil
-local lastLogTime = 0
-local logInterval = 0.1 
-local logging = true 
-local function init()
+local time = 0
+local armed = false
+local logFile = "throttleMap.csv"
 
+local inputs = { "Thr", "Ail", "Ele", "Rud", "SA", "SB", "SC", "SD" }
 
-  lcd.clear()
- -- Clear again cause it doesnt work sometimes
-  lcd.clear()
-  
-
-  lcd.drawText(0, 0, "Throttle Mapping")
-  lcd.drawText(0, 10, "To begin please set throttle to 100%")
-  logFile = io.open("/SCRIPTS/LOGS/throttle_map.csv", "w+")
-
-end
-
-local function run(event)
-
-
-  if logging then
-    lcd.clear()
-    lcd.drawText(0, 0, "Throttle " .. getValue("thr"))
-
-    local now = getTime() / 100.0
-    if logFile and (now - lastLogTime) >= logInterval then
-      local throttle = getValue("thr")
-      lcd.drawText(0, 20, "Logging: " .. throttle)
-      logFile:write(string.format("%.2f,%d\n", now, throttle))
-      lastLogTime = now
+local function anyInputActive()
+    for i = 1, #inputs do
+        local val = getValue(inputs[i])
+        if val ~= 0 then
+            return true
+        end
     end
-  end
-
-
-
-  return 0
+    return false
 end
 
-local function stop()
-  if logFile then
-    logFile:close()
-    logFile = nil
-  end
+function init()
+    return
 end
 
-return { init=init, run=run, stop=stop }
+function run()
+    if anyInputActive() then
+        if not armed then
+            armed = true
+            time = 0
+            io.open(logFile, "a")
+        end
+
+        lcd.clear()
+        local thr = getValue("Thr")
+        lcd.drawText(LCD_W/2 - 20, LCD_H/2 - 20, "ARMED", MIDSIZE)
+        lcd.drawNumber(LCD_W/2, LCD_H/2, thr)
+        lcd.drawNumber(LCD_W/2, LCD_H/2 + 20, time)
+
+        io.write(logFile, time .. "," .. thr .. "\n")
+        time = time + 1
+
+    else
+        if armed then
+            armed = false
+            io.close()
+        end
+
+        lcd.clear()
+        lcd.drawText(LCD_W/2 - 40, LCD_H/2 - 10, "Move any input to start")
+    end
+end
+
+return {
+    init = init,
+    run = run
+}

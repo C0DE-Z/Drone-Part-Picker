@@ -212,7 +212,7 @@ export class DroneCalculator {
     
     const momentumThrust = 0.5 * correctedAirDensity * diskArea * Math.pow(tipSpeed * 0.08, 2) * propEfficiency;
     const momentumThrustGrams = momentumThrust * 1000;
-    
+
     const bladeAngle = Math.atan(propPitch / (Math.PI * propDiameter)) * (180 / Math.PI);
     const optimalBladeAngle = 15;
     const angleEfficiency = 1 - Math.abs(bladeAngle - optimalBladeAngle) / 30;
@@ -276,9 +276,7 @@ export class DroneCalculator {
     const frameArea = Math.pow(frameWheelbase / 1000, 2);
     const dragCoefficient = 0.8 + (frameWheelbase / 1000) * 0.2;
     const airDensity = 1.225;
-    
-    const totalWeight = this.calculateWeights(components).total / 1000;
-    
+        
     const maxThrust = this.calculateThrust(components) / 1000;
     
     const forwardThrust = maxThrust * 9.81 * 0.3;
@@ -316,8 +314,8 @@ export class DroneCalculator {
     else if (frameWheelbase <= 150) maxRealisticSpeed = 150;
     else if (frameWheelbase <= 180) maxRealisticSpeed = 180;
     else if (frameWheelbase <= 220) maxRealisticSpeed = 200;
-    else if (frameWheelbase <= 280) maxRealisticSpeed = 170;
-    else maxRealisticSpeed = 140;
+    else if (frameWheelbase <= 280) maxRealisticSpeed = 210;
+    else maxRealisticSpeed = 220;
     
     return Math.round(Math.min(topSpeedKmh, maxRealisticSpeed));
   }

@@ -127,9 +127,9 @@ export class RateLimiter {
 }
 
 // Global rate limiters
-export const authRateLimiter = new RateLimiter(5, 15 * 60 * 1000); // 5 requests per 15 minutes
-export const buildRateLimiter = new RateLimiter(20, 60 * 1000); // 20 requests per minute
-export const commentRateLimiter = new RateLimiter(10, 60 * 1000); // 10 comments per minute
+export const authRateLimiter = new RateLimiter(10, 15 * 60 * 1000); // 10 requests per 15 minutes
+export const buildRateLimiter = new RateLimiter(50, 60 * 1000); // 50 requests per minute
+export const commentRateLimiter = new RateLimiter(30, 60 * 1000); // 30 comments per minute
 
 // Sanitize HTML input to prevent XSS
 export function sanitizeHtml(input: string): string {

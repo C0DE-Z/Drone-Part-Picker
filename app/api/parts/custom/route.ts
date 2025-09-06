@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { validateAndSanitize, RateLimiter } from '@/lib/validation';
 import { z } from 'zod';
 
-const customPartsRateLimit = new RateLimiter(10, 60 * 1000); // 10 custom parts per minute
+const customPartsRateLimit = new RateLimiter(30, 60 * 1000); // 30 custom parts per minute
 
 const customPartSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be at most 100 characters').trim(),

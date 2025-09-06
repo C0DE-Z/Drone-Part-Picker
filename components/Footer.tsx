@@ -68,8 +68,8 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-          <a href="mailto:support@dronepartpicker.com" className="text-gray-600 hover:text-gray-900 transition-colors">
-                    Contact Support
+          <a href="mailto:c0dez3y@gmail.com" className="text-gray-600 hover:text-gray-900 transition-colors">
+                    Contact
                   </a>
                 </li>
               </ul>
@@ -79,7 +79,7 @@ export default function Footer() {
       <div className="border-t border-gray-200 mt-8 pt-8 transition-colors">
             <div className="flex flex-col md:flex-row justify-between items-center">
         <p className="text-gray-600 text-sm">
-                © {new Date().getFullYear()} DronePartPicker. All rights reserved.
+                © {new Date().getFullYear()} CodeZ. All rights reserved.
               </p>
         <p className="text-gray-600 text-sm mt-2 md:mt-0">
                 Made with ❤️ for the FPV community

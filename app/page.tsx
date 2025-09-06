@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { DroneComponents, SelectedComponents, PerformanceEstimate, Motor, Frame, Stack, Camera, Prop, Battery, CustomWeight } from '@/types/drone';
@@ -105,6 +105,16 @@ export default function Home() {
   const [showBuildCompleteToast, setShowBuildCompleteToast] = useState(false);
   const [previousBuildComplete, setPreviousBuildComplete] = useState(false);
   const [showPerformanceIndicator, setShowPerformanceIndicator] = useState(true);
+  
+  // Loading and error states for build loading
+  const [isLoadingBuild, setIsLoadingBuild] = useState(false);
+  const [showLoadSuccessToast, setShowLoadSuccessToast] = useState(false);
+  const [showLoadErrorToast, setShowLoadErrorToast] = useState(false);
+  const [loadErrorMessage, setLoadErrorMessage] = useState('');
+  
+  // Save build toast states
+  const [showSaveErrorToast, setShowSaveErrorToast] = useState(false);
+  const [saveErrorMessage, setSaveErrorMessage] = useState('');
 
   // Load saved advanced settings from localStorage
   useEffect(() => {
@@ -153,14 +163,58 @@ export default function Home() {
     setPreviousBuildComplete(isCurrentlyComplete);
   }, [selectedComponents, previousBuildComplete]);
 
+  const loadBuild = useCallback(async (buildId: string) => {
+    // Prevent double loading
+    if (isLoadingBuild) return;
+    
+    setIsLoadingBuild(true);
+    setShowLoadErrorToast(false);
+    setShowLoadSuccessToast(false);
+    
+    try {
+      const response = await fetch(`/api/builds/${buildId}`);
+      if (response.ok) {
+        console.log("Fetch response received");
+        const data = await response.json();
+        console.log("Response data:", data);
+        
+        // The API returns { build: {...} }, so we need to access data.build
+        const build = data.build;
+        console.log("Build data:", build);
+        
+        if (build && build.components) {
+          console.log(`Loading Build: ${build.name || 'Unnamed Build'}`);
+          setSelectedComponents(build.components);
+          setShowLoadSuccessToast(true);
+        } else {
+          throw new Error('Invalid build data structure');
+        }
+      } else {
+        console.log('Build not found response');
+        throw new Error('Build not found');
+      }
+    } catch (error) {
+      console.error('Error loading build:', error);
+      setLoadErrorMessage('Failed to load build. Please make sure the build exists and try again.');
+      setShowLoadErrorToast(true);
+    } finally {
+      setIsLoadingBuild(false);
+    }
+  }, [isLoadingBuild]);
+
   // Load build from URL if present
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const buildId = urlParams.get('loadBuild');
-    if (buildId) {
+    console.log('URL Params:', urlParams.toString());
+    if (buildId && !isLoadingBuild) {
       loadBuild(buildId);
+      console.log("Loading build from URL:", buildId);
+      // Remove the loadBuild parameter from URL after loading
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
     }
-  }, []);
+  }, [loadBuild, isLoadingBuild]);
 
   // Function to scroll to performance section
   const scrollToPerformance = () => {
@@ -189,27 +243,6 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const loadBuild = async (buildId: string) => {
-    try {
-      const response = await fetch(`/api/builds/${buildId}`);
-      if (response.ok) {
-        const build = await response.json();
-        if (build.components) {
-          setSelectedComponents(build.components);
-          // Clear the URL parameter after loading
-          window.history.replaceState({}, '', window.location.pathname);
-          // Show success message
-          alert(`Successfully loaded build: ${build.name || 'Unnamed Build'}`);
-        }
-      } else {
-        throw new Error('Build not found');
-      }
-    } catch (error) {
-      console.error('Error loading build:', error);
-      alert('Failed to load build. Please make sure the build exists and try again.');
-    }
-  };
-
   const handleComponentSelect = (
     type: 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery' | 'customWeight',
     name: string,
@@ -236,7 +269,8 @@ export default function Home() {
 
   const handleSaveBuild = async (buildName: string, description: string, isPublic: boolean, tags: string[]) => {
     if (!session) {
-      alert('Please sign in to save builds');
+      setSaveErrorMessage('Please sign in to save builds');
+      setShowSaveErrorToast(true);
       return;
     }
     
@@ -261,11 +295,11 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error saving build:', error);
-      alert('Failed to save build. Please try again.');
+      setSaveErrorMessage('Failed to save build. Please try again.');
+      setShowSaveErrorToast(true);
     }
   };
 
-  // Merge regular and custom components
   const getAllComponents = (category: keyof DroneComponents) => {
     return { ...componentData[category], ...customComponents[category] };
   };
@@ -318,6 +352,12 @@ export default function Home() {
               <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-gray-700 transition-all duration-300 transform hover:scale-105">
                 DronePartPicker
               </Link>
+              {isLoadingBuild && (
+                <div className="flex items-center space-x-2 text-blue-600">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  <span className="text-sm font-medium">Loading build...</span>
+                </div>
+              )}
               <nav className="hidden md:flex space-x-6">
                 <Link href="/builds/public" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
                   Public Builds
@@ -364,7 +404,7 @@ export default function Home() {
                 </div>
                 
                 <nav className="flex overflow-x-auto px-2 pt-2 pb-3 scroll-smooth custom-scrollbar" style={{ scrollBehavior: 'smooth' }}>
-                  {tabs.map((tab, index) => (
+                  {tabs.map((tab) => (
                     <button
                       key={String(tab.key)}
                       onClick={() => setActiveTab(tab.key)}
@@ -375,7 +415,6 @@ export default function Home() {
             }`}
                       style={{ 
                         minWidth: 'fit-content',
-                        animationDelay: `${index * 50}ms`
                       }}
                     >
                       <span className="text-sm sm:text-base transition-transform duration-200">{tab.icon}</span>
@@ -494,6 +533,27 @@ export default function Home() {
               setShowBuildCompleteToast(false);
             }
           }}
+        />
+
+        <Toast
+          message="✅ Build loaded successfully!"
+          type="success"
+          isVisible={showLoadSuccessToast}
+          onClose={() => setShowLoadSuccessToast(false)}
+        />
+
+        <Toast
+          message={loadErrorMessage}
+          type="error"
+          isVisible={showLoadErrorToast}
+          onClose={() => setShowLoadErrorToast(false)}
+        />
+
+        <Toast
+          message={saveErrorMessage}
+          type="error"
+          isVisible={showSaveErrorToast}
+          onClose={() => setShowSaveErrorToast(false)}
         />
 
         <Footer />

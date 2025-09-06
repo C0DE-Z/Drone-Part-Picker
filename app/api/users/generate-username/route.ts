@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { RateLimiter } from '@/lib/validation';
 
-const usernameRateLimit = new RateLimiter(5, 60 * 1000); // 5 username generations per minute
+const usernameRateLimit = new RateLimiter(50, 60 * 1000); // 50 username generations per minute
 
 // Function to generate a simple username from email
 function generateUsername(email: string): string {

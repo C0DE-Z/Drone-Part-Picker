@@ -21,6 +21,13 @@ export const authOptions: NextAuthOptions = {
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email
+          },
+          select: {
+            id: true,
+            email: true,
+            password: true,
+            username: true,
+            name: true
           }
         })
 
@@ -41,30 +48,52 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.username || user.name || null,
+          username: user.username,
         }
       }
     })
   ],
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // Update session every 24 hours
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+      },
+    },
   },
   callbacks: {
   async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
-    // include name/username for convenience
-    const u = user as (typeof user & { username?: string | null })
-    token.name = u.username || user.name || null
+        // include name/username for convenience
+        const u = user as (typeof user & { username?: string | null })
+        token.name = u.username || user.name || null
+        token.username = u.username
       }
       // Allow updating session name on update triggers
       if (trigger === 'update' && session?.user?.name) {
         token.name = session.user.name
       }
+      // Set token expiration to match session duration
+      token.exp = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
       return token
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string
+        session.user.username = token.username as string
         // prefer token.name (may be username), else existing
         if (token.name) session.user.name = token.name as string
       }

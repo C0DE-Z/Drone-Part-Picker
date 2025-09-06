@@ -71,7 +71,6 @@ export default function ComponentGrid({
             key={name}
             className="transition-all duration-500 ease-out transform hover:scale-105"
             style={{ 
-              animationDelay: `${index * 50}ms`,
               animation: 'fadeInUp 0.6s ease-out forwards'
             }}
           >

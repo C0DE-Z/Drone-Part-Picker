@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { validateAndSanitize, RateLimiter } from '@/lib/validation';
 import { z } from 'zod';
 
-const reportRateLimit = new RateLimiter(5, 60 * 1000); // 5 reports per minute
+const reportRateLimit = new RateLimiter(10, 60 * 1000); // 10 reports per minute
 
 const reportSchema = z.object({
   reason: z.string().min(1, 'Reason is required').max(100, 'Reason must be at most 100 characters').trim(),

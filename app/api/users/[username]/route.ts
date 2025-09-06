@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { validateAndSanitize, RateLimiter } from '@/lib/validation';
 import { z } from 'zod';
 
-const profileUpdateRateLimit = new RateLimiter(5, 60 * 1000); // 5 profile updates per minute
+const profileUpdateRateLimit = new RateLimiter(20, 60 * 1000); // 20 profile updates per minute
 
 const profileUpdateSchema = z.object({
   bio: z.string().max(500, 'Bio must be at most 500 characters').trim().optional(),

@@ -203,7 +203,7 @@ export default function UserProfile({ username, isOwnProfile = false }: UserProf
                     
                     {isOwnProfile && (
                       <Link
-                        href="/settings/profile"
+                        href={`/profile/${username}/edit`}
                         className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
                       >
                         Edit Profile

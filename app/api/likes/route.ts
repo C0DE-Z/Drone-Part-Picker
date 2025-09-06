@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { validateAndSanitize, RateLimiter } from '@/lib/validation';
 import { z } from 'zod';
 
-const likesRateLimit = new RateLimiter(30, 60 * 1000); // 30 likes per minute
+const likesRateLimit = new RateLimiter(100, 60 * 1000); // 100 likes per minute
 
 const likeSchema = z.object({
   buildId: z.string().uuid().optional(),
