@@ -188,7 +188,7 @@ export default function BuildDetails({ params }: { params: Promise<{ id: string 
           <div className="space-y-6">
             {/* Performance Stats */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Performance</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">(Est) Performance</h3>
               <div className="space-y-3">
                 {build.performance.totalWeight && (
                   <div className="flex justify-between">

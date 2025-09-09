@@ -1,5 +1,6 @@
 import { SelectedComponents, PerformanceEstimate } from '@/types/drone';
 import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
+import { Princess_Sofia } from 'next/font/google';
 
 type ComponentData = {
   price?: number;
@@ -15,6 +16,7 @@ export class DroneCalculator {
   const maxThrustKg = Math.round((thrust / 1000) * 100) / 100;
     
     
+    /* Debug
     console.log('Debug - Thrust calculation:', {
       totalWeight: weights.total,
       thrust: thrust,
@@ -27,23 +29,22 @@ export class DroneCalculator {
         prop: weights.prop,
         battery: weights.battery
       }
-    });
+    }); 
+    */
     
     
-    const thrustToWeightRatio = Math.round((thrust / weights.total) * 100) / 100;
-    
-    
+    const thrustToWeightRatio = Math.round((thrust / weights.total) * 100) / 100;    
     const clampedTWR = Math.max(1.0, Math.min(15.0, thrustToWeightRatio));
-    
     const estimatedTopSpeed = Math.round(this.estimateTopSpeed(components, clampedTWR));
     const powerConsumption = Math.round(this.estimatePowerConsumption(components) * 10) / 10;
     const estimatedFlightTime = Math.round(this.estimateFlightTime(components, powerConsumption, advancedSettings) * 10) / 10;
-    
+
     const hovering = this.calculateHoveringMetrics(components, weights.total, thrust);
     const motors = this.getMotorMetrics(components);
     const battery = this.getBatteryMetrics(components);
     
     const pricing = this.calculatePricing(components);
+    console.table(pricing.breakdown);
     const compatibility = this.checkCompatibility(components);
 
     return {
@@ -859,7 +860,7 @@ export class DroneCalculator {
         const kv = data.kv || 2000;
         const statorSizeStr = typeof data.statorSize === 'string' ? data.statorSize : String(data.statorSize || '20');
         const statorSize = parseFloat(statorSizeStr.replace(/[^\d.]/g, '') || '20');
-  return Math.round((statorSize * 2 + Number(kv) * 0.01) * 0.8);
+  return Math.round(((statorSize * 2 + Number(kv) * 0.01) * 0.8) / 1000) * 4;
 
       case 'frame':
         const materialStr = typeof data.material === 'string' ? data.material : String(data.material || '');
@@ -869,7 +870,7 @@ export class DroneCalculator {
   let framePrice = wheelbase * 0.2;
   if (material.includes('carbon')) framePrice *= 1.5;
   if (material.includes('titanium')) framePrice *= 2;
-  return Math.round(framePrice);
+  return Math.round(framePrice) / 100;
 
       case 'stack':
         const processorStr = typeof data.fcProcessor === 'string' ? data.fcProcessor : String(data.fcProcessor || '');
@@ -897,7 +898,7 @@ export class DroneCalculator {
         const material_prop = materialPropStr.toLowerCase();
   let propPrice = propSize * 0.8;
   if (material_prop.includes('carbon')) propPrice *= 2;
-  return Math.round(propPrice * 100) / 100;
+  return Math.round(propPrice) ;
 
       case 'battery':
         const capacityStr = typeof data.capacity === 'string' ? data.capacity : String(data.capacity || '1300');

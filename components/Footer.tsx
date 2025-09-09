@@ -20,9 +20,6 @@ export default function Footer() {
                 <a href="https://github.com/C0DE-Z/Drone-Part-Picker" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors">
                   GitHub
                 </a>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  Discord
-                </a>
               </div>
             </div>
 
