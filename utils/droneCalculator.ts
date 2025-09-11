@@ -1,7 +1,7 @@
 import { SelectedComponents, PerformanceEstimate } from '@/types/drone';
 import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
+import { estimateComponentPrice } from './math/cost';
 import { Princess_Sofia } from 'next/font/google';
-
 type ComponentData = {
   price?: number;
   [key: string]: string | number | undefined;
@@ -804,44 +804,44 @@ export class DroneCalculator {
       breakdown.motor = components.motor.data.price * 4;
     } else if (components.motor) {
       
-      breakdown.motor = this.estimateComponentPrice('motor', components.motor.data as unknown as ComponentData) * 4;
+      breakdown.motor = estimateComponentPrice('motor', components.motor.data as unknown as ComponentData) * 4;
     }
 
     
     if (components.frame?.data.price) {
       breakdown.frame = components.frame.data.price;
     } else if (components.frame) {
-      breakdown.frame = this.estimateComponentPrice('frame', components.frame.data as unknown as ComponentData);
+      breakdown.frame = estimateComponentPrice('frame', components.frame.data as unknown as ComponentData);
     }
 
     if (components.stack?.data.price) {
       breakdown.stack = components.stack.data.price;
     } else if (components.stack) {
-      breakdown.stack = this.estimateComponentPrice('stack', components.stack.data as unknown as ComponentData);
+      breakdown.stack = estimateComponentPrice('stack', components.stack.data as unknown as ComponentData);
     }
 
     if (components.camera?.data.price) {
       breakdown.camera = components.camera.data.price;
     } else if (components.camera) {
-      breakdown.camera = this.estimateComponentPrice('camera', components.camera.data as unknown as ComponentData);
+      breakdown.camera = estimateComponentPrice('camera', components.camera.data as unknown as ComponentData);
     }
 
     if (components.prop?.data.price) {
   breakdown.prop = components.prop.data.price * 4;
     } else if (components.prop) {
-  breakdown.prop = this.estimateComponentPrice('prop', components.prop.data as unknown as ComponentData) * 4;
+  breakdown.prop = estimateComponentPrice('prop', components.prop.data as unknown as ComponentData) * 4;
     }
 
     if (components.battery?.data.price) {
       breakdown.battery = components.battery.data.price;
     } else if (components.battery) {
-      breakdown.battery = this.estimateComponentPrice('battery', components.battery.data as unknown as ComponentData);
+      breakdown.battery = estimateComponentPrice('battery', components.battery.data as unknown as ComponentData);
     }
 
     
     if (components.customWeights) {
       breakdown.customWeights = components.customWeights.reduce((total, weight) => {
-        return total + (weight.data.price || this.estimateComponentPrice('customWeight', weight.data as unknown as ComponentData));
+        return total + (weight.data.price || estimateComponentPrice('customWeight', weight.data as unknown as ComponentData));
       }, 0);
     }
 
@@ -853,68 +853,7 @@ export class DroneCalculator {
     };
   }
 
-  private static estimateComponentPrice(type: string, data: ComponentData): number {
-    
-    switch (type) {
-      case 'motor':
-        const kv = data.kv || 2000;
-        const statorSizeStr = typeof data.statorSize === 'string' ? data.statorSize : String(data.statorSize || '20');
-        const statorSize = parseFloat(statorSizeStr.replace(/[^\d.]/g, '') || '20');
-  return Math.round(((statorSize * 2 + Number(kv) * 0.01) * 0.8) / 1000) * 4;
-
-      case 'frame':
-        const materialStr = typeof data.material === 'string' ? data.material : String(data.material || '');
-        const material = materialStr.toLowerCase();
-        const wheelbaseStr = typeof data.wheelbase === 'string' ? data.wheelbase : String(data.wheelbase || '220');
-        const wheelbase = parseFloat(wheelbaseStr.replace(/[^\d]/g, '') || '220');
-  let framePrice = wheelbase * 0.2;
-  if (material.includes('carbon')) framePrice *= 1.5;
-  if (material.includes('titanium')) framePrice *= 2;
-  return Math.round(framePrice) / 100;
-
-      case 'stack':
-        const processorStr = typeof data.fcProcessor === 'string' ? data.fcProcessor : String(data.fcProcessor || '');
-        const processor = processorStr.toLowerCase();
-        const escRatingStr = typeof data.escCurrentRating === 'string' ? data.escCurrentRating : String(data.escCurrentRating || '30');
-        const escRating = parseFloat(escRatingStr.replace(/[^\d]/g, '') || '30');
-  let stackPrice = escRating * 2;
-  if (processor.includes('f7')) stackPrice *= 1.5;
-  if (processor.includes('f4')) stackPrice *= 1.2;
-  return Math.round(stackPrice);
-
-      case 'camera':
-        const resolutionStr = typeof data.resolution === 'string' ? data.resolution : String(data.resolution || '');
-        const resolution = resolutionStr.toLowerCase();
-  let cameraPrice = 25;
-  if (resolution.includes('4k')) cameraPrice = 45;
-  if (resolution.includes('1080p')) cameraPrice = 30;
-  if (resolution.includes('720p')) cameraPrice = 20;
-  return cameraPrice;
-
-      case 'prop':
-        const sizeStr = typeof data.size === 'string' ? data.size : String(data.size || '5');
-        const propSize = parseFloat(sizeStr.replace(/[^\d.]/g, '') || '5');
-        const materialPropStr = typeof data.material === 'string' ? data.material : String(data.material || '');
-        const material_prop = materialPropStr.toLowerCase();
-  let propPrice = propSize * 0.8;
-  if (material_prop.includes('carbon')) propPrice *= 2;
-  return Math.round(propPrice) ;
-
-      case 'battery':
-        const capacityStr = typeof data.capacity === 'string' ? data.capacity : String(data.capacity || '1300');
-        const capacity = parseFloat(capacityStr.replace(/[^\d]/g, '') || '1300');
-        const voltageStr = typeof data.voltage === 'string' ? data.voltage : String(data.voltage || '4S');
-        const voltage = voltageStr;
-        const cells = parseFloat(voltage.replace(/[^\d]/g, '') || '4');
-        return Math.round((capacity / 100) * cells * 0.5);
-
-      case 'customWeight':
-  return data.price || 5;
-
-      default:
-        return 0;
-    }
-  }
+  
 
   private static calculateHoveringMetrics(components: SelectedComponents, totalWeight: number, maxThrust: number): {
     throttlePercentage: number;

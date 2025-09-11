@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { DroneComponents, SelectedComponents, PerformanceEstimate, Motor, Frame, Stack, Camera, Prop, Battery, CustomWeight } from '@/types/drone';
-import { DroneCalculator } from '@/utils/droneCalculator';
+import { DronePerformanceService } from '@/services/DronePerformanceService';
+import { getComponentDataService } from '@/services/ComponentDataService';
 import ComponentGrid from '@/components/ComponentGrid';
 import PerformancePanel from '@/components/PerformancePanel';
 import BuildSummary from '@/components/BuildSummary';
@@ -13,9 +14,9 @@ import Footer from '@/components/Footer';
 import Toast from '@/components/Toast';
 import AdvancedSettingsComponent from '@/components/AdvancedSettings';
 import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
-import droneData from '../list.json';
 
-const componentData: DroneComponents = droneData as DroneComponents;
+const componentDataService = getComponentDataService();
+const componentData: DroneComponents = componentDataService.getAllComponents();
 
 function AuthControls() {
   const { data: session, status } = useSession();
@@ -145,7 +146,7 @@ export default function Home() {
 
   // Update performance when components change
   useEffect(() => {
-    setPerformance(DroneCalculator.calculatePerformance(selectedComponents, advancedSettings));
+    setPerformance(DronePerformanceService.calculatePerformance(selectedComponents, advancedSettings));
   }, [selectedComponents, advancedSettings]);
 
   // Check if build is complete and show toast

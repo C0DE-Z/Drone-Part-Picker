@@ -4,14 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { z } from 'zod';
 
 const MAX_FILE_SIZE = 40 * 1024 * 1024; // 40MB in bytes
 const ALLOWED_FORMATS = ['glb', 'gltf', 'obj', 'stl', 'fbx', 'ply'];
-
-const modelUploadSchema = z.object({
-  partId: z.string().cuid(),
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -69,7 +64,7 @@ export async function POST(request: NextRequest) {
     const uploadsDir = join(process.cwd(), 'public', 'uploads', '3d-models');
     try {
       await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
+    } catch {
       // Directory might already exist
     }
 

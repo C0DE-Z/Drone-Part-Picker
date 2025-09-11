@@ -66,7 +66,7 @@ export default function ComponentGrid({
     <div className="p-4">
       {/* Component Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr">
-        {displayItems.map(([name, component], index) => (
+        {displayItems.map(([name, component]) => (
           <div
             key={name}
             className="transition-all duration-500 ease-out transform hover:scale-105"

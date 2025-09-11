@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { validateAndSanitize, RateLimiter } from '@/lib/validation';
+import { RateLimiter } from '@/lib/validation';
 import { z } from 'zod';
 
 const likesRateLimit = new RateLimiter(100, 60 * 1000); // 100 likes per minute
