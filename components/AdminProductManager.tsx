@@ -1,8 +1,3 @@
-/**
- * Admin Product Management Component
- * Allows admins to view, search, and edit product details
- */
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';

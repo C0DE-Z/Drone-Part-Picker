@@ -11,14 +11,7 @@ type ComponentData = {
   [key: string]: string | number | undefined;
 };
 
-/**
- * Master calculation service that orchestrates all drone performance calculations
- * This replaces the monolithic DroneCalculator class with a modular approach
- */
 export class DronePerformanceService {
-  /**
-   * Calculate complete performance estimate for a drone build
-   */
   static calculatePerformance(
     components: SelectedComponents, 
     advancedSettings: AdvancedSettings = defaultAdvancedSettings
@@ -56,9 +49,6 @@ export class DronePerformanceService {
     };
   }
 
-  /**
-   * Get detailed performance breakdown for analysis
-   */
   static getDetailedBreakdown(
     components: SelectedComponents,
     advancedSettings: AdvancedSettings = defaultAdvancedSettings
@@ -78,9 +68,6 @@ export class DronePerformanceService {
     };
   }
 
-  /**
-   * Calculate hovering-specific metrics
-   */
   private static calculateHoveringMetrics(
     components: SelectedComponents,
     weights: WeightBreakdown,
@@ -105,9 +92,6 @@ export class DronePerformanceService {
     };
   }
 
-  /**
-   * Get motor performance metrics
-   */
   private static getMotorMetrics(components: SelectedComponents) {
     const kv = components.motor?.data.kv || 0;
     const voltage = this.getBatteryVoltage(components.battery?.data.voltage || '4S');
@@ -122,9 +106,6 @@ export class DronePerformanceService {
     };
   }
 
-  /**
-   * Get battery performance metrics
-   */
   private static getBatteryMetrics(components: SelectedComponents) {
     if (!components.battery) {
       return { voltage: 0, capacity: 0, cells: 0, dischargeRate: 0 };
@@ -148,9 +129,6 @@ export class DronePerformanceService {
     };
   }
 
-  /**
-   * Calculate component pricing
-   */
   private static calculatePricing(components: SelectedComponents) {
     const breakdown = {
       motor: 0,
@@ -219,9 +197,6 @@ export class DronePerformanceService {
     };
   }
 
-  /**
-   * Check component compatibility
-   */
   private static checkCompatibility(components: SelectedComponents) {
     return {
       propMotorMatch: this.checkPropMotorCompatibility(components),
@@ -231,9 +206,6 @@ export class DronePerformanceService {
     };
   }
 
-  /**
-   * Check propeller/motor compatibility
-   */
   private static checkPropMotorCompatibility(components: SelectedComponents): boolean {
     if (!components.motor || !components.prop) return true;
     
@@ -243,9 +215,6 @@ export class DronePerformanceService {
     return propRecommended.includes(motorStator);
   }
 
-  /**
-   * Check voltage compatibility
-   */
   private static checkVoltageCompatibility(components: SelectedComponents): boolean {
     if (!components.battery || (!components.motor && !components.stack)) return true;
     
@@ -267,9 +236,6 @@ export class DronePerformanceService {
     return true;
   }
 
-  /**
-   * Check mounting compatibility
-   */
   private static checkMountingCompatibility(components: SelectedComponents): boolean {
     if (!components.frame || !components.stack) return true;
     
@@ -279,9 +245,6 @@ export class DronePerformanceService {
     return frameMount.includes(stackMount);
   }
 
-  /**
-   * Check frame/propeller compatibility
-   */
   private static checkFrameStackCompatibility(components: SelectedComponents): boolean {
     if (!components.frame || !components.prop) return true;
     
@@ -291,9 +254,6 @@ export class DronePerformanceService {
     return framePropSize.includes(propSize.replace(' inch', ''));
   }
 
-  /**
-   * Estimate top speed
-   */
   private static estimateTopSpeed(components: SelectedComponents, twr: number): number {
     if (!components.motor || !components.prop || !components.frame) return 0;
     
@@ -333,18 +293,12 @@ export class DronePerformanceService {
     return Math.round(Math.min(topSpeedKmh, maxRealisticSpeed));
   }
 
-  /**
-   * Parse weight from string
-   */
   private static parseWeight(weightStr: string | undefined): number {
     if (!weightStr) return 0;
     const match = weightStr.match(/(\d+\.?\d*)/);
     return match ? parseFloat(match[1]) : 0;
   }
 
-  /**
-   * Get battery voltage
-   */
   private static getBatteryVoltage(voltageStr: string): number {
     const match = voltageStr.match(/(\d+)S/);
     if (match) {

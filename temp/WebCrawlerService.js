@@ -697,9 +697,6 @@ export class WebCrawlerService {
         // If no URL match, use advanced scoring system to analyze product name and description
         return this.determineCategoryByScoring(productName || '', description || '');
     }
-    /**
-     * Rule-based category determination with definitive classification
-     */
     determineCategoryByScoring(productName, description) {
         const textToAnalyze = `${productName} ${description}`.toLowerCase();
         console.log(`🔍 Analyzing: "${productName}"`);
@@ -709,9 +706,6 @@ export class WebCrawlerService {
         console.log(`📂 Final classification: ${category}`);
         return category;
     }
-    /**
-     * Rule-based classification with hierarchical decision making
-     */
     classifyByRules(text) {
         // Step 1: Check for DEFINITIVE exclusions first
         if (this.isDefinitelyBattery(text))
@@ -732,9 +726,6 @@ export class WebCrawlerService {
         // Step 4: Fallback scoring for edge cases
         return this.fallbackClassification(text);
     }
-    /**
-     * Definitive battery classification
-     */
     isDefinitelyBattery(text) {
         // Battery brands are almost 100% definitive
         const batteryBrands = ['tattu', 'gnb', 'cnhl', 'gens ace', 'turnigy', 'zippy', 'ovonic', 'zeee', 'goldbat', 'dinogy'];
@@ -754,9 +745,6 @@ export class WebCrawlerService {
         }
         return false;
     }
-    /**
-     * Definitive prop classification
-     */
     isDefinitelyProp(text) {
         // Prop brands are highly definitive
         const propBrands = ['gemfan', 'hqprop', 'hq prop', 'dalprop', 'dal', 'ethix'];
@@ -776,9 +764,6 @@ export class WebCrawlerService {
         }
         return false;
     }
-    /**
-     * Definitive frame classification
-     */
     isDefinitelyFrame(text) {
         // Frame is usually very clear
         if (text.includes('frame') && !text.includes('flight controller') && !text.includes('esc')) {
@@ -792,9 +777,6 @@ export class WebCrawlerService {
         }
         return false;
     }
-    /**
-     * Definitive camera classification
-     */
     isDefinitelyCamera(text) {
         // Digital FPV systems
         if (text.includes('dji air unit') || text.includes('air unit') ||
@@ -819,9 +801,6 @@ export class WebCrawlerService {
         }
         return false;
     }
-    /**
-     * ESC/Stack classification (most complex logic)
-     */
     classifyEscStack(text) {
         // 4-in-1 ESCs are always stack
         if (text.includes('4in1') || text.includes('4-in-1') || text.includes('four in one')) {
@@ -855,9 +834,6 @@ export class WebCrawlerService {
         }
         return null;
     }
-    /**
-     * Definitive motor classification
-     */
     isDefinitelyMotor(text) {
         // Power systems are motors
         if (text.includes('power system')) {
@@ -882,9 +858,6 @@ export class WebCrawlerService {
         }
         return false;
     }
-    /**
-     * Fallback classification for edge cases
-     */
     fallbackClassification(text) {
         console.log(`⚠️ Using fallback classification`);
         // Count definitive keywords for each category
@@ -967,9 +940,6 @@ export class WebCrawlerService {
         const cleaned = priceText.replace(/[^0-9.]/g, '');
         return parseFloat(cleaned) || 0;
     }
-    /**
-     * Normalize and clean product titles
-     */
     normalizeProductTitle(title, vendor) {
         let cleaned = title;
         // Remove excessive whitespace and newlines

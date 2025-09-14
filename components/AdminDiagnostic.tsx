@@ -1,8 +1,3 @@
-/**
- * Admin Panel Diagnostic Component
- * Quick test to verify admin functionality is working
- */
-
 'use client';
 
 import { useState } from 'react';

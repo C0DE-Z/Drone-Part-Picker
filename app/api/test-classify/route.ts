@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { WebCrawlerService } from '@/services/WebCrawlerService';
 
-/**
- * API endpoint to test product classification
- */
 export async function POST(request: NextRequest) {
   try {
     const { productName, description } = await request.json();

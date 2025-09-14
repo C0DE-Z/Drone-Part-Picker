@@ -1,8 +1,3 @@
-/**
- * Product Resort Service
- * Reclassifies existing products in the database based on improved detection logic
- */
-
 import { PrismaClient } from '@prisma/client';
 
 interface ProductSpecifications {
@@ -16,9 +11,6 @@ export class ProductResortService {
     this.prisma = new PrismaClient();
   }
 
-  /**
-   * Resort all products in the database - reclassify them based on current logic
-   */
   async resortAllProducts(): Promise<{
     totalProcessed: number;
     reclassified: number;
@@ -81,9 +73,6 @@ export class ProductResortService {
     };
   }
 
-  /**
-   * Resort products by specific vendor
-   */
   async resortByBrand(brandName: string): Promise<{
     totalProcessed: number;
     reclassified: number;
@@ -142,9 +131,6 @@ export class ProductResortService {
     };
   }
 
-  /**
-   * Resort products of a specific current category
-   */
   async resortByCurrentCategory(currentCategory: string): Promise<{
     totalProcessed: number;
     reclassified: number;
@@ -203,10 +189,6 @@ export class ProductResortService {
     };
   }
 
-  /**
-   * Advanced scoring-based category determination logic (matches WebCrawlerService)
-   * Analyzes entire product listing and scores all categories
-   */
   private determineCategory(productName: string, description: string): string {
     const textToAnalyze = `${productName} ${description}`.toLowerCase();
     
@@ -321,9 +303,6 @@ export class ProductResortService {
     return bestCategory && maxScore > 0 ? bestCategory : 'motor';
   }
 
-  /**
-   * Calculate score for a specific category based on keyword matches
-   */
   private calculateCategoryScore(
     text: string, 
     keywordGroups: Record<string, { weight: number; keywords: string[] }>, 
@@ -357,9 +336,6 @@ export class ProductResortService {
     scores[category] = totalScore;
   }
 
-  /**
-   * Apply negative scoring for conflicting indicators
-   */
   private applyNegativeScoring(text: string, scores: Record<string, number>): void {
     // T-Motor brand context: Motors vs Flight Controllers
     if (text.includes('t-motor')) {
@@ -393,9 +369,6 @@ export class ProductResortService {
     }
   }
 
-  /**
-   * Get a human-readable reason for the classification
-   */
   private getClassificationReason(productName: string, description: string, category: string): string {
     const textToAnalyze = `${productName} ${description}`.toLowerCase();
     
@@ -447,9 +420,6 @@ export class ProductResortService {
     }
   }
 
-  /**
-   * Extract specifications based on category (simplified version)
-   */
   private extractSpecifications(description: string, category: string): ProductSpecifications {
     const specs: ProductSpecifications = {};
     const text = description.toLowerCase();
@@ -483,9 +453,6 @@ export class ProductResortService {
     return specs;
   }
 
-  /**
-   * Generate a resort report
-   */
   async generateResortReport(): Promise<{
     categoryDistribution: Record<string, number>;
     brandBreakdown: Record<string, Record<string, number>>;

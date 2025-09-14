@@ -1,8 +1,3 @@
-/**
- * Product Resort API Endpoints
- * Web interface for reclassifying products in the database
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { ProductResortService } from '@/services/ProductResortService';
 

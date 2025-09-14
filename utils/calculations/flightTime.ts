@@ -10,13 +10,7 @@ export interface FlightTimeData {
   recommendations?: string[];
 }
 
-/**
- * Flight time calculation utilities
- */
 export class FlightTimeCalculator {
-  /**
-   * Calculate estimated flight time for different scenarios
-   */
   static calculateFlightTime(
     components: SelectedComponents, 
     powerData: ReturnType<typeof PowerCalculator.calculatePowerConsumption>,
@@ -52,9 +46,6 @@ export class FlightTimeCalculator {
     };
   }
 
-  /**
-   * Parse battery specifications from data
-   */
   private static parseBatterySpecs(batteryData: { capacity?: string; cRating?: string; voltage?: string }) {
     const capacityMatch = batteryData.capacity?.match(/(\d+)/);
     const capacity = capacityMatch ? parseInt(capacityMatch[1]) : 1300;
@@ -68,9 +59,6 @@ export class FlightTimeCalculator {
     return { capacity, cRating, cells };
   }
 
-  /**
-   * Calculate effective battery capacity considering various factors
-   */
   private static calculateEffectiveCapacity(
     batterySpecs: { capacity: number; cRating: number; cells: number },
     settings: AdvancedSettings
@@ -112,9 +100,6 @@ export class FlightTimeCalculator {
     return effectiveCapacity;
   }
 
-  /**
-   * Calculate flight time for a specific current scenario
-   */
   private static calculateScenarioTime(effectiveCapacity: number, current: number): number {
     if (current <= 0) return 0;
     
@@ -126,17 +111,11 @@ export class FlightTimeCalculator {
     return timeMinutes * 0.9; // 10% safety margin
   }
 
-  /**
-   * Calculate battery utilization percentage
-   */
   private static calculateBatteryUtilization(current: number, batterySpecs: { capacity: number; cRating: number }): number {
     const maxContinuousCurrent = (batterySpecs.capacity * batterySpecs.cRating) / 1000;
     return (current / maxContinuousCurrent) * 100;
   }
 
-  /**
-   * Analyze flight time and provide recommendations
-   */
   private static analyzeFlightTime(
     flightTime: number, 
     batterySpecs: { capacity: number; cRating: number; cells: number },
@@ -184,9 +163,6 @@ export class FlightTimeCalculator {
     return { recommendations };
   }
 
-  /**
-   * Calculate flight time for specific battery capacity (useful for comparisons)
-   */
   static calculateTimeWithCapacity(
     capacity: number,
     current: number,
@@ -197,9 +173,6 @@ export class FlightTimeCalculator {
     return this.calculateScenarioTime(effectiveCapacity, current);
   }
 
-  /**
-   * Get recommended battery capacity for target flight time
-   */
   static getRecommendedCapacity(
     targetFlightTime: number, // minutes
     current: number,

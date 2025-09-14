@@ -1,8 +1,3 @@
-/**
- * Individual Product Management API
- * Get, update, and delete specific products
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 

@@ -9,13 +9,7 @@ export interface ThrustData {
   recommendations?: string[];
 }
 
-/**
- * Thrust calculation utilities for drone performance
- */
 export class ThrustCalculator {
-  /**
-   * Calculate total thrust and thrust-to-weight ratio
-   */
   static calculateThrust(components: SelectedComponents): ThrustData {
     if (!components.motor || !components.prop) {
       return {
@@ -32,6 +26,15 @@ export class ThrustCalculator {
     const totalThrust = thrustPerMotor * 4; // 4 motors
     const thrustToWeightRatio = totalThrust / weights.total;
     
+    // Debug logging for thrust calculations
+    console.log('🚁 Thrust Debug:', {
+      totalWeight: weights.total,
+      thrustPerMotor: thrustPerMotor,
+      totalThrust: totalThrust,
+      thrustToWeightRatio: thrustToWeightRatio,
+      weightBreakdown: weights
+    });
+    
     const analysis = this.analyzeThrustToWeight(thrustToWeightRatio);
     
     return {
@@ -43,9 +46,6 @@ export class ThrustCalculator {
     };
   }
 
-  /**
-   * Calculate thrust for a single motor/prop combination
-   */
   private static calculateSingleMotorThrust(components: SelectedComponents): number {
     if (!components.motor || !components.prop) return 0;
     
@@ -60,6 +60,16 @@ export class ThrustCalculator {
     const specThrustStr = components.motor.data.maxThrust;
     const specThrustMatch = specThrustStr.match(/(\d+\.?\d*)/);
     const specThrust = specThrustMatch ? parseFloat(specThrustMatch[1]) * 1000 : 0; // Convert kg to grams
+    
+    console.log('🔧 Motor Thrust Debug:', {
+      specThrustStr: specThrustStr,
+      specThrust: specThrust,
+      kv: kv,
+      voltage: voltage,
+      propDiameter: propDiameter,
+      propPitch: propPitch,
+      motorStatorSize: motorStatorSize
+    });
     
     if (specThrust === 0) {
       // Estimate thrust if no spec available
@@ -80,12 +90,19 @@ export class ThrustCalculator {
     const maxThrust = specThrust * 1.3; // Maximum 130% of spec
     finalThrust = Math.max(minThrust, Math.min(finalThrust, maxThrust));
     
+    console.log('⚡ Final Thrust Calculation:', {
+      specThrust: specThrust,
+      matchingFactor: matchingFactor,
+      environmentalFactor: environmentalFactor,
+      beforeBounds: specThrust * matchingFactor * environmentalFactor,
+      minThrust: minThrust,
+      maxThrust: maxThrust,
+      finalThrust: finalThrust
+    });
+    
     return Math.round(finalThrust);
   }
 
-  /**
-   * Estimate thrust from motor/prop specifications when no spec thrust available
-   */
   private static estimateThrustFromSpecs(
     kv: number, 
     voltage: number, 
@@ -106,9 +123,6 @@ export class ThrustCalculator {
     return Math.round(estimatedThrust * powerFactor);
   }
 
-  /**
-   * Calculate motor/prop compatibility factor
-   */
   private static calculateMotorPropMatching(
     kv: number, 
     voltage: number, 
@@ -131,26 +145,17 @@ export class ThrustCalculator {
     return Math.max(0.85, Math.min(1.15, 0.9 + overallMatch * 0.2));
   }
 
-  /**
-   * Get environmental adjustment factor
-   */
   private static getEnvironmentalFactor(): number {
     // Standard conditions factor (can be enhanced with actual environment data)
     return 0.95; // 5% reduction for real-world conditions
   }
 
-  /**
-   * Parse numeric value from string
-   */
   private static parseNumeric(value: string | number): number {
     if (typeof value === 'number') return value;
     const match = value.match(/(\d+\.?\d*)/);
     return match ? parseFloat(match[1]) : 0;
   }
 
-  /**
-   * Get battery voltage from voltage string
-   */
   private static getBatteryVoltage(voltageStr: string): number {
     const match = voltageStr.match(/(\d+)S/);
     if (match) {
@@ -159,9 +164,6 @@ export class ThrustCalculator {
     return 14.8; // Default 4S voltage
   }
 
-  /**
-   * Analyze thrust-to-weight ratio and provide recommendations
-   */
   private static analyzeThrustToWeight(twr: number): {
     isOptimal: boolean;
     recommendations: string[];
@@ -191,9 +193,6 @@ export class ThrustCalculator {
     return { isOptimal, recommendations };
   }
 
-  /**
-   * Calculate hover throttle percentage
-   */
   static calculateHoverThrottle(thrustData: ThrustData, totalWeight: number): number {
     if (thrustData.totalThrust === 0) return 0;
     

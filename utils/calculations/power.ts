@@ -10,13 +10,7 @@ export interface PowerData {
   recommendations?: string[];
 }
 
-/**
- * Power consumption calculation utilities
- */
 export class PowerCalculator {
-  /**
-   * Calculate power consumption for different flight modes
-   */
   static calculatePowerConsumption(components: SelectedComponents): PowerData {
     if (!components.motor || !components.stack || !components.battery) {
       return {
@@ -55,9 +49,6 @@ export class PowerCalculator {
     };
   }
 
-  /**
-   * Calculate hover current consumption
-   */
   private static calculateHoverCurrent(components: SelectedComponents, totalWeight: number): number {
     const kv = components.motor?.data.kv || 2000;
     const voltage = this.getBatteryVoltage(components.battery?.data.voltage || '4S');
@@ -91,9 +82,6 @@ export class PowerCalculator {
     return Math.max(3.0, finalCurrent); // Minimum realistic current
   }
 
-  /**
-   * Calculate weighted average current based on flight patterns
-   */
   private static calculateAverageCurrent(hover: number, sport: number, aggressive: number): number {
     // Typical flight pattern weights
     const hoverWeight = 0.30;      // 30% hovering/slow flight
@@ -109,9 +97,6 @@ export class PowerCalculator {
            (aggressive * aggressiveWeight);
   }
 
-  /**
-   * Calculate figure of merit (propeller efficiency)
-   */
   private static calculateFigureOfMerit(propDiameter: number, totalWeight: number): number {
     // Disk loading calculation
     const diskArea = Math.PI * Math.pow((propDiameter * 0.0254) / 2, 2); // m²
@@ -135,9 +120,6 @@ export class PowerCalculator {
     return figureOfMerit;
   }
 
-  /**
-   * Calculate motor efficiency based on specifications
-   */
   private static calculateMotorEfficiency(kv: number, voltage: number, statorSize: number): number {
     // Base efficiency based on stator size
     let efficiency = 0.85;
@@ -160,9 +142,6 @@ export class PowerCalculator {
     return Math.min(0.95, efficiency);
   }
 
-  /**
-   * Get ESC efficiency based on current rating
-   */
   private static getEscEfficiency(escRating: string): number {
     const ratingMatch = escRating.match(/(\d+)A/);
     const rating = ratingMatch ? parseInt(ratingMatch[1]) : 30;
@@ -173,9 +152,6 @@ export class PowerCalculator {
     else return 0.90;
   }
 
-  /**
-   * Calculate overall system efficiency
-   */
   private static calculateSystemEfficiency(components: SelectedComponents): number {
     const motorEff = this.calculateMotorEfficiency(
       components.motor?.data.kv || 2000,
@@ -190,9 +166,6 @@ export class PowerCalculator {
     return motorEff * escEff * propEff * systemEff;
   }
 
-  /**
-   * Parse numeric value from string
-   */
   private static parseNumeric(value: string | number | undefined): number {
     if (typeof value === 'number') return value;
     if (!value) return 0;
@@ -200,9 +173,6 @@ export class PowerCalculator {
     return match ? parseFloat(match[1]) : 0;
   }
 
-  /**
-   * Get battery voltage from voltage string
-   */
   private static getBatteryVoltage(voltageStr: string): number {
     const match = voltageStr.match(/(\d+)S/);
     if (match) {
@@ -211,9 +181,6 @@ export class PowerCalculator {
     return 14.8;
   }
 
-  /**
-   * Analyze power consumption and provide recommendations
-   */
   private static analyzePowerConsumption(current: number, components: SelectedComponents): {
     recommendations: string[];
   } {

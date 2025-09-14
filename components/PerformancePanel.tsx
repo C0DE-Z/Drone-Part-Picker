@@ -120,7 +120,7 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
         />
         <StatCard
           title="Power-to-Weight"
-          value={((performance.powerConsumption * performance.motors.voltage * 4) / (performance.totalWeight / 1000)).toFixed(0)}
+          value={(performance.powerConsumption / (performance.totalWeight / 1000)).toFixed(0)}
           unit="W/kg"
           subtitle="Total system power"
           icon="⚡"
@@ -138,9 +138,12 @@ export default function PerformancePanel({ performance }: PerformancePanelProps)
           title="Propeller Loading"
           value={(() => {
             const propDiameter = parseFloat(performance.motors.propSize.split('x')[0] || '5');
-            return ((performance.totalWeight) / (Math.PI * Math.pow(propDiameter * 0.0254 / 2, 2) * 4)).toFixed(1);
+            // Convert to proper disc loading in g/m² (total weight over total disc area of 4 props)
+            const singleDiscAreaM2 = Math.PI * Math.pow((propDiameter * 0.0254) / 2, 2); // Single prop disc area in m²
+            const totalDiscAreaM2 = singleDiscAreaM2 * 4; // Total disc area for 4 props
+            return ((performance.totalWeight / 1000 * 9.81) / totalDiscAreaM2).toFixed(1); // N/m² = kg/m² * 9.81
           })()}
-          unit="g/m²"
+          unit="N/m²"
           subtitle="Disc loading"
           icon="🌀"
           color="text-cyan-600"

@@ -747,10 +747,6 @@ export class WebCrawlerService {
     return this.determineCategoryByScoring(productName || '', description || '');
   }
 
-  /**
-   * Hybrid classification system combining rule-based logic with enhanced scoring
-   * for maximum accuracy (targeting 99%+)
-   */
   public determineCategoryByScoring(productName: string, description: string): string {
     const textToAnalyze = `${productName} ${description}`.toLowerCase();
     
@@ -786,9 +782,6 @@ export class WebCrawlerService {
     }
   }
 
-  /**
-   * Rule-based classification with hierarchical decision making
-   */
   private classifyByRules(text: string): string {
     // Step 1: Check for DEFINITIVE exclusions first
     if (this.isDefinitelyBattery(text)) return 'battery';
@@ -808,9 +801,6 @@ export class WebCrawlerService {
     return this.fallbackClassification(text);
   }
 
-  /**
-   * Definitive battery classification
-   */
   private isDefinitelyBattery(text: string): boolean {
     // Battery brands are almost 100% definitive
     const batteryBrands = ['tattu', 'gnb', 'cnhl', 'gens ace', 'turnigy', 'zippy', 'ovonic', 'zeee', 'goldbat', 'dinogy'];
@@ -834,9 +824,6 @@ export class WebCrawlerService {
     return false;
   }
 
-  /**
-   * Definitive prop classification
-   */
   private isDefinitelyProp(text: string): boolean {
     // Prop brands are highly definitive
     const propBrands = ['gemfan', 'hqprop', 'hq prop', 'dalprop', 'dal', 'ethix'];
@@ -860,9 +847,6 @@ export class WebCrawlerService {
     return false;
   }
 
-  /**
-   * Definitive frame classification
-   */
   private isDefinitelyFrame(text: string): boolean {
     // Frame is usually very clear
     if (text.includes('frame') && !text.includes('flight controller') && !text.includes('esc')) {
@@ -879,9 +863,6 @@ export class WebCrawlerService {
     return false;
   }
 
-  /**
-   * Definitive camera classification
-   */
   private isDefinitelyCamera(text: string): boolean {
     // Digital FPV systems
     if (text.includes('dji air unit') || text.includes('air unit') || 
@@ -911,9 +892,6 @@ export class WebCrawlerService {
     return false;
   }
 
-  /**
-   * ESC/Stack classification (most complex logic)
-   */
   private classifyEscStack(text: string): string | null {
     // 4-in-1 ESCs are always stack
     if (text.includes('4in1') || text.includes('4-in-1') || text.includes('four in one')) {
@@ -953,9 +931,6 @@ export class WebCrawlerService {
     return null;
   }
 
-  /**
-   * Definitive motor classification
-   */
   private isDefinitelyMotor(text: string): boolean {
     // Power systems are ALWAYS motors (even if they mention props)
     if (text.includes('power system')) {
@@ -989,9 +964,6 @@ export class WebCrawlerService {
     return false;
   }
 
-  /**
-   * Fallback classification for edge cases
-   */
   private fallbackClassification(text: string): string {
     console.log(`⚠️ Using fallback classification`);
     
@@ -1047,9 +1019,6 @@ export class WebCrawlerService {
     return bestCategory || 'motor'; // Default fallback
   }
 
-  /**
-   * Calculate confidence level for rule-based classification
-   */
   private getRuleConfidence(text: string, category: string): number {
     let confidence = 50; // Base confidence
     
@@ -1093,9 +1062,6 @@ export class WebCrawlerService {
     return Math.min(confidence, 95); // Cap at 95%
   }
 
-  /**
-   * Enhanced scoring classification system with improved weights
-   */
   private enhancedScoringClassification(text: string): string {
     const categoryScores = {
       motor: 0,
@@ -1121,9 +1087,6 @@ export class WebCrawlerService {
     return bestCategory && maxScore > 0 ? bestCategory : 'motor';
   }
 
-  /**
-   * Calculate enhanced scores with improved weights
-   */
   private calculateEnhancedScores(text: string, scores: Record<string, number>): void {
     // MOTOR SCORING (Enhanced)
     const motorIndicators = [
@@ -1194,9 +1157,6 @@ export class WebCrawlerService {
     this.applyIndicatorScoring(text, cameraIndicators, scores, 'camera');
   }
 
-  /**
-   * Apply indicator-based scoring
-   */
   private applyIndicatorScoring(
     text: string, 
     indicators: Array<{pattern: RegExp, weight: number}>, 
@@ -1216,9 +1176,6 @@ export class WebCrawlerService {
     }
   }
 
-  /**
-   * Apply advanced negative scoring to prevent misclassification
-   */
   private applyAdvancedNegativeScoring(text: string, scores: Record<string, number>): void {
     // ESC-specific negative scoring
     if (text.includes('esc') && /\d+a/.test(text)) {
@@ -1272,9 +1229,6 @@ export class WebCrawlerService {
     }
   }
 
-  /**
-   * Calculate confidence level for scoring-based classification
-   */
   private getScoringConfidence(text: string, category: string): number {
     // Recalculate scores to get confidence
     const scores = {
@@ -1324,9 +1278,6 @@ export class WebCrawlerService {
     return parseFloat(cleaned) || 0;
   }
 
-  /**
-   * Normalize and clean product titles
-   */
   private normalizeProductTitle(title: string, vendor: string): string {
     let cleaned = title;
 

@@ -1,7 +1,6 @@
 import { SelectedComponents, PerformanceEstimate } from '@/types/drone';
 import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
 import { estimateComponentPrice } from './math/cost';
-import { Princess_Sofia } from 'next/font/google';
 type ComponentData = {
   price?: number;
   [key: string]: string | number | undefined;
@@ -16,7 +15,7 @@ export class DroneCalculator {
   const maxThrustKg = Math.round((thrust / 1000) * 100) / 100;
     
     
-    /* Debug
+    // Debug
     console.log('Debug - Thrust calculation:', {
       totalWeight: weights.total,
       thrust: thrust,
@@ -30,7 +29,6 @@ export class DroneCalculator {
         battery: weights.battery
       }
     }); 
-    */
     
     
     const thrustToWeightRatio = Math.round((thrust / weights.total) * 100) / 100;    

@@ -31,11 +31,6 @@ interface ScrapedProduct {
   };
 }
 
-/**
- * Data service for managing drone component data
- * This replaces the old JSON-based approach with a proper TypeScript structure
- * and integrates scraped products from the database
- */
 export class ComponentDataService {
   private static instance: ComponentDataService;
   private componentsData: DroneComponents;
@@ -56,9 +51,6 @@ export class ComponentDataService {
     };
   }
 
-  /**
-   * Get singleton instance
-   */
   public static getInstance(): ComponentDataService {
     if (!ComponentDataService.instance) {
       ComponentDataService.instance = new ComponentDataService();
@@ -66,9 +58,6 @@ export class ComponentDataService {
     return ComponentDataService.instance;
   }
 
-  /**
-   * Fetch scraped products from the database
-   */
   private async fetchScrapedProducts(): Promise<void> {
     const now = Date.now();
     if (now - this.lastFetch < this.fetchInterval) {
@@ -107,9 +96,6 @@ export class ComponentDataService {
     }
   }
 
-  /**
-   * Map database category to component type
-   */
   private mapCategoryToComponentType(category: string): keyof DroneComponents | null {
     const mapping: Record<string, keyof DroneComponents> = {
       'motor': 'Motors',
@@ -133,9 +119,6 @@ export class ComponentDataService {
     return mapping[category.toLowerCase()] || null;
   }
 
-  /**
-   * Convert scraped product to component format
-   */
   private convertScrapedToComponent(product: ScrapedProduct, type: keyof DroneComponents): ComponentType {
     const specs = product.specifications || {};
     const baseComponent = {
@@ -247,9 +230,6 @@ export class ComponentDataService {
     }
   }
 
-  /**
-   * Get all components data (including scraped products)
-   */
   public async getAllComponents(): Promise<DroneComponents> {
     await this.fetchScrapedProducts();
     
@@ -269,9 +249,6 @@ export class ComponentDataService {
     return enhancedComponents;
   }
 
-  /**
-   * Get components by type (including scraped products)
-   */
   public async getComponentsByType<T>(type: keyof DroneComponents): Promise<Record<string, T>> {
     await this.fetchScrapedProducts();
     
@@ -288,30 +265,18 @@ export class ComponentDataService {
     return enhancedComponents;
   }
 
-  /**
-   * Get all components data (synchronous, for backwards compatibility)
-   */
   public getAllComponentsSync(): DroneComponents {
     return this.componentsData;
   }
 
-  /**
-   * Get a specific component by type and name
-   */
   public getComponent<T>(type: keyof DroneComponents, name: string): T | undefined {
     return this.componentsData[type][name] as T;
   }
 
-  /**
-   * Add a new component
-   */
   public addComponent<T extends ComponentType>(type: keyof DroneComponents, name: string, component: T): void {
     (this.componentsData[type] as Record<string, T>)[name] = component;
   }
 
-  /**
-   * Update an existing component
-   */
   public updateComponent<T extends ComponentType>(type: keyof DroneComponents, name: string, component: T): boolean {
     if (this.componentsData[type][name]) {
       (this.componentsData[type] as Record<string, T>)[name] = component;
@@ -320,9 +285,6 @@ export class ComponentDataService {
     return false;
   }
 
-  /**
-   * Remove a component
-   */
   public removeComponent(type: keyof DroneComponents, name: string): boolean {
     if (this.componentsData[type][name]) {
       delete this.componentsData[type][name];
@@ -331,9 +293,6 @@ export class ComponentDataService {
     return false;
   }
 
-  /**
-   * Search components by name across all types
-   */
   public searchComponents(query: string): SearchResult[] {
     const results: SearchResult[] = [];
     
@@ -352,16 +311,10 @@ export class ComponentDataService {
     return results;
   }
 
-  /**
-   * Get component count by type
-   */
   public getComponentCount(type: keyof DroneComponents): number {
     return Object.keys(this.componentsData[type]).length;
   }
 
-  /**
-   * Get total component count
-   */
   public getTotalComponentCount(): number {
     return Object.values(this.componentsData).reduce(
       (total, components) => total + Object.keys(components).length,
@@ -369,9 +322,6 @@ export class ComponentDataService {
     );
   }
 
-  /**
-   * Validate component data structure
-   */
   public validateComponent(type: keyof DroneComponents, component: ComponentType): boolean {
     // Add validation logic based on component type
     switch (type) {

@@ -1,7 +1,3 @@
-/**
- * Quick test page for admin functionality
- */
-
 import AdminDiagnostic from '@/components/AdminDiagnostic';
 
 export default function AdminTestPage() {

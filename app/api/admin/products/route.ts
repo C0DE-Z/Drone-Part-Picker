@@ -1,8 +1,3 @@
-/**
- * Admin Product Management API
- * Allows admins to view and edit product details
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 

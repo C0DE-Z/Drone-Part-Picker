@@ -11,13 +11,7 @@ export interface WeightBreakdown {
   total: number;
 }
 
-/**
- * Weight calculation utilities for drone components
- */
 export class WeightCalculator {
-  /**
-   * Calculate total weight and breakdown of all components
-   */
   static calculateWeights(components: SelectedComponents): WeightBreakdown {
     const weights: WeightBreakdown = {
       motor: 0,
@@ -66,9 +60,6 @@ export class WeightCalculator {
     return weights;
   }
 
-  /**
-   * Parse weight string and extract numeric value
-   */
   static parseWeight(weightStr: string | undefined): number {
     if (!weightStr) return 0;
     
@@ -77,9 +68,6 @@ export class WeightCalculator {
     return match ? parseFloat(match[1]) : 0;
   }
 
-  /**
-   * Calculate stack weight based on type
-   */
   private static calculateStackWeight(stackType: string): number {
     const type = stackType.toLowerCase();
     
@@ -96,9 +84,6 @@ export class WeightCalculator {
     }
   }
 
-  /**
-   * Get weight distribution as percentages
-   */
   static getWeightDistribution(weights: WeightBreakdown): Record<string, number> {
     if (weights.total === 0) return {};
 
@@ -113,9 +98,6 @@ export class WeightCalculator {
     };
   }
 
-  /**
-   * Check if weight is within reasonable limits for drone type
-   */
   static validateWeight(totalWeight: number, frameSize: string): {
     isValid: boolean;
     category: string;
