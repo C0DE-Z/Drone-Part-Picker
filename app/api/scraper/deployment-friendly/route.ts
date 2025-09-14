@@ -1,39 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deploymentFriendlyScraperService } from '@/services/DeploymentFriendlyScraperService';
-import { webScraperService } from '@/services/WebScraperService';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
-    const { vendor, category, usePuppeteer = false, test = false } = await request.json();
+    const { vendor, category, test = false } = await request.json();
 
     if (test) {
-      let result;
-      if (usePuppeteer) {
-        result = { success: false, products: [], error: 'Puppeteer testing not available in deployment' };
-      } else {
-        result = await deploymentFriendlyScraperService.testScraping(vendor, category);
-      }
-      return NextResponse.json({
-        ...result,
-        scraperType: usePuppeteer ? 'puppeteer' : 'fetch-based'
-      });
+      const result = await deploymentFriendlyScraperService.testScraping(vendor, category);
+      return NextResponse.json(result);
     }
 
     const job = await prisma.scrapingJob.create({
       data: {
         vendor: vendor || 'all',
-        category,
+        category: category || 'all',
         status: 'PENDING'
       }
     });
 
-    scrapeInBackground(job.id, vendor, category, usePuppeteer);
+    scrapeInBackground(job.id, vendor, category);
 
     return NextResponse.json({
       message: 'Scraping job started',
       jobId: job.id,
-      scraperType: usePuppeteer ? 'puppeteer (local only)' : 'fetch-based (deployment-friendly)'
+      info: 'Using deployment-friendly scraper (no browser required)'
     });
   } catch (error) {
     console.error('Error starting scraping job:', error);
@@ -50,6 +41,13 @@ export async function GET(request: NextRequest) {
     const jobId = searchParams.get('jobId');
     const vendor = searchParams.get('vendor');
     const status = searchParams.get('status');
+    const action = searchParams.get('action');
+
+    if (action === 'vendors') {
+      const vendors = ['GetFPV', 'RDQ'];
+      const categories = ['motors', 'props', 'frames'];
+      return NextResponse.json({ vendors, categories });
+    }
 
     const where: Record<string, unknown> = {};
     if (jobId) where.id = jobId;
@@ -72,7 +70,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function scrapeInBackground(jobId: string, vendor?: string, category?: string, usePuppeteer = false) {
+async function scrapeInBackground(jobId: string, vendor?: string, category?: string) {
   try {
     await prisma.scrapingJob.update({
       where: { id: jobId },
@@ -84,55 +82,39 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
 
     let products;
     
-    if (usePuppeteer) {
-      console.log('Using Puppeteer scraper (may not work in deployment)');
-      if (vendor && category) {
-        products = await webScraperService.scrapeCategory(vendor, category);
-      } else if (vendor) {
-        const vendorConfig = webScraperService.getVendorConfig(vendor);
-        if (!vendorConfig) {
-          throw new Error(`Vendor ${vendor} not found`);
-        }
-        
-        products = [];
-        for (const categoryName of Object.keys(vendorConfig.categories)) {
-          const categoryProducts = await webScraperService.scrapeCategory(vendor, categoryName);
+    if (vendor && category) {
+      console.log(`Scraping ${vendor} ${category}`);
+      products = await deploymentFriendlyScraperService.scrapeCategory(vendor, category, 100);
+    } else if (vendor) {
+      console.log(`Scraping all categories for ${vendor}`);
+      const vendorConfig = deploymentFriendlyScraperService.getVendorConfig(vendor);
+      if (!vendorConfig) {
+        throw new Error(`Vendor ${vendor} not found`);
+      }
+      
+      products = [];
+      for (const categoryName of Object.keys(vendorConfig.categories)) {
+        try {
+          const categoryProducts = await deploymentFriendlyScraperService.scrapeCategory(vendor, categoryName, 50);
           products.push(...categoryProducts);
+          console.log(`${vendor} ${categoryName}: ${categoryProducts.length} products`);
+        } catch (error) {
+          console.error(`Error scraping ${vendor} ${categoryName}:`, error);
         }
-      } else {
-        products = await webScraperService.scrapeAllVendors();
       }
     } else {
-      console.log('Using deployment-friendly scraper');
-      if (vendor && category) {
-        products = await deploymentFriendlyScraperService.scrapeCategory(vendor, category, 100);
-      } else if (vendor) {
-        const vendorConfig = deploymentFriendlyScraperService.getVendorConfig(vendor);
-        if (!vendorConfig) {
-          throw new Error(`Vendor ${vendor} not found`);
-        }
-        
-        products = [];
-        for (const categoryName of Object.keys(vendorConfig.categories)) {
-          try {
-            const categoryProducts = await deploymentFriendlyScraperService.scrapeCategory(vendor, categoryName, 50);
-            products.push(...categoryProducts);
-          } catch (error) {
-            console.error(`Error scraping ${vendor} ${categoryName}:`, error);
-          }
-        }
-      } else {
-        products = await deploymentFriendlyScraperService.scrapeAllVendors();
-      }
+      console.log('Scraping all vendors');
+      products = await deploymentFriendlyScraperService.scrapeAllVendors();
     }
 
     let productsCreated = 0;
     let productsUpdated = 0;
+    let errors = 0;
 
-    // Process and save products to database
+    console.log(`Processing ${products.length} scraped products`);
+
     for (const scrapedProduct of products) {
       try {
-        // First, ensure vendor exists
         const vendor = await prisma.vendor.upsert({
           where: { name: scrapedProduct.vendor },
           update: {},
@@ -142,11 +124,12 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
           }
         });
 
-        // Find or create product
         const existingProduct = await prisma.product.findFirst({
           where: {
-            name: scrapedProduct.name,
-            category: scrapedProduct.category
+            OR: [
+              { name: scrapedProduct.name },
+              { sku: scrapedProduct.sku }
+            ].filter(condition => Object.values(condition)[0]) // Filter out empty conditions
           }
         });
 
@@ -159,7 +142,8 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
               sku: scrapedProduct.sku || existingProduct.sku,
               description: scrapedProduct.description || existingProduct.description,
               imageUrl: scrapedProduct.imageUrl || existingProduct.imageUrl,
-              specifications: scrapedProduct.specifications || existingProduct.specifications || {}
+              specifications: scrapedProduct.specifications || existingProduct.specifications || {},
+              updatedAt: new Date()
             }
           });
           productsUpdated++;
@@ -168,17 +152,16 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
             data: {
               name: scrapedProduct.name,
               category: scrapedProduct.category,
-              brand: scrapedProduct.brand,
-              sku: scrapedProduct.sku,
-              description: scrapedProduct.description,
-              imageUrl: scrapedProduct.imageUrl,
-              specifications: scrapedProduct.specifications
+              brand: scrapedProduct.brand || '',
+              sku: scrapedProduct.sku || '',
+              description: scrapedProduct.description || '',
+              imageUrl: scrapedProduct.imageUrl || '',
+              specifications: scrapedProduct.specifications || {}
             }
           });
           productsCreated++;
         }
 
-        // Update or create vendor price
         await prisma.vendorPrice.upsert({
           where: {
             productId_vendorId: {
@@ -201,7 +184,6 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
           }
         });
 
-        // Add to price history
         await prisma.priceHistory.create({
           data: {
             productId: product.id,
@@ -211,10 +193,13 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
         });
       } catch (productError) {
         console.error(`Error processing product ${scrapedProduct.name}:`, productError);
+        errors++;
       }
     }
 
-    // Update job as completed
+    const completionMessage = `Processed ${products.length} products: ${productsCreated} created, ${productsUpdated} updated, ${errors} errors`;
+    console.log(completionMessage);
+
     await prisma.scrapingJob.update({
       where: { id: jobId },
       data: {
@@ -222,7 +207,8 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
         completedAt: new Date(),
         productsFound: products.length,
         productsCreated,
-        productsUpdated
+        productsUpdated,
+        errorMessage: errors > 0 ? `${errors} products had errors` : null
       }
     });
 
@@ -237,10 +223,6 @@ async function scrapeInBackground(jobId: string, vendor?: string, category?: str
         errorMessage: error instanceof Error ? error.message : 'Unknown error'
       }
     });
-  } finally {
-    if (usePuppeteer) {
-      await webScraperService.cleanup();
-    }
   }
 }
 

@@ -44,6 +44,8 @@ export default function ScraperManagement() {
   const [loading, setLoading] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [usePuppeteer, setUsePuppeteer] = useState(false);
+  const [useDeploymentFriendly, setUseDeploymentFriendly] = useState(true);
   const [crawlerVendors, setCrawlerVendors] = useState<string[]>([]);
   const [maxPages, setMaxPages] = useState('500');
   const [maxProducts, setMaxProducts] = useState('500');
@@ -122,7 +124,8 @@ export default function ScraperManagement() {
         },
         body: JSON.stringify({
           vendor: selectedVendor || undefined,
-          category: selectedCategory || undefined
+          category: selectedCategory || undefined,
+          usePuppeteer: useDeploymentFriendly ? false : usePuppeteer
         })
       });
 
@@ -378,19 +381,65 @@ export default function ScraperManagement() {
             ))}
           </select>
           
-          <button
-            onClick={startScraping}
-            disabled={loading}
-            className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <Activity className="w-4 h-4 animate-spin" />
-            ) : (
-              <Play className="w-4 h-4" />
-            )}
-            <span>Start Category Scraping</span>
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={startScraping}
+              disabled={loading}
+              className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <Activity className="w-4 h-4 animate-spin" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
+              <span>Start Scraping</span>
+            </button>
+            
+            <label className="flex items-center space-x-2 text-sm">
+              <input
+                type="checkbox"
+                checked={useDeploymentFriendly}
+                onChange={(e) => setUseDeploymentFriendly(e.target.checked)}
+                className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+              />
+              <span>Production Mode (no browser)</span>
+            </label>
+          </div>
         </div>
+        
+        {useDeploymentFriendly && (
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <h3 className="text-sm font-medium text-green-800 mb-2">Production Mode Test</h3>
+            <p className="text-xs text-green-700 mb-3">
+              Test the deployment-friendly scraper without browser dependencies.
+            </p>
+            <button
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const response = await fetch('/api/scraper/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      vendor: selectedVendor || 'getfpv',
+                      category: selectedCategory || 'motors'
+                    })
+                  });
+                  const result = await response.json();
+                  console.log('Test result:', result);
+                } catch (error) {
+                  console.error('Test failed:', error);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+            >
+              Test Production Scraper
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Sitemap-based Scraping */}
