@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import ProductResortPanel from './ProductResortPanel';
+import AdminProductManager from './AdminProductManager';
 
 interface User {
   id: string;
@@ -41,7 +43,7 @@ interface AdminData {
 
 export default function AdminPanel() {
   const { data: session, status } = useSession();
-  const [activeTab, setActiveTab] = useState<'users' | 'posts'>('posts');
+  const [activeTab, setActiveTab] = useState<'users' | 'posts' | 'products' | 'resort'>('posts');
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<AdminData>({});
   const [loading, setLoading] = useState(false);
@@ -201,6 +203,26 @@ export default function AdminPanel() {
           >
             Manage Users
           </button>
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'products'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Manage Products
+          </button>
+          <button
+            onClick={() => setActiveTab('resort')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'resort'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Product Resort
+          </button>
         </nav>
       </div>
 
@@ -344,6 +366,16 @@ export default function AdminPanel() {
             </ul>
           </div>
         </div>
+      )}
+
+      {/* Products Tab */}
+      {activeTab === 'products' && !loading && (
+        <AdminProductManager />
+      )}
+
+      {/* Resort Tab */}
+      {activeTab === 'resort' && !loading && (
+        <ProductResortPanel />
       )}
 
       {/* Delete Confirmation Modal */}

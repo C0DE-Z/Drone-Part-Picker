@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import AdminActionMenu from './AdminActionMenu';
+import ScraperManagement from './ScraperManagement';
+import ProductResortPanel from './ProductResortPanel';
+import AdminProductManager from './AdminProductManager';
+import ProductVariantManager from './ProductVariantManager';
 
 interface User {
   id: string;
@@ -179,6 +183,10 @@ export default function AdminDashboard() {
                 { id: 'overview', name: 'Overview', icon: '📊' },
                 { id: 'users', name: 'Users', icon: '👥' },
                 { id: 'reports', name: 'Reports', icon: '🚨' },
+                { id: 'products', name: 'Manage Products', icon: '📦' },
+                { id: 'variants', name: 'Split Variants', icon: '🔀' },
+                { id: 'resort', name: 'Product Resort', icon: '🔄' },
+                { id: 'scraper', name: 'Web Scraper', icon: '🕷️' },
                 { id: 'settings', name: 'Settings', icon: '⚙️' }
               ].map((tab) => (
                 <button
@@ -349,6 +357,22 @@ export default function AdminDashboard() {
               )}
             </div>
           </div>
+        )}
+
+        {activeTab === 'products' && (
+          <AdminProductManager />
+        )}
+
+        {activeTab === 'variants' && (
+          <ProductVariantManager />
+        )}
+
+        {activeTab === 'resort' && (
+          <ProductResortPanel />
+        )}
+
+        {activeTab === 'scraper' && (
+          <ScraperManagement />
         )}
 
         {activeTab === 'settings' && (

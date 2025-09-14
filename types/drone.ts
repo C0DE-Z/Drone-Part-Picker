@@ -1,3 +1,12 @@
+export interface VendorPrice {
+  vendor: string;
+  price: number;
+  url: string;
+  inStock: boolean;
+  lastUpdated: Date;
+  shippingInfo?: string;
+}
+
 export interface Motor {
   statorSize: string;
   kv: number;
@@ -11,6 +20,10 @@ export interface Motor {
   wireGauge: string;
   price?: number;
   priceRange?: string;
+  vendorPrices?: VendorPrice[];
+  productUrls?: Record<string, string>;
+  sku?: string;
+  brand?: string;
 }
 
 export interface Frame {
@@ -26,6 +39,10 @@ export interface Frame {
   stackMounting: string;
   price?: number;
   priceRange?: string;
+  vendorPrices?: VendorPrice[];
+  productUrls?: Record<string, string>;
+  sku?: string;
+  brand?: string;
 }
 
 export interface Stack {
@@ -39,6 +56,10 @@ export interface Stack {
   voltageInput: string;
   price?: number;
   priceRange?: string;
+  vendorPrices?: VendorPrice[];
+  productUrls?: Record<string, string>;
+  sku?: string;
+  brand?: string;
 }
 
 export interface Camera {
@@ -53,6 +74,10 @@ export interface Camera {
   features?: string;
   price?: number;
   priceRange?: string;
+  vendorPrices?: VendorPrice[];
+  productUrls?: Record<string, string>;
+  sku?: string;
+  brand?: string;
 }
 
 export interface Prop {
@@ -65,6 +90,10 @@ export interface Prop {
   recommendedMotorSize: string;
   price?: number;
   priceRange?: string;
+  vendorPrices?: VendorPrice[];
+  productUrls?: Record<string, string>;
+  sku?: string;
+  brand?: string;
 }
 
 export interface Battery {
@@ -76,6 +105,10 @@ export interface Battery {
   dimensions: string;
   price?: number;
   priceRange?: string;
+  vendorPrices?: VendorPrice[];
+  productUrls?: Record<string, string>;
+  sku?: string;
+  brand?: string;
 }
 
 export interface CustomWeight {
@@ -83,6 +116,10 @@ export interface CustomWeight {
   description?: string;
   price?: number;
   priceRange?: string;
+  vendorPrices?: VendorPrice[];
+  productUrls?: Record<string, string>;
+  sku?: string;
+  brand?: string;
 }
 
 export interface DroneComponents {
@@ -168,4 +205,49 @@ export interface SavedDrone {
     mountingMatch: boolean;
     frameStackMatch: boolean;
   };
+}
+
+// Scraper-specific types
+export interface ScrapedProduct {
+  name: string;
+  price: number;
+  url: string;
+  vendor: string;
+  inStock: boolean;
+  imageUrl?: string;
+  description?: string;
+  sku?: string;
+  brand?: string;
+  category: 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery';
+  specifications?: Record<string, string>;
+  lastUpdated: Date;
+}
+
+export interface ScraperConfig {
+  vendor: string;
+  baseUrl: string;
+  categories: {
+    [key: string]: {
+      url: string;
+      selectors: {
+        productContainer: string;
+        name: string;
+        price: string;
+        url: string;
+        inStock: string;
+        image?: string;
+        sku?: string;
+        brand?: string;
+      };
+    };
+  };
+  rateLimit: number; // milliseconds between requests
+  userAgent?: string;
+}
+
+export interface PriceHistory {
+  productId: string;
+  vendor: string;
+  price: number;
+  timestamp: Date;
 }

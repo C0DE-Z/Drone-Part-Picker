@@ -1,0 +1,573 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { 
+  Play, 
+  Pause, 
+  RotateCcw, 
+  Activity, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  AlertCircle,
+  BarChart3,
+  Settings
+} from 'lucide-react';
+import RealTimeDashboard from './RealTimeDashboard';
+
+interface ScrapingJob {
+  id: string;
+  vendor: string;
+  category?: string;
+  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
+  startedAt?: string;
+  completedAt?: string;
+  errorMessage?: string;
+  productsFound: number;
+  productsUpdated: number;
+  productsCreated: number;
+  createdAt: string;
+}
+
+interface ScheduleStatus {
+  isRunning: boolean;
+  scheduledJobs: Array<{
+    name: string;
+    exists: boolean;
+  }>;
+}
+
+export default function ScraperManagement() {
+  const [activeTab, setActiveTab] = useState('scraper');
+  const [jobs, setJobs] = useState<ScrapingJob[]>([]);
+  const [scheduleStatus, setScheduleStatus] = useState<ScheduleStatus | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [crawlerVendors, setCrawlerVendors] = useState<string[]>([]);
+  const [maxPages, setMaxPages] = useState('500');
+  const [maxProducts, setMaxProducts] = useState('500');
+  const [sitemapVendors, setSitemapVendors] = useState<string[]>([]);
+
+  const vendors = [
+    { value: '', label: 'All Vendors' },
+    { value: 'GetFPV', label: 'GetFPV' },
+    { value: 'RDQ', label: 'Race Day Quads' }
+  ];
+
+  const categories = [
+    { value: '', label: 'All Categories' },
+    { value: 'motors', label: 'Motors' },
+    { value: 'frames', label: 'Frames' },
+    { value: 'flight_controllers', label: 'Flight Controllers' },
+    { value: 'cameras', label: 'Cameras' },
+    { value: 'propellers', label: 'Propellers' },
+    { value: 'batteries', label: 'Batteries' }
+  ];
+
+  useEffect(() => {
+    loadJobs();
+    loadScheduleStatus();
+    loadSitemapVendors();
+    loadCrawlerVendors();
+  }, []);
+
+  const loadJobs = async () => {
+    try {
+      const response = await fetch('/api/scraper');
+      const data = await response.json();
+      setJobs(data);
+    } catch (error) {
+      console.error('Error loading jobs:', error);
+    }
+  };
+
+  const loadScheduleStatus = async () => {
+    try {
+      const response = await fetch('/api/scraper/schedule');
+      const data = await response.json();
+      setScheduleStatus(data);
+    } catch (error) {
+      console.error('Error loading schedule status:', error);
+    }
+  };
+
+  const loadSitemapVendors = async () => {
+    try {
+      const response = await fetch('/api/scraper/sitemap');
+      const data = await response.json();
+      setSitemapVendors(data.availableVendors || []);
+    } catch (error) {
+      console.error('Error loading sitemap vendors:', error);
+    }
+  };
+
+  const loadCrawlerVendors = async () => {
+    try {
+      const response = await fetch('/api/scraper/crawler');
+      const data = await response.json();
+      setCrawlerVendors(data.vendors || []);
+    } catch (error) {
+      console.error('Error loading crawler vendors:', error);
+    }
+  };
+
+  const startScraping = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/scraper', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          vendor: selectedVendor || undefined,
+          category: selectedCategory || undefined
+        })
+      });
+
+      if (response.ok) {
+        await loadJobs();
+      }
+    } catch (error) {
+      console.error('Error starting scraping:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startSitemapScraping = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/scraper/sitemap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          vendor: selectedVendor,
+          maxProducts: parseInt(maxProducts)
+        })
+      });
+
+      if (response.ok) {
+        await loadJobs();
+      }
+    } catch (error) {
+      console.error('Error starting sitemap scraping:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startCrawling = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/scraper/crawler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          vendor: selectedVendor,
+          maxPages: parseInt(maxPages)
+        }),
+      });
+
+      if (response.ok) {
+        await loadJobs();
+      }
+    } catch (error) {
+      console.error('Error starting crawler:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const manageSchedule = async (action: string) => {
+    try {
+      const response = await fetch('/api/scraper/schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action })
+      });
+
+      if (response.ok) {
+        await loadScheduleStatus();
+      }
+    } catch (error) {
+      console.error('Error managing schedule:', error);
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return <Clock className="w-4 h-4 text-yellow-500" />;
+      case 'RUNNING':
+        return <Activity className="w-4 h-4 text-blue-500 animate-pulse" />;
+      case 'COMPLETED':
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'FAILED':
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      default:
+        return <AlertCircle className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'RUNNING':
+        return 'bg-blue-100 text-blue-800';
+      case 'COMPLETED':
+        return 'bg-green-100 text-green-800';
+      case 'FAILED':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
+  };
+
+  const formatDuration = (startDate: string, endDate?: string) => {
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date();
+    const diffMs = end.getTime() - start.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+
+    if (diffHour > 0) {
+      return `${diffHour}h ${diffMin % 60}m`;
+    } else if (diffMin > 0) {
+      return `${diffMin}m ${diffSec % 60}s`;
+    } else {
+      return `${diffSec}s`;
+    }
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-4">Web Scraper Management</h1>
+        <p className="text-gray-600">
+          Manage web scraping jobs and monitor price updates from drone retailers.
+        </p>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="mb-6">
+        <nav className="flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`${
+              activeTab === 'dashboard'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center`}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Real-Time Dashboard
+          </button>
+          <button
+            onClick={() => setActiveTab('scraper')}
+            className={`${
+              activeTab === 'scraper'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center`}
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Scraper Controls
+          </button>
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'dashboard' ? (
+        <RealTimeDashboard />
+      ) : (
+        <>
+          {/* Existing scraper management content */}
+
+      {/* Schedule Management */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Scheduled Jobs</h2>
+        
+        {scheduleStatus && (
+          <div className="mb-4">
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="text-sm font-medium">Status:</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                scheduleStatus.isRunning ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+              }`}>
+                {scheduleStatus.isRunning ? 'Running' : 'Stopped'}
+              </span>
+            </div>
+            
+            <div className="text-sm text-gray-600">
+              Scheduled jobs: {scheduleStatus.scheduledJobs.map(job => job.name).join(', ')}
+            </div>
+          </div>
+        )}
+
+        <div className="flex space-x-4">
+          <button
+            onClick={() => manageSchedule('start')}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Play className="w-4 h-4" />
+            <span>Start Schedule</span>
+          </button>
+          
+          <button
+            onClick={() => manageSchedule('stop')}
+            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <Pause className="w-4 h-4" />
+            <span>Stop Schedule</span>
+          </button>
+          
+          <button
+            onClick={() => manageSchedule('trigger-full')}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Trigger Full Scrape</span>
+          </button>
+          
+          <button
+            onClick={() => manageSchedule('trigger-price-update')}
+            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Trigger Price Update</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Manual Scraping */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Manual Scraping (Category-based)</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <select
+            value={selectedVendor}
+            onChange={(e) => setSelectedVendor(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            {vendors.map(vendor => (
+              <option key={vendor.value} value={vendor.value}>{vendor.label}</option>
+            ))}
+          </select>
+          
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            {categories.map(category => (
+              <option key={category.value} value={category.value}>{category.label}</option>
+            ))}
+          </select>
+          
+          <button
+            onClick={startScraping}
+            disabled={loading}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <Activity className="w-4 h-4 animate-spin" />
+            ) : (
+              <Play className="w-4 h-4" />
+            )}
+            <span>Start Category Scraping</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Sitemap-based Scraping */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">🗺️ Sitemap-based Scraping (Recommended)</h2>
+        <p className="text-gray-600 mb-4">
+          Automatically discovers all products from vendor sitemaps. Handles URL modifications like .html extensions.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <select
+            value={selectedVendor}
+            onChange={(e) => setSelectedVendor(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Select Vendor</option>
+            {sitemapVendors.map(vendor => (
+              <option key={vendor} value={vendor}>{vendor}</option>
+            ))}
+          </select>
+          
+          <input
+            type="number"
+            value={maxProducts}
+            onChange={(e) => setMaxProducts(e.target.value)}
+            placeholder="Max products (500)"
+            min="50"
+            max="2000"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          
+          <button
+            onClick={startSitemapScraping}
+            disabled={loading || !selectedVendor}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <Activity className="w-4 h-4 animate-spin" />
+            ) : (
+              <RotateCcw className="w-4 h-4" />
+            )}
+            <span>Start Sitemap Scraping</span>
+          </button>
+        </div>
+        
+        <div className="text-sm text-gray-500">
+          <p>• Automatically finds all product URLs from sitemap</p>
+          <p>• Handles GetFPV .html extension requirement</p>
+          <p>• Discovers products across all categories</p>
+          <p>• More comprehensive than category-based scraping</p>
+        </div>
+      </div>
+
+      {/* Web Crawler */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">🕷️ Web Crawler (For sites without sitemaps)</h2>
+        <p className="text-gray-600 mb-4">
+          Crawls websites by following links from category pages. Works for sites without sitemaps or with incomplete sitemaps.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <select
+            value={selectedVendor}
+            onChange={(e) => setSelectedVendor(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Select Vendor</option>
+            {crawlerVendors.map(vendor => (
+              <option key={vendor} value={vendor}>{vendor}</option>
+            ))}
+          </select>
+          
+          <input
+            type="number"
+            value={maxPages}
+            onChange={(e) => setMaxPages(e.target.value)}
+            placeholder="Max pages (500)"
+            min="50"
+            max="2000"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          
+          <button
+            onClick={startCrawling}
+            disabled={loading || !selectedVendor}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <Activity className="w-4 h-4 animate-spin" />
+            ) : (
+              <Activity className="w-4 h-4" />
+            )}
+            <span>Start Web Crawling</span>
+          </button>
+        </div>
+        
+        <div className="text-sm text-gray-500">
+          <p>• Starts from category pages and follows links</p>
+          <p>• Discovers product pages automatically</p>
+          <p>• Works for sites without complete sitemaps</p>
+          <p>• Respects rate limits and robots.txt</p>
+        </div>
+      </div>
+
+      {/* Job History */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Scraping Jobs</h2>
+          <button
+            onClick={loadJobs}
+            className="flex items-center space-x-2 px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">Vendor</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">Category</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">Started</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">Duration</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">Results</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">Error</th>
+              </tr>
+            </thead>
+            <tbody>
+              {jobs.map(job => (
+                <tr key={job.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-3 px-4">
+                    <div className="flex items-center space-x-2">
+                      {getStatusIcon(job.status)}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+                        {job.status}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 font-medium">{job.vendor}</td>
+                  <td className="py-3 px-4">{job.category || 'All'}</td>
+                  <td className="py-3 px-4">
+                    {job.startedAt ? formatDate(job.startedAt) : '-'}
+                  </td>
+                  <td className="py-3 px-4">
+                    {job.startedAt ? formatDuration(job.startedAt, job.completedAt) : '-'}
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="text-xs">
+                      <div>Found: {job.productsFound}</div>
+                      <div>Created: {job.productsCreated}</div>
+                      <div>Updated: {job.productsUpdated}</div>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4">
+                    {job.errorMessage && (
+                      <div className="text-xs text-red-600 max-w-xs truncate" title={job.errorMessage}>
+                        {job.errorMessage}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {jobs.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No scraping jobs found.
+          </div>
+        )}
+      </div>
+        </>
+      )}
+    </div>
+  );
+}

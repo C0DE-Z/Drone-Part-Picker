@@ -313,5 +313,107 @@ model UserBadge {
   @@index([badgeId])
 }
 
+// Price tracking and web scraper models
+model Product {
+  id           String   @id @default(cuid())
+  name         String
+  category     String   // motor, frame, stack, camera, prop, battery
+  brand        String?
+  sku          String?
+  description  String?
+  imageUrl     String?
+  specifications Json?  // Store product specs as JSON
+  
+  // Price tracking
+  vendorPrices VendorPrice[]
+  priceHistory PriceHistory[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([category])
+  @@index([brand])
+  @@index([name])
+}
+
+model Vendor {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  website      String
+  logoUrl      String?
+  isActive     Boolean  @default(true)
+  
+  vendorPrices VendorPrice[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([isActive])
+}
+
+model VendorPrice {
+  id          String   @id @default(cuid())
+  productId   String
+  vendorId    String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  
+  price       Float
+  currency    String   @default("USD")
+  url         String
+  inStock     Boolean  @default(true)
+  shippingInfo String?
+  
+  lastUpdated DateTime @default(now())
+  
+  @@unique([productId, vendorId])
+  @@index([productId])
+  @@index([vendorId])
+  @@index([lastUpdated])
+}
+
+model PriceHistory {
+  id          String   @id @default(cuid())
+  productId   String
+  vendorId    String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  price       Float
+  currency    String   @default("USD")
+  timestamp   DateTime @default(now())
+  
+  @@index([productId])
+  @@index([timestamp])
+}
+
+model ScrapingJob {
+  id          String   @id @default(cuid())
+  vendor      String
+  category    String?
+  status      ScrapingStatus @default(PENDING)
+  
+  startedAt   DateTime?
+  completedAt DateTime?
+  errorMessage String?
+  
+  productsFound    Int @default(0)
+  productsUpdated  Int @default(0)
+  productsCreated  Int @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([status])
+  @@index([vendor])
+  @@index([createdAt])
+}
+
+enum ScrapingStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
 
 

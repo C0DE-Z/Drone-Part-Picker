@@ -46,6 +46,9 @@ export default function Navbar() {
             <Link href="/parts" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Parts
             </Link>
+            <Link href="/prices" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Prices
+            </Link>
             <Link href="/guides" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Guides
             </Link>
@@ -149,6 +152,12 @@ export default function Navbar() {
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
             >
               Parts
+            </Link>
+            <Link
+              href="/prices"
+              className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
+            >
+              Price Comparison
             </Link>
             <Link
               href="/guides"

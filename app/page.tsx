@@ -5,8 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { DroneComponents, SelectedComponents, PerformanceEstimate, Motor, Frame, Stack, Camera, Prop, Battery, CustomWeight } from '@/types/drone';
 import { DronePerformanceService } from '@/services/DronePerformanceService';
-import { getComponentDataService } from '@/services/ComponentDataService';
-import ComponentGrid from '@/components/ComponentGrid';
+import EnhancedComponentGrid from '@/components/EnhancedComponentGrid';
 import PerformancePanel from '@/components/PerformancePanel';
 import BuildSummary from '@/components/BuildSummary';
 import AddComponentModal from '@/components/AddComponentModal';
@@ -14,9 +13,6 @@ import Footer from '@/components/Footer';
 import Toast from '@/components/Toast';
 import AdvancedSettingsComponent from '@/components/AdvancedSettings';
 import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
-
-const componentDataService = getComponentDataService();
-const componentData: DroneComponents = componentDataService.getAllComponents();
 
 function AuthControls() {
   const { data: session, status } = useSession();
@@ -92,15 +88,6 @@ export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [advancedSettings, setAdvancedSettings] = useState<AdvancedSettings>(defaultAdvancedSettings);
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
-  const [customComponents, setCustomComponents] = useState<DroneComponents>({
-    Motors: {},
-    Frames: {},
-    Stacks: {},
-    Camera: {},
-    Props: {},
-    Batteries: {},
-    'Simple Weight': {}
-  });
   
   // Toast state
   const [showBuildCompleteToast, setShowBuildCompleteToast] = useState(false);
@@ -133,16 +120,6 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem('dronepartpicker-advanced-settings', JSON.stringify(advancedSettings));
   }, [advancedSettings]);
-
-  const handleAddCustomComponent = (category: string, name: string, specs: Record<string, string | number>) => {
-    setCustomComponents(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category as keyof DroneComponents],
-        [name]: specs
-      }
-    }));
-  };
 
   // Update performance when components change
   useEffect(() => {
@@ -301,21 +278,6 @@ export default function Home() {
     }
   };
 
-  const getAllComponents = (category: keyof DroneComponents) => {
-    return { ...componentData[category], ...customComponents[category] };
-  };
-
-  const getFilteredComponents = (category: keyof DroneComponents) => {
-    const components = getAllComponents(category);
-    if (!searchTerm) return components;
-    
-    return Object.fromEntries(
-      Object.entries(components).filter(([name]) =>
-        name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  };
-
   const tabs: { key: keyof DroneComponents; label: string; icon: string }[] = [
     { key: 'Motors', label: 'Motors', icon: '⚡' },
     { key: 'Frames', label: 'Frames', icon: '🔧' },
@@ -327,21 +289,6 @@ export default function Home() {
   ];
 
   const checkComponentCompatibility = () => true;
-
-  type TabKey = 'Motors' | 'Frames' | 'Stacks' | 'Camera' | 'Props' | 'Batteries' | 'Simple Weight';
-
-  const getComponentType = (tabKey: TabKey): 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery' | 'customWeight' => {
-    const mapping: Record<TabKey, 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery' | 'customWeight'> = {
-      'Motors': 'motor',
-      'Frames': 'frame',
-      'Stacks': 'stack',
-      'Camera': 'camera',
-      'Props': 'prop',
-      'Batteries': 'battery',
-      'Simple Weight': 'customWeight'
-    };
-    return mapping[tabKey];
-  };
 
   return (
   <div className="min-h-screen bg-gray-50 transition-colors">
@@ -444,14 +391,13 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Component Grid */}
-              <ComponentGrid
-                components={getFilteredComponents(activeTab)}
-                type={getComponentType(activeTab as TabKey)}
+              {/* Enhanced Component Grid with scraped products */}
+              <EnhancedComponentGrid
+                activeTab={activeTab}
+                searchTerm={searchTerm}
                 selectedComponents={selectedComponents}
                 onComponentSelect={handleComponentSelect}
                 checkCompatibility={checkComponentCompatibility}
-                searchTerm={searchTerm}
               />
             </div>
           </div>
@@ -519,7 +465,11 @@ export default function Home() {
         <AddComponentModal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
-          onAdd={handleAddCustomComponent}
+          onAdd={(category: string, name: string, specs: Record<string, string | number>) => {
+            console.log('Custom component added:', { category, name, specs });
+            // TODO: Save to database instead of local state
+            setIsAddModalOpen(false);
+          }}
         />
 
         <Toast

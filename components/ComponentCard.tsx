@@ -29,6 +29,83 @@ export default function ComponentCard({
     e.stopPropagation();
     setIsExpanded(!isExpanded);
   };
+
+  const renderPriceInfo = () => {
+    const comp = component as Motor & Frame & Stack & Camera & Prop & Battery & CustomWeight & {
+      price?: number;
+      vendor?: string;
+      inStock?: boolean;
+      vendorPrices?: Array<{
+        vendor: string;
+        price: number;
+        inStock: boolean;
+      }>;
+    };
+    
+    if (comp.price) {
+      return (
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+          <span className="text-green-600 font-semibold text-lg">${comp.price}</span>
+          {comp.vendor && (
+            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+              {comp.vendor}
+            </span>
+          )}
+          {comp.inStock === false && (
+            <span className="text-xs text-red-500 font-medium">Out of Stock</span>
+          )}
+        </div>
+      );
+    }
+
+    if (comp.vendorPrices && comp.vendorPrices.length > 0) {
+      const bestPrice = comp.vendorPrices[0];
+      return (
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between">
+            <span className="text-green-600 font-semibold text-lg">${bestPrice.price}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                {bestPrice.vendor}
+              </span>
+              {!bestPrice.inStock && (
+                <span className="text-xs text-red-500">Out of Stock</span>
+              )}
+            </div>
+          </div>
+          {comp.vendorPrices.length > 1 && (
+            <div className="text-xs text-gray-500 mt-1">
+              +{comp.vendorPrices.length - 1} more vendors
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const renderBrandInfo = () => {
+    const comp = component as Motor & Frame & Stack & Camera & Prop & Battery & CustomWeight & {
+      brand?: string;
+      imageUrl?: string;
+    };
+    
+    if (comp.brand) {
+      return (
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium">
+            {comp.brand}
+          </span>
+          {comp.imageUrl && (
+            <span className="text-xs text-gray-400">📷</span>
+          )}
+        </div>
+      );
+    }
+
+    return null;
+  };
   const getCardColor = () => {
   if (isSelected) return 'border-black bg-gray-50 ring-2 ring-gray-200 shadow-lg scale-105';
   if (!isCompatible) return 'border-gray-300 bg-gray-100 opacity-60';
@@ -179,6 +256,7 @@ export default function ComponentCard({
       <div className="flex items-start gap-4">
         <div className="text-3xl opacity-70 transition-transform duration-300 hover:scale-110">{getTypeIcon()}</div>
         <div className="flex-1 min-w-0">
+          {renderBrandInfo()}
           <div className="flex items-start justify-between mb-4">
       <h3 className="font-semibold text-lg text-gray-900 leading-tight transition-colors duration-200 hover:text-gray-950 pr-2">{name}</h3>
             {type !== 'customWeight' && (
@@ -204,6 +282,7 @@ export default function ComponentCard({
             )}
           </div>
           {renderSpecs()}
+          {renderPriceInfo()}
         </div>
       </div>
       
