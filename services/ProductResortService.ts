@@ -229,24 +229,43 @@ export class ProductResortService {
   }
 
   private isDefinitivelyBattery(text: string): boolean {
+    // Button/coin batteries are definitely batteries (specific form factor)
+    if (text.includes('button battery') || text.includes('coin battery') || text.includes('lithium button')) {
+      return true;
+    }
+    
     // Battery brands are definitive
     const batteryBrands = ['tattu', 'gnb', 'cnhl', 'gens ace', 'turnigy', 'zippy', 'ovonic', 'zeee', 'goldbat', 'dinogy'];
     if (batteryBrands.some(brand => text.includes(brand))) {
       return true;
     }
     
-    // Strong battery indicators with capacity
-    if ((text.includes('lipo') || text.includes('battery') || text.includes('lithium')) && text.includes('mah')) {
+    // Must exclude products that are clearly NOT batteries but mention battery terms
+    const nonBatteryIndicators = [
+      'motor', 'kv', 'frame', 'flight controller', 'fc', 'aio', 'esc', 'camera', 'fpv camera',
+      'prop', 'propeller', 'blade', 'antenna', 'vtx', 'transmitter'
+    ];
+    
+    if (nonBatteryIndicators.some(indicator => text.includes(indicator))) {
+      return false;
+    }
+    
+    // Very specific battery patterns - capacity AND chemistry as primary product type
+    const batteryPatterns = [
+      /\b\d+mah.*(?:lipo|lithium|battery)\b/,  // "1500mAh LiPo"
+      /\b(?:lipo|lithium).*\d+mah\b/,          // "LiPo 1500mAh"
+      /\b\d+s\s+\d+mah/,                       // "4S 1500mAh"
+      /\bmah.*\d+s.*(?:lipo|battery)/,         // "mAh 4S LiPo"
+      /\b(?:lipo|lithium).*pack.*\d+mah/,      // "LiPo pack 1500mAh"
+      /\bbattery.*pack.*\d+mah/                // "Battery pack 1500mAh"
+    ];
+    
+    if (batteryPatterns.some(pattern => pattern.test(text))) {
       return true;
     }
     
-    // Cell count with battery context
-    if (/\d+s.*(?:lipo|battery)|(?:lipo|battery).*\d+s/.test(text)) {
-      return true;
-    }
-    
-    // Button/coin batteries are definitely batteries
-    if (text.includes('button battery') || text.includes('coin battery') || text.includes('lithium button')) {
+    // Look for actual battery product names (not just compatibility mentions)
+    if (text.includes('battery pack') || text.includes('lipo pack') || text.includes('lithium pack')) {
       return true;
     }
     
@@ -265,13 +284,28 @@ export class ProductResortService {
       return true;
     }
     
-    // Motor with KV rating
+    // Motor with KV rating (very definitive)
     if (text.includes('motor') && /\d+kv/.test(text)) {
       return true;
     }
     
     // Brushless motor
     if (text.includes('brushless motor') || (text.includes('brushless') && text.includes('motor') && !text.includes('frame'))) {
+      return true;
+    }
+    
+    // Motor size patterns (very common in drone motors)
+    if (/\b\d{4}\s*motor|\b\d{4}\s*kv|motor.*\d{4}/.test(text)) {
+      return true;
+    }
+    
+    // Micro motor patterns
+    if (text.includes('micro motor') || text.includes('whoop motor')) {
+      return true;
+    }
+    
+    // Power system (T-Motor, etc.)
+    if (text.includes('power system') && (text.includes('motor') || /\d+kv/.test(text))) {
       return true;
     }
     
@@ -294,6 +328,17 @@ export class ProductResortService {
       return true;
     }
     
+    // Common frame patterns
+    if (text.includes('whoop frame') || text.includes('cinewhoop frame') || text.includes('micro frame')) {
+      return true;
+    }
+    
+    // Frame brands
+    const frameBrands = ['flywoo.*frame', 'betafpv.*frame', 'speedybee.*frame'];
+    if (frameBrands.some(brand => new RegExp(brand).test(text))) {
+      return true;
+    }
+    
     return false;
   }
 
@@ -308,8 +353,19 @@ export class ProductResortService {
       return true;
     }
     
+    // ESC patterns
+    if (text.includes('esc') && (text.includes('stack') || text.includes('aio') || /\d+a/.test(text))) {
+      return true;
+    }
+    
     // Processor indicators
     if (/\b(f411|f722|f405|f745|h7)\b/.test(text) && (text.includes('fc') || text.includes('controller'))) {
+      return true;
+    }
+    
+    // Stack brands
+    if ((text.includes('aikon') || text.includes('axisflying') || text.includes('hglrc')) && 
+        (text.includes('esc') || text.includes('fc') || text.includes('aio'))) {
       return true;
     }
     
@@ -330,6 +386,16 @@ export class ProductResortService {
     
     // FPV camera with TVL
     if (text.includes('fpv camera') || (text.includes('camera') && text.includes('tvl'))) {
+      return true;
+    }
+    
+    // Action cameras
+    if (text.includes('action camera') || text.includes('4k camera') || text.includes('hd camera')) {
+      return true;
+    }
+    
+    // DJI Osmo or other action cams
+    if (text.includes('dji osmo') || text.includes('gopro') || text.includes('insta360')) {
       return true;
     }
     
