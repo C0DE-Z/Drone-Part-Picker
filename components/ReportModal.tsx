@@ -37,24 +37,25 @@ export default function ReportModal({ isOpen, onClose, targetType, targetId, tar
     setError(null);
 
     try {
-      // For now, we'll use a temporary storage method since the Report model isn't ready
-      // This would normally go to /api/reports
-      const reportData = {
-        reason: reason.trim(),
-        description: description.trim(),
-        targetType,
-        targetId,
-        targetName,
-        reporterId: session.user?.email,
-        timestamp: new Date().toISOString()
-      };
+      // Submit report to the real API
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reason: reason.trim(),
+          description: description.trim(),
+          targetType,
+          targetId
+        })
+      });
 
-      // Store in localStorage for now (in production, this would go to the database)
-      const existingReports = JSON.parse(localStorage.getItem('tempReports') || '[]');
-      existingReports.push(reportData);
-      localStorage.setItem('tempReports', JSON.stringify(existingReports));
+      const data = await response.json();
 
-      console.log('Report submitted:', reportData);
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit report');
+      }
 
       // Show success and close modal
       alert('Report submitted successfully. Thank you for helping keep our community safe.');
@@ -62,7 +63,8 @@ export default function ReportModal({ isOpen, onClose, targetType, targetId, tar
       setReason('');
       setDescription('');
     } catch (err) {
-      setError('Failed to submit report. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to submit report. Please try again.';
+      setError(errorMessage);
       console.error('Report submission error:', err);
     } finally {
       setIsSubmitting(false);

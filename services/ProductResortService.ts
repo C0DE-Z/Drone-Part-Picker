@@ -192,6 +192,178 @@ export class ProductResortService {
   private determineCategory(productName: string, description: string): string {
     const textToAnalyze = `${productName} ${description}`.toLowerCase();
     
+    // DEFINITIVE EXCLUSIONS FIRST - These override everything else
+    
+    // 1. DEFINITIVE BATTERY DETECTION (highest priority)
+    if (this.isDefinitivelyBattery(textToAnalyze)) {
+      return 'battery';
+    }
+    
+    // 2. DEFINITIVE MOTOR DETECTION 
+    if (this.isDefinitivelyMotor(textToAnalyze)) {
+      return 'motor';
+    }
+    
+    // 3. DEFINITIVE FRAME DETECTION
+    if (this.isDefinitivelyFrame(textToAnalyze)) {
+      return 'frame';
+    }
+    
+    // 4. DEFINITIVE STACK DETECTION
+    if (this.isDefinitivelyStack(textToAnalyze)) {
+      return 'stack';
+    }
+    
+    // 5. DEFINITIVE CAMERA DETECTION
+    if (this.isDefinitivelyCamera(textToAnalyze)) {
+      return 'camera';
+    }
+    
+    // 6. DEFINITIVE PROP DETECTION (lowest priority - can be fooled by cross-references)
+    if (this.isDefinitivelyProp(textToAnalyze)) {
+      return 'prop';
+    }
+    
+    // Fallback to scoring system for edge cases
+    return this.scoringBasedClassification(textToAnalyze);
+  }
+
+  private isDefinitivelyBattery(text: string): boolean {
+    // Battery brands are definitive
+    const batteryBrands = ['tattu', 'gnb', 'cnhl', 'gens ace', 'turnigy', 'zippy', 'ovonic', 'zeee', 'goldbat', 'dinogy'];
+    if (batteryBrands.some(brand => text.includes(brand))) {
+      return true;
+    }
+    
+    // Strong battery indicators with capacity
+    if ((text.includes('lipo') || text.includes('battery') || text.includes('lithium')) && text.includes('mah')) {
+      return true;
+    }
+    
+    // Cell count with battery context
+    if (/\d+s.*(?:lipo|battery)|(?:lipo|battery).*\d+s/.test(text)) {
+      return true;
+    }
+    
+    // Button/coin batteries are definitely batteries
+    if (text.includes('button battery') || text.includes('coin battery') || text.includes('lithium button')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private isDefinitivelyMotor(text: string): boolean {
+    // Motor brands (excluding flight controllers)
+    const motorBrands = ['emax motor', 'brotherhobby', 'racerstar', 'sunnysky'];
+    if (motorBrands.some(brand => text.includes(brand))) {
+      return true;
+    }
+    
+    // T-Motor products (unless they're FCs)
+    if (text.includes('t-motor') && !text.includes('flight controller') && !text.includes('aio')) {
+      return true;
+    }
+    
+    // Motor with KV rating
+    if (text.includes('motor') && /\d+kv/.test(text)) {
+      return true;
+    }
+    
+    // Brushless motor
+    if (text.includes('brushless motor') || (text.includes('brushless') && text.includes('motor') && !text.includes('frame'))) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private isDefinitivelyFrame(text: string): boolean {
+    // Frame is usually very clear
+    if (text.includes('frame') && !text.includes('flight controller') && !text.includes('esc') && !text.includes('motor')) {
+      return true;
+    }
+    
+    // Wheelbase is definitive for frames
+    if (text.includes('wheelbase') || /\d+mm.*frame/.test(text)) {
+      return true;
+    }
+    
+    // Frame kit
+    if (text.includes('frame kit') || text.includes('chassis kit')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private isDefinitivelyStack(text: string): boolean {
+    // Flight controller terms
+    if (text.includes('flight controller') || text.includes('aio') || text.includes('all in one') || text.includes('all-in-one')) {
+      return true;
+    }
+    
+    // 4-in-1 ESCs are always stack
+    if (text.includes('4in1') || text.includes('4-in-1') || text.includes('four in one')) {
+      return true;
+    }
+    
+    // Processor indicators
+    if (/\b(f411|f722|f405|f745|h7)\b/.test(text) && (text.includes('fc') || text.includes('controller'))) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private isDefinitivelyCamera(text: string): boolean {
+    // Camera brands
+    const cameraBrands = ['runcam', 'foxeer', 'caddx'];
+    if (cameraBrands.some(brand => text.includes(brand)) && text.includes('camera')) {
+      return true;
+    }
+    
+    // Digital FPV systems
+    if (text.includes('dji air unit') || text.includes('walksnail avatar') || text.includes('hdzero')) {
+      return true;
+    }
+    
+    // FPV camera with TVL
+    if (text.includes('fpv camera') || (text.includes('camera') && text.includes('tvl'))) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private isDefinitivelyProp(text: string): boolean {
+    // Prop brands are definitive ONLY if no contradictory evidence
+    const propBrands = ['gemfan', 'hqprop', 'hq prop', 'dalprop', 'dal', 'ethix'];
+    const hasPropBrand = propBrands.some(brand => text.includes(brand));
+    
+    // If it has battery indicators, don't classify as prop even with brand mention
+    if (hasPropBrand && (text.includes('battery') || text.includes('lithium') || text.includes('mah'))) {
+      return false;
+    }
+    
+    if (hasPropBrand) {
+      return true;
+    }
+    
+    // Definitive prop indicators
+    if (text.includes('propeller') || text.includes('propellers')) {
+      return true;
+    }
+    
+    // Prop size patterns with blade count
+    if (/\d+x\d+x\d+|\d+x\d+\.\d+.*blade|\d{4}.*(?:prop|blade)/.test(text)) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private scoringBasedClassification(textToAnalyze: string): string {
     // Define scoring weights for each category
     const categoryScores = {
       motor: 0,
@@ -218,8 +390,8 @@ export class ProductResortService {
 
     // PROPELLER SCORING
     const propKeywords = {
-      // Brand indicators (very high confidence)
-      brands: { weight: 60, keywords: ['gemfan', 'hqprop', 'hq prop', 'dal', 'dalprop', 'ethix', 'azure'] },
+      // Brand indicators (reduced confidence to avoid cross-contamination)
+      brands: { weight: 35, keywords: ['gemfan', 'hqprop', 'hq prop', 'dal', 'dalprop', 'ethix', 'azure'] },
       // Strong prop indicators
       strong: { weight: 45, keywords: ['propeller', 'propellers', 'props'] },
       // Prop specifications

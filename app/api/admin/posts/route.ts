@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { isCurrentUserAdmin } from '@/lib/auth-utils';
+import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
 const deleteSchema = z.object({
@@ -8,14 +10,6 @@ const deleteSchema = z.object({
   postType: z.enum(['build', 'part', 'comment']),
   reason: z.string().min(10, 'Deletion reason must be at least 10 characters')
 });
-
-// Check if user is admin
-async function isAdmin(email: string | null | undefined): Promise<boolean> {
-  if (!email) return false;
-  
-  const adminEmail = process.env.ADMIN_EMAIL;
-  return adminEmail === email;
-}
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -29,7 +23,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check admin status
-    const adminStatus = await isAdmin(session.user.email);
+    const adminStatus = await isCurrentUserAdmin();
     if (!adminStatus) {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
@@ -42,16 +36,90 @@ export async function DELETE(request: NextRequest) {
     const validatedData = deleteSchema.parse(body);
     const { postId, postType, reason } = validatedData;
 
-    // For now, store deletion in localStorage since database migration is blocked
-    // This would normally delete from database and create audit log
+    // Log the deletion for audit trail
+    console.log(`Admin ${session.user.email} deleting ${postType} ${postId} - Reason: ${reason}`);
     
-    // Simulate deletion success
-    console.log(`Admin ${session.user.email} deleted ${postType} ${postId} - Reason: ${reason}`);
-    
-    // In a real implementation, this would:
-    // 1. Delete the post/comment from database
-    // 2. Create audit log entry
-    // 3. Notify relevant users if needed
+    // Actually delete from database based on type
+    switch (postType) {
+      case 'build':
+        // First check if build exists
+        const build = await prisma.droneBuild.findUnique({
+          where: { id: postId },
+          select: { id: true, name: true, user: { select: { email: true } } }
+        });
+        
+        if (!build) {
+          return NextResponse.json(
+            { success: false, error: 'Build not found' },
+            { status: 404 }
+          );
+        }
+
+        // Delete the build (cascading will handle related likes, comments, reports)
+        await prisma.droneBuild.delete({
+          where: { id: postId }
+        });
+
+        console.log(`✅ Deleted build "${build.name}" by ${build.user.email}`);
+        break;
+
+      case 'part':
+        // First check if part exists
+        const part = await prisma.customPart.findUnique({
+          where: { id: postId },
+          select: { id: true, name: true, user: { select: { email: true } } }
+        });
+        
+        if (!part) {
+          return NextResponse.json(
+            { success: false, error: 'Part not found' },
+            { status: 404 }
+          );
+        }
+
+        // Delete the part (cascading will handle related likes, comments, reports)
+        await prisma.customPart.delete({
+          where: { id: postId }
+        });
+
+        console.log(`✅ Deleted part "${part.name}" by ${part.user.email}`);
+        break;
+
+      case 'comment':
+        // First check if comment exists
+        const comment = await prisma.comment.findUnique({
+          where: { id: postId },
+          select: { 
+            id: true, 
+            content: true, 
+            user: { select: { email: true } },
+            build: { select: { name: true } },
+            part: { select: { name: true } }
+          }
+        });
+        
+        if (!comment) {
+          return NextResponse.json(
+            { success: false, error: 'Comment not found' },
+            { status: 404 }
+          );
+        }
+
+        // Delete the comment (cascading will handle related reports)
+        await prisma.comment.delete({
+          where: { id: postId }
+        });
+
+        const targetName = comment.build?.name || comment.part?.name || 'Unknown';
+        console.log(`✅ Deleted comment by ${comment.user.email} on "${targetName}"`);
+        break;
+
+      default:
+        return NextResponse.json(
+          { success: false, error: 'Invalid post type' },
+          { status: 400 }
+        );
+    }
     
     return NextResponse.json({
       success: true,
@@ -74,6 +142,16 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // Handle specific Prisma errors
+    if (error instanceof Error) {
+      if (error.message.includes('Record to delete does not exist')) {
+        return NextResponse.json(
+          { success: false, error: 'Item not found or already deleted' },
+          { status: 404 }
+        );
+      }
+    }
+
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -81,8 +159,8 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// Get deletion history (for admin audit)
-export async function GET() {
+// GET /api/admin/posts - Get all posts for admin management
+export async function GET(request: NextRequest) {
   try {
     // Get user session
     const session = await getServerSession(authOptions);
@@ -94,7 +172,7 @@ export async function GET() {
     }
 
     // Check admin status
-    const adminStatus = await isAdmin(session.user.email);
+    const adminStatus = await isCurrentUserAdmin();
     if (!adminStatus) {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
@@ -102,17 +180,102 @@ export async function GET() {
       );
     }
 
-    // In a real implementation, this would fetch deletion audit logs
-    // For now, return empty array since database migration is blocked
-    
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
+    const offset = (page - 1) * limit;
+
+    // Fetch builds, parts, and comments from database
+    const [builds, parts, comments] = await Promise.all([
+      // Fetch builds
+      prisma.droneBuild.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              email: true
+            }
+          },
+          _count: {
+            select: {
+              likes: true,
+              comments: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: offset
+      }),
+
+      // Fetch custom parts
+      prisma.customPart.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              email: true
+            }
+          },
+          _count: {
+            select: {
+              likes: true,
+              comments: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: offset
+      }),
+
+      // Fetch comments
+      prisma.comment.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              email: true
+            }
+          },
+          build: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          part: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: offset
+      })
+    ]);
+
     return NextResponse.json({
       success: true,
-      deletions: [],
-      message: 'Deletion history will be available after database migration'
+      data: {
+        builds,
+        parts,
+        comments
+      },
+      pagination: {
+        page,
+        limit,
+        total: builds.length + parts.length + comments.length
+      }
     });
 
   } catch (error) {
-    console.error('Get deletion history error:', error);
+    console.error('Get posts error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

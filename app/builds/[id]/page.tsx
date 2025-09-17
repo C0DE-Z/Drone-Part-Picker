@@ -2,8 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import LikeButton from '@/components/LikeButton';
 import Comments from '@/components/Comments';
+import AdminActionMenu from '@/components/AdminActionMenu';
+import ReportModal from '@/components/ReportModal';
 
 interface ComponentData {
   name: string;
@@ -42,6 +45,8 @@ interface BuildDetail {
 export default function BuildDetails({ params }: { params: Promise<{ id: string }> }) {
   const [build, setBuild] = useState<BuildDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchBuild = async () => {
@@ -127,7 +132,17 @@ export default function BuildDetails({ params }: { params: Promise<{ id: string 
                     <span>{new Date(build.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
-                <LikeButton buildId={build.id} />
+                <div className="flex items-center gap-3">
+                  <LikeButton buildId={build.id} />
+                  {session?.user && (
+                    <AdminActionMenu 
+                      itemType="build" 
+                      itemId={build.id} 
+                      itemName={build.name}
+                      onDelete={() => window.location.href = '/builds/public'}
+                    />
+                  )}
+                </div>
               </div>
 
               {/* Tags */}
@@ -153,18 +168,79 @@ export default function BuildDetails({ params }: { params: Promise<{ id: string 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {build.components && Object.entries(build.components).map(([type, component]) => {
                   if (!component) return null;
+                  
+                  // Define which specs to show for each component type
+                  const getRelevantSpecs = (componentType: string, data: Record<string, string | number>) => {
+                    const specs: Record<string, string | number> = {};
+                    
+                    switch (componentType) {
+                      case 'motor':
+                        if (data.kv) specs['KV'] = data.kv;
+                        if (data.statorSize) specs['Stator Size'] = data.statorSize;
+                        if (data.maxThrust) specs['Max Thrust'] = data.maxThrust;
+                        if (data.weight) specs['Weight'] = data.weight;
+                        if (data.voltageCompatibility) specs['Voltage'] = data.voltageCompatibility;
+                        break;
+                      case 'frame':
+                        if (data.wheelbase) specs['Wheelbase'] = data.wheelbase;
+                        if (data.weight) specs['Weight'] = data.weight;
+                        if (data.material) specs['Material'] = data.material;
+                        if (data.propellerSizeCompatibility) specs['Prop Size'] = data.propellerSizeCompatibility;
+                        break;
+                      case 'stack':
+                        if (data.fcProcessor) specs['FC Processor'] = data.fcProcessor;
+                        if (data.escCurrentRating) specs['ESC Rating'] = data.escCurrentRating;
+                        if (data.mountingSize) specs['Mounting'] = data.mountingSize;
+                        if (data.voltageInput) specs['Voltage'] = data.voltageInput;
+                        break;
+                      case 'camera':
+                        if (data.resolution) specs['Resolution'] = data.resolution;
+                        if (data.sensor) specs['Sensor'] = data.sensor;
+                        if (data.fov) specs['FOV'] = data.fov;
+                        if (data.weight) specs['Weight'] = data.weight;
+                        break;
+                      case 'prop':
+                        if (data.size) specs['Size'] = data.size;
+                        if (data.pitch) specs['Pitch'] = data.pitch;
+                        if (data.blades) specs['Blades'] = data.blades;
+                        if (data.material) specs['Material'] = data.material;
+                        if (data.weight) specs['Weight'] = data.weight;
+                        break;
+                      case 'battery':
+                        if (data.voltage) specs['Voltage'] = data.voltage;
+                        if (data.capacity) specs['Capacity'] = data.capacity;
+                        if (data.cRating) specs['C Rating'] = data.cRating;
+                        if (data.weight) specs['Weight'] = data.weight;
+                        if (data.connector) specs['Connector'] = data.connector;
+                        break;
+                      default:
+                        // For unknown components, show basic info
+                        if (data.weight) specs['Weight'] = data.weight;
+                        if (data.price) specs['Price'] = `$${data.price}`;
+                        break;
+                    }
+                    
+                    return specs;
+                  };
+                  
+                  const relevantSpecs = getRelevantSpecs(type, component.data);
+                  
                   return (
                     <div key={type} className="border border-gray-200 rounded-lg p-4">
                       <h3 className="font-semibold text-gray-900 capitalize mb-2">{type}</h3>
                       <p className="text-gray-800 font-medium mb-3">{component.name}</p>
-                      <div className="space-y-1 text-sm">
-                        {component.data && Object.entries(component.data).map(([key, value]) => (
-                          <div key={key} className="flex justify-between">
-                            <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span>
-                            <span className="text-gray-900 font-medium">{value}</span>
-                          </div>
-                        ))}
-                      </div>
+                      {Object.keys(relevantSpecs).length > 0 ? (
+                        <div className="space-y-1 text-sm">
+                          {Object.entries(relevantSpecs).map(([key, value]) => (
+                            <div key={key} className="flex justify-between">
+                              <span className="text-gray-600">{key}:</span>
+                              <span className="text-gray-900 font-medium">{value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-sm">No specifications available</p>
+                      )}
                     </div>
                   );
                 })}
@@ -250,7 +326,10 @@ export default function BuildDetails({ params }: { params: Promise<{ id: string 
                 >
                   Share Build
                 </button>
-                <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <button 
+                  onClick={() => setShowReportModal(true)}
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                >
                   Report Issue
                 </button>
               </div>
@@ -258,6 +337,17 @@ export default function BuildDetails({ params }: { params: Promise<{ id: string 
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <ReportModal
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          targetType="build"
+          targetId={build.id}
+          targetName={build.name}
+        />
+      )}
     </div>
   );
 }

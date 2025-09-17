@@ -19,12 +19,97 @@ interface CategoryConfig {
     image?: string;
     sku?: string;
     brand?: string;
+    description?: string;
   };
   pagination?: {
     nextButton?: string;
     pageParam?: string;
     maxPages?: number;
   };
+}
+
+// Intelligent product classification
+function classifyProduct(productName: string, description: string = '', url: string = ''): string {
+  const text = `${productName} ${description} ${url}`.toLowerCase()
+  
+  // Definitive checks with more specific rules
+  
+  // Stack/Flight Controller has priority over motor (for cases like "T-Motor F7 AIO")
+  if (text.includes('flight controller') || text.includes('aio') || text.includes('all-in-one') || 
+      (text.includes('stack') && !text.includes('mount') && !text.includes('dampener'))) {
+    return 'stack'
+  }
+  
+  // Motor - but exclude mounts and accessories
+  if (text.includes('motor') && !text.includes('motor mount') && !text.includes('mount')) {
+    return 'motor'
+  }
+  
+  // Frame - but exclude mounts and accessories
+  if ((text.includes('frame') || text.includes('chassis')) && 
+      !text.includes('mount') && !text.includes('dampener')) {
+    return 'frame'
+  }
+  
+  if (text.includes('camera') || text.includes('cam ') || text.includes(' cam')) {
+    return 'camera'
+  }
+  if (text.includes('propeller') || text.includes('props') || text.includes('prop ')) {
+    return 'prop'
+  }
+  if (text.includes('battery') || text.includes('lipo') || text.includes('li-po')) {
+    return 'battery'
+  }
+  if (text.includes('esc') && !text.includes('mount')) {
+    return 'stack'
+  }
+  
+  // Scoring-based fallback
+  const scores = {
+    motor: 0,
+    frame: 0,
+    camera: 0,
+    prop: 0,
+    battery: 0,
+    stack: 0
+  }
+  
+  // Exclude accessories and mounts from scoring
+  if (text.includes('mount') || text.includes('dampener') || text.includes('accessory')) {
+    return 'other'
+  }
+  
+  // Motor keywords
+  if (text.includes('kv') || text.includes('stator') || text.includes('brushless') || text.includes('2207') || text.includes('2306') || text.includes('2208')) scores.motor += 2
+  if (text.includes('motor') && !text.includes('mount')) scores.motor += 1
+  
+  // Frame keywords
+  if (text.includes('frame') || text.includes('chassis') || text.includes('wheelbase') || text.includes('carbon fiber')) scores.frame += 2
+  if (text.includes('freestyle') || text.includes('racing') || text.includes('micro')) scores.frame += 1
+  
+  // Camera keywords  
+  if (text.includes('fpv') && (text.includes('camera') || text.includes('cam'))) scores.camera += 2
+  if (text.includes('lens') || text.includes('cmos') || text.includes('ccd')) scores.camera += 1
+  
+  // Prop keywords
+  if (text.includes('propeller') || text.includes('props') || text.includes('blades')) scores.prop += 2
+  if (text.includes('5inch') || text.includes('6inch') || text.includes('tri-blade')) scores.prop += 1
+  
+  // Battery keywords
+  if (text.includes('battery') || text.includes('lipo') || text.includes('mah') || text.includes('cell')) scores.battery += 2
+  if (text.includes('1300mah') || text.includes('1500mah') || text.includes('4s') || text.includes('6s')) scores.battery += 1
+  
+  // Stack keywords - give priority to flight controller terms
+  if (text.includes('flight controller') || text.includes('aio') || text.includes('all-in-one')) scores.stack += 3
+  if (text.includes('stack') && !text.includes('mount') && !text.includes('dampener')) scores.stack += 2
+  if (text.includes('esc') || text.includes('gyro')) scores.stack += 1
+  
+  // Find the highest scoring category
+  const maxScore = Math.max(...Object.values(scores))
+  if (maxScore === 0) return 'other'
+  
+  const winningEntry = Object.entries(scores).find(([, score]) => score === maxScore)
+  return winningEntry ? winningEntry[0] : 'other'
 }
 
 export class DeploymentFriendlyScraperService {
@@ -122,6 +207,39 @@ export class DeploymentFriendlyScraperService {
               image: '.product-item__primary-image img'
             }
           },
+          frames: {
+            url: '/collections/frames?limit=48',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title a',
+              price: '.price--highlight',
+              url: '.product-item__title a',
+              inStock: '.product-form__cart-submit',
+              image: '.product-item__primary-image img'
+            }
+          },
+          stacks: {
+            url: '/collections/stacks-aios-fc-esc?limit=48',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title a',
+              price: '.price--highlight',
+              url: '.product-item__title a',
+              inStock: '.product-form__cart-submit',
+              image: '.product-item__primary-image img'
+            }
+          },
+          cameras: {
+            url: '/collections/fpv-cameras?limit=48',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title a',
+              price: '.price--highlight',
+              url: '.product-item__title a',
+              inStock: '.product-form__cart-submit',
+              image: '.product-item__primary-image img'
+            }
+          },
           props: {
             url: '/collections/propellers?limit=48',
             selectors: {
@@ -131,6 +249,95 @@ export class DeploymentFriendlyScraperService {
               url: '.product-item__title a',
               inStock: '.product-form__cart-submit',
               image: '.product-item__primary-image img'
+            }
+          },
+          batteries: {
+            url: '/collections/batteries?limit=48',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title a',
+              price: '.price--highlight',
+              url: '.product-item__title a',
+              inStock: '.product-form__cart-submit',
+              image: '.product-item__primary-image img'
+            }
+          }
+        }
+      },
+      {
+        vendor: 'PyrodDrone',
+        baseUrl: 'https://pyrodrone.com',
+        rateLimit: 2000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5'
+        },
+        categories: {
+          motors: {
+            url: '/collections/motors',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title',
+              price: '.price',
+              url: '.product-item__link',
+              inStock: '.product-form__buttons',
+              image: '.product-item__image img'
+            }
+          },
+          frames: {
+            url: '/collections/frames',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title',
+              price: '.price',
+              url: '.product-item__link',
+              inStock: '.product-form__buttons',
+              image: '.product-item__image img'
+            }
+          },
+          cameras: {
+            url: '/collections/cameras',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title',
+              price: '.price',
+              url: '.product-item__link',
+              inStock: '.product-form__buttons',
+              image: '.product-item__image img'
+            }
+          },
+          props: {
+            url: '/collections/propellers',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title',
+              price: '.price',
+              url: '.product-item__link',
+              inStock: '.product-form__buttons',
+              image: '.product-item__image img'
+            }
+          },
+          batteries: {
+            url: '/collections/batteries',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title',
+              price: '.price',
+              url: '.product-item__link',
+              inStock: '.product-form__buttons',
+              image: '.product-item__image img'
+            }
+          },
+          stacks: {
+            url: '/collections/flight-controllers',
+            selectors: {
+              productContainer: '.product-item',
+              name: '.product-item__title',
+              price: '.price',
+              url: '.product-item__link',
+              inStock: '.product-form__buttons',
+              image: '.product-item__image img'
             }
           }
         }
@@ -284,18 +491,23 @@ export class DeploymentFriendlyScraperService {
       const imageUrl = this.extractAttribute(productHtml, categoryConfig.selectors.image || '', 'src');
       const sku = this.extractText(productHtml, categoryConfig.selectors.sku || '');
       const brand = this.extractText(productHtml, categoryConfig.selectors.brand || '');
+      const description = this.extractText(productHtml, categoryConfig.selectors.description || '');
+
+      // Use intelligent classification instead of URL-based category
+      const classifiedCategory = classifyProduct(name, description, fullUrl || '');
+      console.log(`[Classification] "${name}" -> ${classifiedCategory} (URL category was: ${category})`);
 
       return {
         name: name.trim(),
         price,
         vendor,
-        category: category as 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery',
+        category: classifiedCategory as 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery',
         url: fullUrl || '',
         inStock,
         imageUrl: imageUrl || '',
         sku: sku || '',
         brand: brand || this.extractBrandFromName(name),
-        description: '',
+        description: description || '',
         specifications: {},
         lastUpdated: new Date()
       };

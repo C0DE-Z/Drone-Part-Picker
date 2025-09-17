@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { isCurrentUserAdmin } from '@/lib/auth-utils';
+import { prisma } from '@/lib/prisma';
 import { RateLimiter } from '@/lib/validation';
 import { z } from 'zod';
+import { ReportStatus } from '@prisma/client';
 
 const adminReportActionRateLimit = new RateLimiter(30, 60 * 1000); // 30 report actions per minute
 
 const updateReportSchema = z.object({
-  reportId: z.string().uuid(),
-  status: z.enum(['PENDING', 'RESOLVED', 'DISMISSED']),
+  reportId: z.string().cuid(),
+  status: z.enum(['PENDING', 'REVIEWING', 'RESOLVED', 'DISMISSED']),
   adminNotes: z.string().max(1000).optional()
 });
 
@@ -34,51 +36,117 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || '';
     const offset = (page - 1) * limit;
 
-    // For now, return mock data since reports system isn't implemented yet
-    // In a real implementation, this would fetch from a reports table
-    const mockReports = [
-      {
-        id: '1',
-        type: 'spam',
-        targetType: 'build',
-        targetId: 'build-123',
-        reporterId: 'user-456',
-        reporterEmail: 'reporter@example.com',
-        reason: 'This build contains spam content',
-        status: 'PENDING',
-        createdAt: new Date().toISOString(),
-        adminNotes: null
-      },
-      {
-        id: '2',
-        type: 'inappropriate',
-        targetType: 'comment',
-        targetId: 'comment-789',
-        reporterId: 'user-101',
-        reporterEmail: 'user@example.com',
-        reason: 'Inappropriate language in comment',
-        status: 'PENDING',
-        createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-        adminNotes: null
-      }
-    ];
+    // Build where clause for filtering
+    const whereClause: { status?: ReportStatus } = {};
+    if (status && ['PENDING', 'REVIEWING', 'RESOLVED', 'DISMISSED'].includes(status)) {
+      whereClause.status = status as ReportStatus;
+    }
 
-    // Filter by status if provided
-    const filteredReports = status ? 
-      mockReports.filter(report => report.status === status) : 
-      mockReports;
+    // Fetch reports from database
+    const reports = await prisma.report.findMany({
+      where: whereClause,
+      include: {
+        reporter: {
+          select: {
+            id: true,
+            email: true,
+            username: true
+          }
+        },
+        build: {
+          select: {
+            id: true,
+            name: true,
+            user: {
+              select: {
+                username: true,
+                email: true
+              }
+            }
+          }
+        },
+        part: {
+          select: {
+            id: true,
+            name: true,
+            user: {
+              select: {
+                username: true,
+                email: true
+              }
+            }
+          }
+        },
+        comment: {
+          select: {
+            id: true,
+            content: true,
+            user: {
+              select: {
+                username: true,
+                email: true
+              }
+            }
+          }
+        },
+        reportedUser: {
+          select: {
+            id: true,
+            username: true,
+            email: true
+          }
+        },
+        reviewedBy: {
+          select: {
+            username: true,
+            email: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: offset,
+      take: limit
+    });
+
+    // Get total count for pagination
+    const totalReports = await prisma.report.count({
+      where: whereClause
+    });
+
+    // Transform reports for frontend
+    const transformedReports = reports.map(report => ({
+      id: report.id,
+      reason: report.reason,
+      description: report.description,
+      status: report.status,
+      targetType: report.buildId ? 'build' : 
+                  report.partId ? 'part' : 
+                  report.commentId ? 'comment' : 
+                  report.reportedUserId ? 'user' : 'unknown',
+      targetId: report.buildId || report.partId || report.commentId || report.reportedUserId,
+      targetName: report.build?.name || 
+                  report.part?.name || 
+                  (report.comment?.content ? report.comment.content.substring(0, 50) + '...' : '') ||
+                  report.reportedUser?.username || 
+                  'Unknown',
+      reportedBy: report.reporter.username || report.reporter.email,
+      reporterId: report.reporter.id,
+      createdAt: report.createdAt,
+      reviewedBy: report.reviewedBy?.username || report.reviewedBy?.email,
+      reviewedAt: report.reviewedAt,
+      adminNotes: report.adminNotes
+    }));
 
     return NextResponse.json({
       success: true,
-      data: filteredReports,
+      data: transformedReports,
       pagination: {
         page,
         limit,
         offset,
-        total: filteredReports.length,
-        totalPages: Math.ceil(filteredReports.length / limit)
-      },
-      message: 'Reports system will be fully functional after database migration'
+        total: totalReports,
+        totalPages: Math.ceil(totalReports / limit)
+      }
     });
 
   } catch (error) {
@@ -121,7 +189,41 @@ export async function PUT(request: NextRequest) {
 
     const { reportId, status, adminNotes } = validation.data;
 
-    // For now, we'll log the report update since the database doesn't have reports yet
+    // Get admin user for reviewedBy field
+    const adminUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true }
+    });
+
+    if (!adminUser) {
+      return NextResponse.json({ error: 'Admin user not found' }, { status: 404 });
+    }
+
+    // Update the report in database
+    const updatedReport = await prisma.report.update({
+      where: { id: reportId },
+      data: {
+        status: status as ReportStatus,
+        adminNotes: adminNotes || null,
+        reviewedById: adminUser.id,
+        reviewedAt: new Date()
+      },
+      include: {
+        reporter: {
+          select: {
+            username: true,
+            email: true
+          }
+        },
+        reviewedBy: {
+          select: {
+            username: true,
+            email: true
+          }
+        }
+      }
+    });
+
     console.log(`ADMIN ACTION: ${session!.user!.email} updated report ${reportId} to ${status}`);
     if (adminNotes) {
       console.log(`Admin notes: ${adminNotes}`);
@@ -131,16 +233,21 @@ export async function PUT(request: NextRequest) {
       success: true,
       message: `Report ${reportId} status updated to ${status}`,
       report: {
-        id: reportId,
-        status,
-        adminNotes,
-        updatedBy: session.user.email,
-        updatedAt: new Date().toISOString()
+        id: updatedReport.id,
+        status: updatedReport.status,
+        adminNotes: updatedReport.adminNotes,
+        updatedBy: updatedReport.reviewedBy?.username || updatedReport.reviewedBy?.email,
+        updatedAt: updatedReport.reviewedAt
       }
     });
 
   } catch (error) {
     console.error('Error updating report:', error);
+    
+    if (error instanceof Error && error.message.includes('Record to update not found')) {
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    }
+    
     return NextResponse.json({ error: 'Failed to update report' }, { status: 500 });
   }
 }
@@ -174,7 +281,11 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Report ID is required' }, { status: 400 });
     }
 
-    // For now, we'll log the report deletion since the database doesn't have reports yet
+    // Delete the report from database
+    await prisma.report.delete({
+      where: { id: reportId }
+    });
+
     console.log(`ADMIN ACTION: ${session!.user!.email} deleted report ${reportId}`);
 
     return NextResponse.json({
@@ -185,6 +296,11 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     console.error('Error deleting report:', error);
+    
+    if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    }
+    
     return NextResponse.json({ error: 'Failed to delete report' }, { status: 500 });
   }
 }

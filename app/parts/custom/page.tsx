@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import LikeButton from '@/components/LikeButton';
+import AdminActionMenu from '@/components/AdminActionMenu';
+import ReportModal from '@/components/ReportModal';
 
 interface CustomPart {
   id: string;
@@ -38,6 +40,11 @@ export default function CustomParts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [reportModal, setReportModal] = useState<{ isOpen: boolean; partId: string; partName: string }>({
+    isOpen: false,
+    partId: '',
+    partName: ''
+  });
 
   const fetchCustomParts = useCallback(async () => {
     try {
@@ -181,15 +188,27 @@ export default function CustomParts() {
             {filteredParts.map((part) => (
               <div key={part.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{part.name}</h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        {part.category}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        by {part.user.username}
-                      </span>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{part.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                            {part.category}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            by {part.user.username}
+                          </span>
+                        </div>
+                      </div>
+                      {session?.user && (
+                        <AdminActionMenu 
+                          itemType="part" 
+                          itemId={part.id} 
+                          itemName={part.name}
+                          onDelete={fetchCustomParts}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -236,6 +255,13 @@ export default function CustomParts() {
                     <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium">
                       Use in Build
                     </button>
+                    <button 
+                      onClick={() => setReportModal({ isOpen: true, partId: part.id, partName: part.name })}
+                      className="px-3 py-2 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-sm"
+                      title="Report this part"
+                    >
+                      ⚠️
+                    </button>
                   </div>
                 </div>
               </div>
@@ -260,6 +286,17 @@ export default function CustomParts() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Report Modal */}
+      {reportModal.isOpen && (
+        <ReportModal
+          isOpen={reportModal.isOpen}
+          onClose={() => setReportModal({ isOpen: false, partId: '', partName: '' })}
+          targetType="part"
+          targetId={reportModal.partId}
+          targetName={reportModal.partName}
+        />
       )}
     </div>
   );

@@ -126,8 +126,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to toggle like' }, { status: 500 });
   }
 }
-    //     }
-    //   });
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
