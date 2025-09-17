@@ -4,7 +4,7 @@ import "./globals.css";
 import SessionProvider from '@/components/SessionProvider';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-
+import { Analytics } from "@vercel/analytics/next"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,6 +31,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
   <head></head>
   <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}>
+    <Analytics/>
         <SessionProvider session={session}>
           {children}
         </SessionProvider>
