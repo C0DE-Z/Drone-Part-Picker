@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { WebCrawlerService } from '@/services/WebCrawlerService';
+import { EnhancedClassificationIntegrationService } from '@/utils/EnhancedClassificationIntegrationService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,12 +13,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Use enhanced classification for superior accuracy
+    const enhancedClassifier = EnhancedClassificationIntegrationService.getInstance();
+    const enhancedResult = enhancedClassifier.classifyProduct(productName, description || '');
+    
+    // Also get legacy result for comparison
     const crawler = new WebCrawlerService();
-    const category = crawler.determineCategoryByScoring(productName, description || '');
+    const legacyCategory = crawler.determineCategoryByScoring(productName, description || '');
     
     return NextResponse.json({
       success: true,
-      category,
+      enhanced: {
+        category: enhancedResult.enhanced.category,
+        confidence: enhancedResult.enhanced.confidence,
+        reasoning: enhancedResult.enhanced.reasoning,
+        specifications: enhancedResult.enhanced.specifications
+      },
+      legacy: {
+        category: legacyCategory
+      },
+      analysis: enhancedResult.analysis,
       productName,
       description
     });

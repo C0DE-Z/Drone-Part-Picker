@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import ProductResortPanel from './ProductResortPanel';
 import AdminProductManager from './AdminProductManager';
+import ClassificationGameModal from './ClassificationGameModal';
 
 interface User {
   id: string;
@@ -43,12 +44,22 @@ interface AdminData {
 
 export default function AdminPanel() {
   const { data: session, status } = useSession();
-  const [activeTab, setActiveTab] = useState<'users' | 'posts' | 'products' | 'resort'>('posts');
+  const [activeTab, setActiveTab] = useState<'users' | 'posts' | 'products' | 'resort' | 'classification'>('posts');
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<AdminData>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteReason, setDeleteReason] = useState('');
+  const [classificationGameOpen, setClassificationGameOpen] = useState(false);
+  const [sampleProducts] = useState([
+    // Mock sample products for the classification game
+    { id: '1', name: 'EMAX E3 Series 2808 Motor - 1500KV', description: 'High-performance brushless motor for racing drones', price: 29.99, currentCategory: 'motor' },
+    { id: '2', name: 'Holybro Tekko32 F3 Metal 45A 4-in-1 ESC', description: '4-in-1 electronic speed controller with current sensor', price: 79.99, currentCategory: 'stack' },
+    { id: '3', name: 'GEPRC Mark4 HD5 Frame Kit', description: '5-inch carbon fiber frame for FPV racing', price: 45.00, currentCategory: 'frame' },
+    { id: '4', name: 'RunCam Phoenix 2 FPV Camera', description: '1000TVL micro FPV camera with OSD', price: 35.99, currentCategory: 'camera' },
+    { id: '5', name: 'Gemfan 5152S Propellers (Set of 4)', description: 'Tri-blade propellers for 5-inch racing quads', price: 12.99, currentCategory: 'prop' },
+    { id: '6', name: 'CNHL 1300mAh 4S 100C LiPo Battery', description: 'High discharge rate lithium polymer battery', price: 28.50, currentCategory: 'battery' }
+  ]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{id: string, type: string, name: string} | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -223,6 +234,16 @@ export default function AdminPanel() {
           >
             Product Resort
           </button>
+          <button
+            onClick={() => setActiveTab('classification')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'classification'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            AI Classification
+          </button>
         </nav>
       </div>
 
@@ -378,6 +399,91 @@ export default function AdminPanel() {
         <ProductResortPanel />
       )}
 
+      {/* AI Classification Tab */}
+      {activeTab === 'classification' && !loading && (
+        <div className="space-y-6">
+          <div className="bg-white shadow rounded-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">AI Classification Training</h2>
+                <p className="text-gray-600 mt-1">
+                  Help improve our AI by verifying product classifications. Play the classification game to train our machine learning model.
+                </p>
+              </div>
+              <button
+                onClick={() => setClassificationGameOpen(true)}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+              >
+                <span className="text-xl">🤖</span>
+                Start Classification Game
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">🎯</span>
+                  <h3 className="font-semibold text-blue-800">Accuracy Focused</h3>
+                </div>
+                <p className="text-blue-700 text-sm">
+                  Our AI analyzes product names, descriptions, and technical specifications to categorize components accurately.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">📊</span>
+                  <h3 className="font-semibold text-green-800">Multi-Method Analysis</h3>
+                </div>
+                <p className="text-green-700 text-sm">
+                  Combines pattern matching, keyword analysis, feature detection, and brand recognition for best results.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">🎮</span>
+                  <h3 className="font-semibold text-purple-800">Gamified Training</h3>
+                </div>
+                <p className="text-purple-700 text-sm">
+                  Interactive card-based game makes training the AI fun while improving classification accuracy.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-3">Classification Categories</h3>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <span>⚡</span>
+                  <span className="text-sm font-medium">Motors</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <span>🔗</span>
+                  <span className="text-sm font-medium">ESC/FC</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <span>🏗️</span>
+                  <span className="text-sm font-medium">Frames</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <span>🌀</span>
+                  <span className="text-sm font-medium">Props</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <span>🔋</span>
+                  <span className="text-sm font-medium">Batteries</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <span>📷</span>
+                  <span className="text-sm font-medium">Cameras</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
@@ -417,6 +523,17 @@ export default function AdminPanel() {
           </div>
         </div>
       )}
+
+      {/* Classification Game Modal */}
+      <ClassificationGameModal
+        isOpen={classificationGameOpen}
+        onClose={() => setClassificationGameOpen(false)}
+        products={sampleProducts}
+        onUpdateCategory={(productId, category, confidence) => {
+          console.log(`Product ${productId} classified as ${category} with ${confidence} confidence`);
+          // Here you would typically update your database with the verified classification
+        }}
+      />
     </div>
   );
 }

@@ -2042,50 +2042,30 @@ export class WebCrawlerService {
     console.log(`🔍 Extracting motor specs for: ${name}`);
     console.log(`📝 Text content: ${textContent}`);
 
-    // Extract KV rating from name or description - handle multiple KV options
-    const multiKvPattern = /(\d+kv(?:\s*\/\s*\d+kv)+)/i;
-    const multiKvMatch = textContent.match(multiKvPattern);
+    // Extract KV rating from name or description - prioritize name over description
+    const nameKvMatch = name.toLowerCase().match(/(\d+)\s*kv/i);
+    const descKvMatch = description.toLowerCase().match(/(\d+)\s*kv/i);
     
-    if (multiKvMatch) {
-      // Multiple KV options found (e.g., "400KV/500KV/640KV/900KV")
-      const kvOptions = multiKvMatch[1].match(/\d+/g);
-      if (kvOptions && kvOptions.length > 1) {
-        specs.kvOptions = kvOptions.join(', ');
-        specs.kv = kvOptions[0]; // Use first option as primary
-        console.log(`⚡ Found multiple KV options: ${specs.kvOptions}, primary: ${specs.kv}`);
-      }
-    } else {
-      // Single KV rating
-      const kvPatterns = [
-        /(\d+)\s*kv/i,
-        /kv\s*(\d+)/i,
-        /(\d+)\s*rpm\/v/i
-      ];
-      
-      for (const pattern of kvPatterns) {
-        const kvMatch = textContent.match(pattern);
-        if (kvMatch) {
-          specs.kv = kvMatch[1];
-          console.log(`⚡ Found KV: ${specs.kv}`);
-          break;
-        }
-      }
+    // Use name KV if available, otherwise use description KV
+    if (nameKvMatch) {
+      specs.kv = nameKvMatch[1];
+      console.log(`⚡ Found KV from name: ${specs.kv}`);
+    } else if (descKvMatch) {
+      specs.kv = descKvMatch[1];
+      console.log(`⚡ Found KV from description: ${specs.kv}`);
     }
 
-    // Extract stator size (e.g., 2207, 2306, 1407, 2004, 1102, 3115)
-    const statorPatterns = [
-      /(\d{4})/,
-      /motor\s*size\s*(\d{4})/i,
-      /stator\s*(\d{4})/i
-    ];
+    // Extract stator size (e.g., 2207, 2306, 1407, 2004, 1102, 3115) - prioritize name
+    const nameStatorMatch = name.match(/(\d{4})/);
+    const descStatorMatch = description.match(/(\d{4})/);
     
-    for (const pattern of statorPatterns) {
-      const statorMatch = textContent.match(pattern);
-      if (statorMatch && statorMatch[1].length === 4) {
-        specs.statorSize = statorMatch[1];
-        console.log(`📏 Found stator: ${specs.statorSize}`);
-        break;
-      }
+    // Use name stator if available and not the same as KV, otherwise use description
+    if (nameStatorMatch && nameStatorMatch[1] !== specs.kv) {
+      specs.statorSize = nameStatorMatch[1];
+      console.log(`📏 Found stator from name: ${specs.statorSize}`);
+    } else if (descStatorMatch && descStatorMatch[1] !== specs.kv) {
+      specs.statorSize = descStatorMatch[1];
+      console.log(`📏 Found stator from description: ${specs.statorSize}`);
     }
 
     // Extract motor configuration (e.g., 12N14P)

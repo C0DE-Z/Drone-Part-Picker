@@ -1,4 +1,5 @@
 import { ScrapedProduct } from '@/types/drone';
+import { EnhancedClassificationIntegrationService } from '@/utils/EnhancedClassificationIntegrationService';
 
 interface ScraperConfig {
   vendor: string;
@@ -28,8 +29,33 @@ interface CategoryConfig {
   };
 }
 
-// Intelligent product classification
+// Intelligent product classification using Enhanced AI Engine
 function classifyProduct(productName: string, description: string = '', url: string = ''): string {
+  // Use enhanced classification for superior accuracy
+  const enhancedClassifier = EnhancedClassificationIntegrationService.getInstance();
+  
+  try {
+    const result = enhancedClassifier.classifyProduct(productName, description, { url });
+    const enhancedResult = result.enhanced;
+    
+    console.log(`🚀 Enhanced scraper classification for "${productName}": ${enhancedResult.category} (${enhancedResult.confidence}%)`);
+    
+    // Enhanced classifier has high accuracy, use lower confidence threshold
+    if (enhancedResult.confidence >= 65) {
+      return enhancedResult.category;
+    }
+    
+    console.log(`⚠️ Enhanced confidence too low (${enhancedResult.confidence}%), using fallback classification`);
+  } catch (error) {
+    console.error('Enhanced classification failed, falling back to legacy:', error);
+  }
+  
+  // Fallback to legacy rule-based classification
+  return legacyClassifyProduct(productName, description, url);
+}
+
+// Legacy classification as fallback
+function legacyClassifyProduct(productName: string, description: string = '', url: string = ''): string {
   const text = `${productName} ${description} ${url}`.toLowerCase()
   
   // Definitive checks with more specific rules

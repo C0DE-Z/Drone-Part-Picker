@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ComponentCard from './ComponentCard';
+import ComponentModal from './ComponentModal';
 import { Motor, Frame, Stack, Camera, Prop, Battery, CustomWeight } from '@/types/drone';
 
 interface SelectedComponents {
@@ -33,14 +34,62 @@ export default function ComponentGrid({
   const [isExpanded, setIsExpanded] = useState(false);
   const itemsPerPage = 20;
 
-  const componentEntries = Object.entries(components);
-  const totalItems = componentEntries.length;
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState<{
+    name: string;
+    component: Motor | Frame | Stack | Camera | Prop | Battery | CustomWeight;
+    type: 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery' | 'customWeight';
+    cardRect?: DOMRect;
+  } | null>(null);
+
+  const handleViewDetails = (name: string, component: Motor | Frame | Stack | Camera | Prop | Battery | CustomWeight, type: 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery' | 'customWeight', cardRect?: DOMRect) => {
+    setModalData({ name, component, type, cardRect });
+    setModalOpen(true);
+  };
+
+
+  // Sorting options
+  const [sortOption, setSortOption] = useState<'name-asc' | 'name-desc' | 'brand-asc' | 'brand-desc' | 'spec-desc' | 'spec-asc'>('name-asc');
+
+  // Helper to get brand/spec for sorting
+  const getBrand = (c: Motor | Frame | Stack | Camera | Prop | Battery | CustomWeight) => 
+    'brand' in c ? c.brand || '' : '';
+  const getSpec = (c: Motor | Frame | Stack | Camera | Prop | Battery | CustomWeight) => {
+    if ('capacity' in c) return c.capacity || 0;
+    if ('kv' in c) return c.kv || 0;
+    if ('thrust' in c) return c.thrust || 0;
+    if ('cellCount' in c) return c.cellCount || 0;
+    return 0;
+  };
+
+  // Sort function
+  const sortedEntries = Object.entries(components).sort(([nameA, compA], [nameB, compB]) => {
+    switch (sortOption) {
+      case 'name-asc':
+        return nameA.localeCompare(nameB);
+      case 'name-desc':
+        return nameB.localeCompare(nameA);
+      case 'brand-asc':
+        return getBrand(compA).localeCompare(getBrand(compB));
+      case 'brand-desc':
+        return getBrand(compB).localeCompare(getBrand(compA));
+      case 'spec-desc':
+        return Number(getSpec(compB)) - Number(getSpec(compA));
+      case 'spec-asc':
+        return Number(getSpec(compA)) - Number(getSpec(compB));
+      default:
+        return 0;
+    }
+  });
+
+  const totalItems = sortedEntries.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   // Show limited items or all items based on expansion state
   const displayItems = isExpanded 
-    ? componentEntries 
-    : componentEntries.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    ? sortedEntries 
+    : sortedEntries.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -64,8 +113,26 @@ export default function ComponentGrid({
 
   return (
     <div className="p-4">
+      {/* Sort Dropdown */}
+      <div className="mb-4 flex items-center gap-4">
+        <label htmlFor="sort" className="text-sm text-gray-600">Sort by:</label>
+        <select
+          id="sort"
+          value={sortOption}
+          onChange={e => setSortOption(e.target.value as typeof sortOption)}
+          className="border rounded px-2 py-1 text-sm"
+        >
+          <option value="name-asc">Name (A-Z)</option>
+          <option value="name-desc">Name (Z-A)</option>
+          <option value="brand-asc">Brand (A-Z)</option>
+          <option value="brand-desc">Brand (Z-A)</option>
+          <option value="spec-desc">Spec (High-Low)</option>
+          <option value="spec-asc">Spec (Low-High)</option>
+        </select>
+      </div>
+
       {/* Component Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr">
+      <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 auto-cols-max">
         {displayItems.map(([name, component]) => (
           <div
             key={name}
@@ -84,6 +151,7 @@ export default function ComponentGrid({
                   : (selectedComponents[type as keyof Omit<SelectedComponents, 'customWeights'>] as { name: string } | undefined)?.name === name
               }
               onSelect={() => onComponentSelect(type, name, component)}
+              onViewDetails={handleViewDetails}
               isCompatible={checkCompatibility()}
             />
           </div>
@@ -151,7 +219,7 @@ export default function ComponentGrid({
             <span className="text-sm font-medium">
               {isExpanded ? 'Show Less' : `Show All ${totalItems} Items`}
             </span>
-            <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+            <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}> 
               ↓
             </div>
           </button>
@@ -164,6 +232,18 @@ export default function ComponentGrid({
             }
           </div>
         </div>
+      )}
+
+      {/* Component Modal */}
+      {modalData && (
+        <ComponentModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          name={modalData.name}
+          component={modalData.component}
+          type={modalData.type}
+          cardRect={modalData.cardRect}
+        />
       )}
     </div>
   );

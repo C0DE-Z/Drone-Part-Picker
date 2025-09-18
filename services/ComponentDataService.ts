@@ -6,6 +6,8 @@ import { cameras } from '@/data/cameras';
 import { props } from '@/data/props';
 import { batteries } from '@/data/batteries';
 import { customWeights } from '@/data/customWeights';
+import { ComponentClassificationService } from '@/utils/ComponentClassificationService';
+import { EnhancedClassificationIntegrationService } from '@/utils/EnhancedClassificationIntegrationService';
 
 type ComponentType = Motor | Frame | Stack | Camera | Prop | Battery | CustomWeight;
 
@@ -37,6 +39,7 @@ export class ComponentDataService {
   private scrapedProducts: Record<string, ScrapedProduct[]> = {};
   private lastFetch: number = 0;
   private fetchInterval: number = 5 * 60 * 1000; // 5 minutes
+  private enhancedClassifier: EnhancedClassificationIntegrationService;
 
   private constructor() {
     // Initialize with typed data from separate files
@@ -49,6 +52,9 @@ export class ComponentDataService {
       Batteries: batteries,
       'Simple Weight': customWeights
     };
+    
+    // Initialize enhanced classification service
+    this.enhancedClassifier = EnhancedClassificationIntegrationService.getInstance();
   }
 
   public static getInstance(): ComponentDataService {
@@ -80,7 +86,12 @@ export class ComponentDataService {
       // Group products by category
       this.scrapedProducts = {};
       allProducts.forEach(product => {
-        const category = this.mapCategoryToComponentType(product.category);
+        const category = this.mapCategoryToComponentType(
+          product.category,
+          product.name,
+          product.description,
+          product.specifications
+        );
         if (category) {
           if (!this.scrapedProducts[category]) {
             this.scrapedProducts[category] = [];
@@ -96,7 +107,62 @@ export class ComponentDataService {
     }
   }
 
-  private mapCategoryToComponentType(category: string): keyof DroneComponents | null {
+  private mapCategoryToComponentType(category: string, productName?: string, description?: string, specs?: Record<string, unknown>): keyof DroneComponents | null {
+    // Use enhanced classification service for superior accuracy (99%+ target)
+    if (productName || description) {
+      const classificationResult = this.enhancedClassifier.classifyProduct(
+        productName || '',
+        description,
+        { specifications: specs as Record<string, string | number | boolean | undefined> }
+      );
+      
+      const enhancedResult = classificationResult.enhanced;
+      console.log(`🚀 Enhanced classification for "${productName}": ${enhancedResult.category} (${enhancedResult.confidence}%)`);
+      console.log(`🎯 Reasoning: ${enhancedResult.reasoning}`);
+      
+      // Enhanced classifier has much higher accuracy, use lower confidence threshold
+      if (enhancedResult.confidence >= 60) {
+        const mapping: Record<string, keyof DroneComponents> = {
+          'motor': 'Motors',
+          'frame': 'Frames',
+          'stack': 'Stacks',
+          'camera': 'Camera',
+          'prop': 'Props',
+          'battery': 'Batteries'
+        };
+        
+        const mappedType = mapping[enhancedResult.category];
+        if (mappedType) {
+          console.log(`✅ Using enhanced classification: ${mappedType}`);
+          return mappedType;
+        }
+      }
+      
+      // Fallback to legacy classifier only if enhanced fails
+      console.log(`⚠️ Enhanced classifier confidence too low (${enhancedResult.confidence}%), falling back to legacy`);
+      const legacyResult = ComponentClassificationService.classifyComponent(
+        productName || '',
+        description,
+        specs
+      );
+      
+      console.log(`📊 Legacy classification backup: ${legacyResult.category} (${legacyResult.confidence}%)`);
+      
+      if (legacyResult.confidence >= 75) {
+        const mapping: Record<string, keyof DroneComponents> = {
+          'motor': 'Motors',
+          'frame': 'Frames',
+          'stack': 'Stacks',
+          'camera': 'Camera',
+          'prop': 'Props',
+          'battery': 'Batteries'
+        };
+        
+        return mapping[legacyResult.category] || null;
+      }
+    }
+    
+    // Fallback to URL-based classification for lower confidence cases
     const mapping: Record<string, keyof DroneComponents> = {
       'motor': 'Motors',
       'motors': 'Motors',
@@ -105,6 +171,11 @@ export class ComponentDataService {
       'stack': 'Stacks',
       'stacks': 'Stacks',
       'flight-controller': 'Stacks',
+      'flight-controllers': 'Stacks',
+      'esc': 'Stacks',
+      'escs': 'Stacks',
+      'electronic-speed-controller': 'Stacks',
+      'fc': 'Stacks',
       'camera': 'Camera',
       'cameras': 'Camera',
       'prop': 'Props',
@@ -116,10 +187,36 @@ export class ComponentDataService {
       'lipo': 'Batteries'
     };
     
-    return mapping[category.toLowerCase()] || null;
+    const normalizedCategory = category.toLowerCase();
+    return mapping[normalizedCategory] || null;
   }
 
   private convertScrapedToComponent(product: ScrapedProduct, type: keyof DroneComponents): ComponentType {
+    // Verify the product is correctly classified before conversion using enhanced engine
+    const classificationResult = this.enhancedClassifier.classifyProduct(
+      product.name,
+      product.description,
+      { specifications: product.specifications as Record<string, string | number | boolean | undefined> }
+    );
+    
+    const enhancedResult = classificationResult.enhanced;
+    
+    // If classification confidence is high and disagrees with current type, log a warning
+    if (enhancedResult.confidence >= 70) {
+      const correctType = this.mapCategoryToComponentType(enhancedResult.category);
+      if (correctType && correctType !== type) {
+        console.warn(`⚠️ Product "${product.name}" is classified as ${correctType} but being converted as ${type}`);
+        console.warn(`   Enhanced classification confidence: ${enhancedResult.confidence}%`);
+        console.warn(`   Reasoning: ${enhancedResult.reasoning}`);
+        
+        // Auto-reclassify if confidence is very high (enhanced engine is much more accurate)
+        if (enhancedResult.confidence >= 85) {
+          console.log(`🔄 Auto-reclassifying "${product.name}" from ${type} to ${correctType} (high confidence)`);
+          return this.convertScrapedToComponent(product, correctType);
+        }
+      }
+    }
+    
     const specs = product.specifications || {};
     const baseComponent = {
       name: product.name,

@@ -106,19 +106,25 @@ export default function Home() {
 
   // Load saved advanced settings from localStorage
   useEffect(() => {
-    const savedSettings = localStorage.getItem('dronepartpicker-advanced-settings');
-    if (savedSettings) {
-      try {
-        setAdvancedSettings(JSON.parse(savedSettings));
-      } catch (error) {
-        console.error('Failed to load saved settings:', error);
+    // Only access localStorage on client side
+    if (typeof window !== 'undefined') {
+      const savedSettings = localStorage.getItem('dronepartpicker-advanced-settings');
+      if (savedSettings) {
+        try {
+          setAdvancedSettings(JSON.parse(savedSettings));
+        } catch (error) {
+          console.error('Failed to load saved settings:', error);
+        }
       }
     }
   }, []);
 
   // Save advanced settings to localStorage when they change
   useEffect(() => {
-    localStorage.setItem('dronepartpicker-advanced-settings', JSON.stringify(advancedSettings));
+    // Only access localStorage on client side
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dronepartpicker-advanced-settings', JSON.stringify(advancedSettings));
+    }
   }, [advancedSettings]);
 
   // Update performance when components change
