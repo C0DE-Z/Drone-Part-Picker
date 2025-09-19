@@ -64,7 +64,7 @@ export class ComponentClassificationService {
     }
     
     // Step 3: Use enhanced pattern matching
-    const patternResult = this.classifyByPatterns(text, specs);
+    const patternResult = this.classifyByPatterns(text);
     if (patternResult.confidence >= 80) {
       console.log(`✅ Pattern-based classification: ${patternResult.category}`);
       return patternResult;
@@ -168,7 +168,7 @@ export class ComponentClassificationService {
     }
     
     // ESC/Stack detection (before motor, as ESCs can mention motors)
-    const escResult = this.classifyESCAndStack(text, specs);
+    const escResult = this.classifyESCAndStack(text);
     if (escResult.confidence >= 85) {
       return escResult;
     }
@@ -215,7 +215,7 @@ export class ComponentClassificationService {
   /**
    * Enhanced ESC and Stack classification
    */
-  private static classifyESCAndStack(text: string, specs: ComponentSpecifications): ClassificationResult {
+  private static classifyESCAndStack(text: string): ClassificationResult {
     const reasons: string[] = [];
     let confidence = 0;
     
@@ -448,7 +448,7 @@ export class ComponentClassificationService {
   /**
    * Pattern-based classification
    */
-  private static classifyByPatterns(text: string, specs: ComponentSpecifications): ClassificationResult {
+  private static classifyByPatterns(text: string): ClassificationResult {
     const patterns = {
       motor: [
         /\d+kv.*motor/,

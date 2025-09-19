@@ -15,84 +15,43 @@ export class WebScraperService {
       {
         vendor: 'GetFPV',
         baseUrl: 'https://www.getfpv.com',
-        rateLimit: 2000,
+        rateLimit: 3000, // Increased delay for Cloudflare
         categories: {
           motors: {
-            url: '/motors',
+            url: '/products/motors?limit=48',
             selectors: {
               productContainer: '.product-item',
-              name: '.product-item-title a',
-              price: '.price',
-              url: '.product-item-title a',
-              inStock: '.stock-status',
-              image: '.product-item-photo img',
-              sku: '.sku',
+              name: '.product-name a, .product-item-title a',
+              price: '.price-box .price, .price',
+              url: '.product-name a, .product-item-title a',
+              inStock: '.availability, .stock-status',
+              image: '.product-image img, .product-item-photo img',
+              sku: '[data-sku], .sku',
               brand: '.brand'
             }
           },
           frames: {
-            url: '/frames',
+            url: '/products/frames?limit=48',
             selectors: {
               productContainer: '.product-item',
-              name: '.product-item-title a',
-              price: '.price',
-              url: '.product-item-title a',
-              inStock: '.stock-status',
-              image: '.product-item-photo img',
-              sku: '.sku',
+              name: '.product-name a, .product-item-title a',
+              price: '.price-box .price, .price',
+              url: '.product-name a, .product-item-title a',
+              inStock: '.availability, .stock-status',
+              image: '.product-image img, .product-item-photo img',
+              sku: '[data-sku], .sku',
               brand: '.brand'
             }
           },
-          flight_controllers: {
-            url: '/flight-controllers',
+          props: {
+            url: '/products/propellers?limit=48',
             selectors: {
               productContainer: '.product-item',
-              name: '.product-item-title a',
-              price: '.price',
-              url: '.product-item-title a',
-              inStock: '.stock-status',
-              image: '.product-item-photo img',
-              sku: '.sku',
-              brand: '.brand'
-            }
-          },
-          cameras: {
-            url: '/fpv-cameras',
-            selectors: {
-              productContainer: '.product-item',
-              name: '.product-item-title a',
-              price: '.price',
-              url: '.product-item-title a',
-              inStock: '.stock-status',
-              image: '.product-item-photo img',
-              sku: '.sku',
-              brand: '.brand'
-            }
-          },
-          propellers: {
-            url: '/propellers',
-            selectors: {
-              productContainer: '.product-item',
-              name: '.product-item-title a',
-              price: '.price',
-              url: '.product-item-title a',
-              inStock: '.stock-status',
-              image: '.product-item-photo img',
-              sku: '.sku',
-              brand: '.brand'
-            }
-          },
-          batteries: {
-            url: '/batteries',
-            selectors: {
-              productContainer: '.product-item',
-              name: '.product-item-title a',
-              price: '.price',
-              url: '.product-item-title a',
-              inStock: '.stock-status',
-              image: '.product-item-photo img',
-              sku: '.sku',
-              brand: '.brand'
+              name: '.product-name a, .product-item-title a',
+              price: '.price-box .price, .price',
+              url: '.product-name a, .product-item-title a',
+              inStock: '.availability, .stock-status',
+              image: '.product-image img, .product-item-photo img'
             }
           }
         }
@@ -132,7 +91,7 @@ export class WebScraperService {
   async initializeBrowser(): Promise<void> {
     if (!this.browser) {
       this.browser = await puppeteer.launch({
-        headless: true,
+        headless: true, // Keep as boolean for compatibility
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -140,7 +99,15 @@ export class WebScraperService {
           '--disable-accelerated-2d-canvas',
           '--no-first-run',
           '--no-zygote',
-          '--disable-gpu'
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor',
+          '--disable-background-timer-throttling',
+          '--disable-backgrounding-occluded-windows',
+          '--disable-renderer-backgrounding',
+          '--disable-ipc-flooding-protection',
+          '--window-size=1920,1080',
+          '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         ]
       });
     }
@@ -169,6 +136,140 @@ export class WebScraperService {
     return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async setupAntiDetection(page: any): Promise<void> {
+    // Set realistic viewport
+    await page.setViewport({ width: 1920, height: 1080 });
+
+    // Set advanced user agent with realistic headers
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    );
+
+    // Set extra headers to mimic real browser
+    await page.setExtraHTTPHeaders({
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1'
+    });
+
+    // Remove webdriver traces
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+      Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
+      Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+      
+      // Mock chrome runtime
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).chrome = {
+        runtime: {}
+      };
+      
+      // Override permissions query - simplified to avoid type issues
+      if (window.navigator.permissions && window.navigator.permissions.query) {
+        const originalQuery = window.navigator.permissions.query.bind(window.navigator.permissions);
+        window.navigator.permissions.query = function(parameters: PermissionDescriptor) {
+          if (parameters.name === 'notifications') {
+            return Promise.resolve({
+              state: 'granted' as PermissionState,
+              name: parameters.name,
+              onchange: null,
+              addEventListener: () => {},
+              removeEventListener: () => {},
+              dispatchEvent: () => false
+            } as PermissionStatus);
+          }
+          return originalQuery(parameters);
+        };
+      }
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async navigateWithCloudflareBypass(page: any, url: string, vendor: string): Promise<void> {
+    const maxRetries = 3;
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        // For GetFPV, use a more sophisticated approach
+        if (vendor === 'GetFPV') {
+          // First visit the homepage to establish session
+          await page.goto('https://www.getfpv.com', { 
+            waitUntil: 'networkidle0',
+            timeout: 30000 
+          });
+          await this.delay(2000);
+
+          // Add some mouse movement to appear human
+          await page.mouse.move(100, 100);
+          await page.mouse.move(200, 200);
+          await this.delay(1000);
+        }
+
+        // Navigate to target URL
+        await page.goto(url, { 
+          waitUntil: 'networkidle0',
+          timeout: 30000 
+        });
+
+        // Check if navigation was successful
+        const title = await page.title();
+        if (!title.includes('Just a moment') && !title.includes('Checking your browser')) {
+          console.log(`Successfully navigated to ${url}`);
+          return;
+        }
+
+        attempt++;
+        if (attempt < maxRetries) {
+          console.log(`Navigation attempt ${attempt} failed, retrying...`);
+          await this.delay(3000);
+        }
+      } catch (error) {
+        attempt++;
+        if (attempt >= maxRetries) {
+          throw error;
+        }
+        console.log(`Navigation error, attempt ${attempt}:`, error);
+        await this.delay(3000);
+      }
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async handleCloudflareChallenge(page: any): Promise<void> {
+    try {
+      console.log('Handling Cloudflare challenge...');
+      
+      // Wait for potential challenge completion
+      await page.waitForFunction(
+        () => {
+          const title = document.title;
+          const body = document.body?.innerText || '';
+          return !title.includes('Just a moment') && 
+                 !title.includes('Checking your browser') &&
+                 !body.includes('Enable JavaScript and cookies');
+        },
+        { timeout: 15000 }
+      );
+
+      // Additional wait for dynamic content
+      await this.delay(2000);
+      
+      console.log('Cloudflare challenge completed');
+    } catch (error) {
+      console.log('Cloudflare challenge handling timeout or error:', error);
+      // Continue anyway, might still work
+    }
+  }
+
   async scrapeCategory(vendor: string, category: string): Promise<ScrapedProduct[]> {
     const config = this.scraperConfigs.find(c => c.vendor === vendor);
     if (!config || !config.categories[category]) {
@@ -179,20 +280,28 @@ export class WebScraperService {
     const page = await this.browser!.newPage();
     
     try {
-      // Set user agent to avoid bot detection
-      await page.setUserAgent(config.userAgent || 
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      );
+      // Advanced anti-detection setup
+      await this.setupAntiDetection(page);
 
       const categoryConfig = config.categories[category];
       const url = `${config.baseUrl}${categoryConfig.url}`;
       
       console.log(`Scraping ${vendor} - ${category}: ${url}`);
       
-      await page.goto(url, { waitUntil: 'networkidle2' });
+      // Enhanced navigation with Cloudflare bypass
+      await this.navigateWithCloudflareBypass(page, url, vendor);
+      
       await this.delay(config.rateLimit);
 
       const content = await page.content();
+      
+      // Check if we got a Cloudflare challenge page
+      if (content.includes('cf_chl_opt') || content.includes('Just a moment') || content.includes('Enable JavaScript and cookies')) {
+        console.log(`Cloudflare challenge detected for ${vendor}, attempting bypass...`);
+        await this.handleCloudflareChallenge(page);
+        await this.delay(5000); // Wait for challenge to complete
+      }
+
       const $ = cheerio.load(content);
       
       const products: ScrapedProduct[] = [];
@@ -233,6 +342,7 @@ export class WebScraperService {
         }
       });
 
+      console.log(`${vendor} ${category}: Found ${products.length} products`);
       return products;
     } catch (error) {
       console.error(`Error scraping ${vendor} ${category}:`, error);

@@ -1,7 +1,12 @@
 'use client';
 
-import AdminDashboard from '@/components/AdminDashboard';
+import NewAdminDashboard from '@/components/NewAdminDashboard';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export default function AdminPage() {
-  return <AdminDashboard />;
+  return (
+    <ThemeProvider>
+      <NewAdminDashboard />
+    </ThemeProvider>
+  );
 }

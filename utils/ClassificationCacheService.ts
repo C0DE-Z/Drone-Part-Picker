@@ -7,7 +7,7 @@
  */
 
 import { createHash } from 'crypto';
-import { ClassificationResult as EnhancedResult, ComponentCategory } from './EnhancedClassificationEngine';
+import { ClassificationResult as EnhancedResult } from './EnhancedClassificationEngine';
 
 interface CacheEntry {
   result: EnhancedResult;

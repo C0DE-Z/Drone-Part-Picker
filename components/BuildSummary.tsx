@@ -21,7 +21,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
 
   const handleSave = () => {
     if (!buildName.trim()) {
-      alert('Please enter a build name');
+      alert('Give your build a name first!');
       return;
     }
     onSaveBuild(buildName.trim(), description.trim(), isPublic, tags);
@@ -35,9 +35,9 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
   return (
   <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 border border-gray-200 w-full h-fit">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-2">
-  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Build Summary</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">🚁 Your Build</h2>
         <div className="text-sm text-gray-600 font-medium whitespace-nowrap">
-          {componentCount}/6 components
+          {componentCount}/6 picked
         </div>
       </div>
 
@@ -150,7 +150,7 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
           disabled={!isComplete}
           className="w-full px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
-          {isComplete ? 'Save Build' : 'Need More Parts'}
+          {isComplete ? '💾 Save This Build!' : '⏳ Need More Parts'}
         </button>
       </div>
 
@@ -158,33 +158,32 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
       {showSaveOptions && isComplete && (
   <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 w-full">
           <div className="space-y-3 sm:space-y-4">
-            {/* Build Name Input */}
             <div>
               <label htmlFor="buildName" className="text-xs sm:text-sm font-medium text-gray-900 mb-2 block">
-                Build Name *
+                What should we call it? *
               </label>
               <input
                 type="text"
                 id="buildName"
                 value={buildName}
                 onChange={(e) => setBuildName(e.target.value)}
-                placeholder="Enter a catchy name for your build..."
+                placeholder="My awesome racing quad..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 maxLength={50}
               />
-              <p className="text-xs text-gray-500 mt-1">Give your build a unique name that others will remember</p>
+              <p className="text-xs text-gray-500 mt-1">Give it a name that sounds cool!</p>
             </div>
 
             {/* Description Input */}
             <div>
               <label htmlFor="description" className="text-sm font-medium text-gray-900 mb-2 block">
-                Description
+                Tell us about it
               </label>
               <textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell the community about your build, its purpose, flight characteristics..."
+                placeholder="What&apos;s this build for? Racing? Freestyle? Chilling in the park?"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                 rows={3}
                 maxLength={300}
@@ -196,9 +195,9 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
             <div className="flex items-center justify-between">
               <div>
                 <label htmlFor="isPublic" className="text-sm font-medium text-gray-900">
-                  Make Public
+                  Share with everyone?
                 </label>
-                <p className="text-xs text-gray-500">Share this build with the community</p>
+                <p className="text-xs text-gray-500">Let other people see and copy your build</p>
               </div>
               <button
                 type="button"
@@ -215,15 +214,14 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
               </button>
             </div>
 
-            {/* Tags Input */}
             <div>
               <label className="text-sm font-medium text-gray-900 mb-2 block">
-                Tags (optional)
+                Tags (help others find it)
               </label>
               <TagInput
                 tags={tags}
                 onChange={setTags}
-                placeholder="Add tags like 'racing', 'freestyle'..."
+                placeholder="racing, freestyle, beginner..."
                 maxTags={5}
               />
             </div>
@@ -233,15 +231,15 @@ export default function BuildSummary({ selectedComponents, onClearBuild, onSaveB
               onClick={handleSave}
               className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
             >
-              Save Build
+              🚀 Save It!
             </button>
           </div>
         </div>
       )}
 
       {!isComplete && componentCount > 0 && (
-  <p className="text-xs text-gray-500 mt-4 text-center font-medium">
-          Add at least a motor, frame, flight controller, and battery to save your build
+        <p className="text-xs text-gray-500 mt-4 text-center font-medium">
+          Grab at least a motor, frame, flight controller, and battery to save your build! 
         </p>
       )}
     </div>

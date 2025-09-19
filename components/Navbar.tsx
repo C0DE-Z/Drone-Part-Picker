@@ -29,7 +29,7 @@ export default function Navbar() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search for drone parts..."
+                placeholder="Find that perfect part..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -41,16 +41,16 @@ export default function Navbar() {
               Builds
             </Link>
             <Link href="/calculator" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              Calculator
+              Build Helper
             </Link>
             <Link href="/parts" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Parts
             </Link>
             <Link href="/prices" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              Prices
+              Price Check
             </Link>
             <Link href="/guides" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              Guides
+              How-To Guides
             </Link>
 
             {session ? (
@@ -101,7 +101,7 @@ export default function Navbar() {
                   onClick={() => signIn()}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                 >
-                  Get Started
+                  Start Building!
                 </button>
               </div>
             )}
@@ -124,7 +124,7 @@ export default function Navbar() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search for drone parts..."
+              placeholder="Find that perfect part..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -145,7 +145,7 @@ export default function Navbar() {
               href="/calculator"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
             >
-              Calculator
+              Build Helper
             </Link>
             <Link
               href="/parts"
@@ -157,13 +157,13 @@ export default function Navbar() {
               href="/prices"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
             >
-              Price Comparison
+              Price Check
             </Link>
             <Link
               href="/guides"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md font-medium"
             >
-              Guides
+              How-To Guides
             </Link>
             
             {session ? (
@@ -199,7 +199,7 @@ export default function Navbar() {
                   onClick={() => signIn()}
                   className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                 >
-                  Get Started
+                  Start Building!
                 </button>
               </div>
             )}

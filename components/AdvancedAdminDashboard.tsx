@@ -47,9 +47,8 @@ const TabsList = ({ children, className = '' }: { children: React.ReactNode; cla
   </div>
 );
 
-const TabsTrigger = ({ children, value, isActive, onClick }: { 
+const TabsTrigger = ({ children, isActive, onClick }: { 
   children: React.ReactNode; 
-  value: string;
   isActive: boolean;
   onClick: () => void;
 }) => (
@@ -150,8 +149,8 @@ export default function AdvancedAdminDashboard() {
   const [adminActions] = useState<AdminAction[]>([
     {
       id: 'retrain-models',
-      action: 'Retrain Classification Models',
-      description: 'Trigger a complete retraining of all classification models with latest data',
+      action: '🧠 Retrain the AI Brain',
+      description: 'Make our AI even smarter by training it with all the latest part data we have',
       category: 'optimization',
       urgency: 'medium',
       estimatedTime: '45 minutes',
@@ -159,8 +158,8 @@ export default function AdvancedAdminDashboard() {
     },
     {
       id: 'run-duplicate-scan',
-      action: 'Full Duplicate Scan',
-      description: 'Perform comprehensive duplicate detection across entire product catalog',
+      action: '🔍 Hunt for Duplicates',
+      description: 'Go through everything and find parts that are basically the same thing',
       category: 'maintenance',
       urgency: 'low',
       estimatedTime: '2 hours',
@@ -168,8 +167,8 @@ export default function AdvancedAdminDashboard() {
     },
     {
       id: 'optimize-cache',
-      action: 'Optimize Classification Cache',
-      description: 'Clear and rebuild classification cache with optimized parameters',
+      action: '⚡ Speed Things Up',
+      description: 'Clear out the old cache and make everything load faster',
       category: 'optimization',
       urgency: 'low',
       estimatedTime: '15 minutes',
@@ -177,8 +176,8 @@ export default function AdvancedAdminDashboard() {
     },
     {
       id: 'export-learning-data',
-      action: 'Export Learning Data',
-      description: 'Export all learning patterns and feedback data for analysis',
+      action: '📊 Export Learning Data',
+      description: 'Download all the patterns and feedback our AI has learned so far',
       category: 'analysis',
       urgency: 'low',
       estimatedTime: '5 minutes',
@@ -295,44 +294,44 @@ export default function AdvancedAdminDashboard() {
       setRecommendations([
         {
           id: 'improve-battery-classification',
-          title: 'Improve Battery Classification Accuracy',
-          description: 'Battery classification shows lower accuracy (89.2%) compared to other categories. Additional training patterns needed.',
+          title: 'Make Battery Detection Even Better',
+          description: 'Our battery detection is pretty good at 89.2%, but we can totally make it even more awesome with some tweaks.',
           impact: 'high',
           effort: 'medium',
           category: 'Classification',
           potentialImprovement: '+5.8% accuracy',
           actions: [
-            'Analyze failed battery classifications',
-            'Add more battery-specific patterns',
-            'Retrain with focused battery dataset'
+            'Look at what batteries we missed',
+            'Add more battery examples to learn from',
+            'Focus training on battery-specific features'
           ]
         },
         {
           id: 'optimize-duplicate-performance',
-          title: 'Optimize Duplicate Detection Performance',
-          description: 'Duplicate detection is experiencing slower response times during peak usage periods.',
+          title: 'Speed Up Duplicate Detection',
+          description: 'When lots of people are using the site, our duplicate finder gets a bit slow. Let&apos;s fix that!',
           impact: 'medium',
           effort: 'low',
           category: 'Performance',
           potentialImprovement: '-60% response time',
           actions: [
-            'Implement batch processing optimizations',
-            'Add caching layer for similarity calculations',
-            'Optimize database queries'
+            'Process duplicates in smarter batches',
+            'Remember similar calculations to avoid redoing work',
+            'Make database queries more efficient'
           ]
         },
         {
           id: 'expand-learning-patterns',
-          title: 'Expand Learning Pattern Coverage',
-          description: 'Some product categories have limited learned patterns, reducing system adaptability.',
+          title: 'Teach It About More Part Types',
+          description: 'Some drone parts don&apos;t have many learning examples yet, so our AI could be even smarter about them.',
           impact: 'medium',
           effort: 'high',
           category: 'Learning',
           potentialImprovement: '+12% pattern coverage',
           actions: [
-            'Collect more feedback for underrepresented categories',
-            'Implement active learning for pattern discovery',
-            'Add domain-specific pattern extraction'
+            'Get more feedback on uncommon part types',
+            'Make the AI actively ask about things it&apos;s unsure of',
+            'Add specialized knowledge for niche parts'
           ]
         }
       ]);
@@ -423,22 +422,22 @@ export default function AdvancedAdminDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Advanced Admin Dashboard
+            🎛️ Mission Control
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Comprehensive system management and optimization center
+            Where the magic happens - keep an eye on everything and make it even better!
           </p>
         </div>
         
         <div className="flex items-center space-x-4">
           <StatusBadge className="bg-green-100 text-green-800">
-            All Systems Operational
+            🚀 Everything&apos;s Running Smooth
           </StatusBadge>
           <button
             onClick={loadDashboardData}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Refresh Data
+            🔄 Refresh
           </button>
         </div>
       </div>
@@ -482,39 +481,34 @@ export default function AdvancedAdminDashboard() {
       <Tabs>
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger 
-            value="overview"
             isActive={activeTab === 'overview'}
             onClick={() => setActiveTab('overview')}
           >
-            Overview
+            📊 The Big Picture
           </TabsTrigger>
           <TabsTrigger 
-            value="classification"
             isActive={activeTab === 'classification'}
             onClick={() => setActiveTab('classification')}
           >
-            Classification
+            🎯 Smart Sorting
           </TabsTrigger>
           <TabsTrigger 
-            value="learning"
             isActive={activeTab === 'learning'}
             onClick={() => setActiveTab('learning')}
           >
-            Learning System
+            🧠 Getting Smarter
           </TabsTrigger>
           <TabsTrigger 
-            value="analytics"
             isActive={activeTab === 'analytics'}
             onClick={() => setActiveTab('analytics')}
           >
-            Analytics
+            🔮 Future Insights
           </TabsTrigger>
           <TabsTrigger 
-            value="actions"
             isActive={activeTab === 'actions'}
             onClick={() => setActiveTab('actions')}
           >
-            Admin Actions
+            ⚡ Power Tools
           </TabsTrigger>
         </TabsList>
 
@@ -524,7 +518,7 @@ export default function AdvancedAdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  Total Classifications
+                  🎯 Parts We&apos;ve Figured Out
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -532,7 +526,7 @@ export default function AdvancedAdminDashboard() {
                   {systemMetrics.classification.totalClassifications.toLocaleString()}
                 </div>
                 <p className="text-sm text-green-600 mt-1">
-                  {(systemMetrics.classification.accuracyRate * 100).toFixed(1)}% accuracy
+                  {(systemMetrics.classification.accuracyRate * 100).toFixed(1)}% nailed it!
                 </p>
               </CardContent>
             </Card>
@@ -540,7 +534,7 @@ export default function AdvancedAdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  Patterns Learned
+                  🧠 Things We&apos;ve Learned
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -548,7 +542,7 @@ export default function AdvancedAdminDashboard() {
                   {systemMetrics.learning.patternsLearned}
                 </div>
                 <p className="text-sm text-blue-600 mt-1">
-                  +{(systemMetrics.learning.accuracyImprovement * 100).toFixed(1)}% improvement
+                  +{(systemMetrics.learning.accuracyImprovement * 100).toFixed(1)}% smarter than before
                 </p>
               </CardContent>
             </Card>
@@ -556,7 +550,7 @@ export default function AdvancedAdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  Duplicates Processed
+                  🔍 Duplicates We Caught
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -564,7 +558,7 @@ export default function AdvancedAdminDashboard() {
                   {systemMetrics.duplicateDetection.duplicatesFound}
                 </div>
                 <p className="text-sm text-green-600 mt-1">
-                  {systemMetrics.duplicateDetection.autoMerged} auto-merged
+                  {systemMetrics.duplicateDetection.autoMerged} merged automatically
                 </p>
               </CardContent>
             </Card>
@@ -572,7 +566,7 @@ export default function AdvancedAdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  Market Insights
+                  💡 Market Insights
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -580,16 +574,15 @@ export default function AdvancedAdminDashboard() {
                   {systemMetrics.predictiveAnalytics.marketInsights}
                 </div>
                 <p className="text-sm text-purple-600 mt-1">
-                  {(systemMetrics.predictiveAnalytics.predictionAccuracy * 100).toFixed(1)}% accurate
+                  {(systemMetrics.predictiveAnalytics.predictionAccuracy * 100).toFixed(1)}% prediction accuracy
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Optimization Recommendations */}
           <Card>
             <CardHeader>
-              <CardTitle>Optimization Recommendations</CardTitle>
+              <CardTitle>🎯 Smart Suggestions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -611,11 +604,11 @@ export default function AdvancedAdminDashboard() {
                         {rec.description}
                       </p>
                       <div className="text-sm text-green-600 font-medium">
-                        Potential improvement: {rec.potentialImprovement}
+                        Could boost performance by: {rec.potentialImprovement}
                       </div>
                     </div>
                     <button className="ml-4 px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-                      View Details
+                      Let&apos;s Do It! 
                     </button>
                   </div>
                 ))}
@@ -787,7 +780,7 @@ export default function AdvancedAdminDashboard() {
         <TabsContent value="actions" activeValue={activeTab} className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Available Actions</CardTitle>
+              <CardTitle>⚡ Power User Tools</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -809,14 +802,14 @@ export default function AdvancedAdminDashboard() {
                         {action.description}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Estimated time: {action.estimatedTime}
+                        Takes about: {action.estimatedTime}
                       </p>
                     </div>
                     <button
                       onClick={() => executeAdminAction(action.id)}
                       className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                     >
-                      Execute
+                      🚀 Do It!
                     </button>
                   </div>
                 ))}

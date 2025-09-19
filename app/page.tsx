@@ -314,7 +314,7 @@ export default function Home() {
               )}
               <nav className="hidden md:flex space-x-6">
                 <Link href="/builds/public" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
-                  Public Builds
+                  Cool Builds
                 </Link>
                 <Link href="/parts/custom" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
                   Custom Parts
@@ -344,7 +344,8 @@ export default function Home() {
           <div className="xl:col-span-2 lg:col-span-2">
             <div className="bg-white rounded-lg shadow border border-gray-200 transition-all duration-300 hover:shadow-lg">
               <div className="p-4 border-b border-gray-200">
-                <h3 className="text-xl font-bold text-gray-900">Component Selection</h3>
+                <h3 className="text-xl font-bold text-gray-900">🎯 Pick Your Parts</h3>
+                <p className="text-sm text-gray-600 mt-1">Build your dream drone piece by piece!</p>
               </div>
 
               {/* Component Tabs */}
@@ -440,7 +441,7 @@ export default function Home() {
               }}
             >
         <div className="text-gray-700 text-xs sm:text-sm font-medium hidden sm:block group-hover:text-green-600 transition-colors duration-200">
-                View Performance
+                Check Performance
               </div>
         <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-all duration-200 group-hover:shadow-sm">
                 <div className="text-green-600 text-base sm:text-lg animate-bounce-arrow">📊</div>
@@ -452,7 +453,7 @@ export default function Home() {
         {/* Performance Panel */}
         {performance && (
           <div className="mt-6 transition-all duration-700 ease-out animate-in" data-section="performance">
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 transition-all duration-500">Performance Analysis</h2>
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 transition-all duration-500">🚀 How Will It Fly?</h2>
             <div className="transition-all duration-700 ease-out transform">
               <PerformancePanel performance={performance} />
             </div>
@@ -465,6 +466,7 @@ export default function Home() {
           onSettingsChange={setAdvancedSettings}
           isOpen={isAdvancedSettingsOpen}
           onToggle={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+          theme="light" // Default to light theme for now
         />
 
         {/*  Component Modal */}
@@ -479,12 +481,12 @@ export default function Home() {
         />
 
         <Toast
-          message="🎉 Your drone build is complete! Check out the performance analysis below."
+          message="🎉 Your drone build is complete! Ready to see how awesome it&apos;ll be?"
           type="success"
           isVisible={showBuildCompleteToast}
           onClose={() => setShowBuildCompleteToast(false)}
           action={{
-            label: "View Performance →",
+            label: "Show Me! →",
             onClick: () => {
               scrollToPerformance();
               setShowBuildCompleteToast(false);
@@ -493,7 +495,7 @@ export default function Home() {
         />
 
         <Toast
-          message="✅ Build loaded successfully!"
+          message="✅ Build loaded - let&apos;s check it out!"
           type="success"
           isVisible={showLoadSuccessToast}
           onClose={() => setShowLoadSuccessToast(false)}

@@ -19,11 +19,6 @@ interface ImageClassificationResult {
   visualCues: string[];
 }
 
-interface ImageAnalysisData {
-  width: number;
-  height: number;
-  data: Uint8ClampedArray;
-}
 
 export class ImageClassificationService {
   private static instance: ImageClassificationService;

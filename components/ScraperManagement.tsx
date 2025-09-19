@@ -37,7 +37,11 @@ interface ScheduleStatus {
   }>;
 }
 
-export default function ScraperManagement() {
+interface ScraperManagementProps {
+  theme: 'light' | 'dark';
+}
+
+export default function ScraperManagement({ theme }: ScraperManagementProps) {
   const [activeTab, setActiveTab] = useState('scraper');
   const [jobs, setJobs] = useState<ScrapingJob[]>([]);
   const [scheduleStatus, setScheduleStatus] = useState<ScheduleStatus | null>(null);
@@ -221,17 +225,32 @@ export default function ScraperManagement() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'RUNNING':
-        return 'bg-blue-100 text-blue-800';
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800';
-      case 'FAILED':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    if (theme === 'dark') {
+      switch (status) {
+        case 'PENDING':
+          return 'bg-yellow-900 text-yellow-200';
+        case 'RUNNING':
+          return 'bg-blue-900 text-blue-200';
+        case 'COMPLETED':
+          return 'bg-green-900 text-green-200';
+        case 'FAILED':
+          return 'bg-red-900 text-red-200';
+        default:
+          return 'bg-gray-700 text-gray-300';
+      }
+    } else {
+      switch (status) {
+        case 'PENDING':
+          return 'bg-yellow-100 text-yellow-800';
+        case 'RUNNING':
+          return 'bg-blue-100 text-blue-800';
+        case 'COMPLETED':
+          return 'bg-green-100 text-green-800';
+        case 'FAILED':
+          return 'bg-red-100 text-red-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
     }
   };
 
@@ -259,8 +278,10 @@ export default function ScraperManagement() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Web Scraper Management</h1>
-        <p className="text-gray-600">
+        <h1 className={`text-3xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+          Web Scraper Management
+        </h1>
+        <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
           Manage web scraping jobs and monitor price updates from drone retailers.
         </p>
       </div>
@@ -273,7 +294,9 @@ export default function ScraperManagement() {
             className={`${
               activeTab === 'dashboard'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : theme === 'dark'
+                  ? 'border-transparent text-gray-300 hover:text-gray-100 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center`}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
@@ -284,7 +307,9 @@ export default function ScraperManagement() {
             className={`${
               activeTab === 'scraper'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : theme === 'dark'
+                  ? 'border-transparent text-gray-300 hover:text-gray-100 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center`}
           >
             <Settings className="w-4 h-4 mr-2" />
@@ -301,21 +326,31 @@ export default function ScraperManagement() {
           {/* Existing scraper management content */}
 
       {/* Schedule Management */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Scheduled Jobs</h2>
+      <div className={`rounded-lg shadow-md p-6 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h2 className={`text-xl font-semibold mb-4 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>Scheduled Jobs</h2>
         
         {scheduleStatus && (
           <div className="mb-4">
             <div className="flex items-center space-x-2 mb-2">
-              <span className="text-sm font-medium">Status:</span>
+              <span className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>Status:</span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                scheduleStatus.isRunning ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                scheduleStatus.isRunning 
+                  ? theme === 'dark' ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'
+                  : theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'
               }`}>
                 {scheduleStatus.isRunning ? 'Running' : 'Stopped'}
               </span>
             </div>
             
-            <div className="text-sm text-gray-600">
+            <div className={`text-sm ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+            }`}>
               Scheduled jobs: {scheduleStatus.scheduledJobs.map(job => job.name).join(', ')}
             </div>
           </div>
@@ -357,14 +392,22 @@ export default function ScraperManagement() {
       </div>
 
       {/* Manual Scraping */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Manual Scraping (Category-based)</h2>
+      <div className={`rounded-lg shadow-md p-6 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h2 className={`text-xl font-semibold mb-4 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>Manual Scraping (Category-based)</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <select
             value={selectedVendor}
             onChange={(e) => setSelectedVendor(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-white border-gray-600' 
+                : 'bg-white text-gray-900 border-gray-300'
+            }`}
           >
             {vendors.map(vendor => (
               <option key={vendor.value} value={vendor.value}>{vendor.label}</option>
@@ -374,7 +417,11 @@ export default function ScraperManagement() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-white border-gray-600' 
+                : 'bg-white text-gray-900 border-gray-300'
+            }`}
           >
             {categories.map(category => (
               <option key={category.value} value={category.value}>{category.label}</option>
@@ -395,12 +442,16 @@ export default function ScraperManagement() {
               <span>Start Scraping</span>
             </button>
             
-            <label className="flex items-center space-x-2 text-sm">
+            <label className={`flex items-center space-x-2 text-sm ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+            }`}>
               <input
                 type="checkbox"
                 checked={useDeploymentFriendly}
                 onChange={(e) => setUseDeploymentFriendly(e.target.checked)}
-                className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                className={`rounded focus:ring-2 focus:ring-blue-500 ${
+                  theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'border-gray-300'
+                }`}
               />
               <span>Production Mode (no browser)</span>
             </label>
@@ -408,9 +459,17 @@ export default function ScraperManagement() {
         </div>
         
         {useDeploymentFriendly && (
-          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h3 className="text-sm font-medium text-green-800 mb-2">Production Mode Test</h3>
-            <p className="text-xs text-green-700 mb-3">
+          <div className={`mt-4 p-4 rounded-lg ${
+            theme === 'dark' 
+              ? 'bg-green-900/20 border border-green-800' 
+              : 'bg-green-50 border border-green-200'
+          }`}>
+            <h3 className={`text-sm font-medium mb-2 ${
+              theme === 'dark' ? 'text-green-300' : 'text-green-800'
+            }`}>Production Mode Test</h3>
+            <p className={`text-xs mb-3 ${
+              theme === 'dark' ? 'text-green-400' : 'text-green-700'
+            }`}>
               Test the deployment-friendly scraper without browser dependencies.
             </p>
             <button
@@ -443,9 +502,15 @@ export default function ScraperManagement() {
       </div>
 
       {/* Sitemap-based Scraping */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">🗺️ Sitemap-based Scraping (Recommended)</h2>
-        <p className="text-gray-600 mb-4">
+      <div className={`rounded-lg shadow-md p-6 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h2 className={`text-xl font-semibold mb-4 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>🗺️ Sitemap-based Scraping (Recommended)</h2>
+        <p className={`mb-4 ${
+          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+        }`}>
           Automatically discovers all products from vendor sitemaps. Handles URL modifications like .html extensions.
         </p>
         
@@ -453,7 +518,11 @@ export default function ScraperManagement() {
           <select
             value={selectedVendor}
             onChange={(e) => setSelectedVendor(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-white border-gray-600' 
+                : 'bg-white text-gray-900 border-gray-300'
+            }`}
           >
             <option value="">Select Vendor</option>
             {sitemapVendors.map(vendor => (
@@ -468,7 +537,11 @@ export default function ScraperManagement() {
             placeholder="Max products (500)"
             min="50"
             max="2000"
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-white border-gray-600' 
+                : 'bg-white text-gray-900 border-gray-300'
+            }`}
           />
           
           <button
@@ -485,7 +558,9 @@ export default function ScraperManagement() {
           </button>
         </div>
         
-        <div className="text-sm text-gray-500">
+        <div className={`text-sm ${
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+        }`}>
           <p>• Automatically finds all product URLs from sitemap</p>
           <p>• Handles GetFPV .html extension requirement</p>
           <p>• Discovers products across all categories</p>
@@ -494,9 +569,15 @@ export default function ScraperManagement() {
       </div>
 
       {/* Web Crawler */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">🕷️ Web Crawler (For sites without sitemaps)</h2>
-        <p className="text-gray-600 mb-4">
+      <div className={`rounded-lg shadow-md p-6 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h2 className={`text-xl font-semibold mb-4 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>🕷️ Web Crawler (For sites without sitemaps)</h2>
+        <p className={`mb-4 ${
+          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+        }`}>
           Crawls websites by following links from category pages. Works for sites without sitemaps or with incomplete sitemaps.
         </p>
         
@@ -504,7 +585,11 @@ export default function ScraperManagement() {
           <select
             value={selectedVendor}
             onChange={(e) => setSelectedVendor(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-white border-gray-600' 
+                : 'bg-white text-gray-900 border-gray-300'
+            }`}
           >
             <option value="">Select Vendor</option>
             {crawlerVendors.map(vendor => (
@@ -519,7 +604,11 @@ export default function ScraperManagement() {
             placeholder="Max pages (500)"
             min="50"
             max="2000"
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-white border-gray-600' 
+                : 'bg-white text-gray-900 border-gray-300'
+            }`}
           />
           
           <button
@@ -536,7 +625,9 @@ export default function ScraperManagement() {
           </button>
         </div>
         
-        <div className="text-sm text-gray-500">
+        <div className={`text-sm ${
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+        }`}>
           <p>• Starts from category pages and follows links</p>
           <p>• Discovers product pages automatically</p>
           <p>• Works for sites without complete sitemaps</p>
@@ -545,12 +636,20 @@ export default function ScraperManagement() {
       </div>
 
       {/* Job History */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className={`rounded-lg shadow-md p-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Scraping Jobs</h2>
+          <h2 className={`text-xl font-semibold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Scraping Jobs</h2>
           <button
             onClick={loadJobs}
-            className="flex items-center space-x-2 px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className={`flex items-center space-x-2 px-3 py-1 rounded-lg transition-colors ${
+              theme === 'dark' 
+                ? 'text-blue-400 hover:bg-gray-700' 
+                : 'text-blue-600 hover:bg-blue-50'
+            }`}
           >
             <RotateCcw className="w-4 h-4" />
             <span>Refresh</span>
@@ -560,19 +659,39 @@ export default function ScraperManagement() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Vendor</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Category</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Started</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Duration</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Results</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">Error</th>
+              <tr className={`border-b ${
+                theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              }`}>
+                <th className={`text-left py-3 px-4 font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>Status</th>
+                <th className={`text-left py-3 px-4 font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>Vendor</th>
+                <th className={`text-left py-3 px-4 font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>Category</th>
+                <th className={`text-left py-3 px-4 font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>Started</th>
+                <th className={`text-left py-3 px-4 font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>Duration</th>
+                <th className={`text-left py-3 px-4 font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>Results</th>
+                <th className={`text-left py-3 px-4 font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>Error</th>
               </tr>
             </thead>
             <tbody>
               {jobs.map(job => (
-                <tr key={job.id} className="border-b border-gray-100 hover:bg-gray-50">
+                <tr key={job.id} className={`border-b ${
+                  theme === 'dark' 
+                    ? 'border-gray-700 hover:bg-gray-700' 
+                    : 'border-gray-100 hover:bg-gray-50'
+                }`}>
                   <td className="py-3 px-4">
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(job.status)}
@@ -581,15 +700,25 @@ export default function ScraperManagement() {
                       </span>
                     </div>
                   </td>
-                  <td className="py-3 px-4 font-medium">{job.vendor}</td>
-                  <td className="py-3 px-4">{job.category || 'All'}</td>
-                  <td className="py-3 px-4">
+                  <td className={`py-3 px-4 font-medium ${
+                    theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                  }`}>{job.vendor}</td>
+                  <td className={`py-3 px-4 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-800'
+                  }`}>{job.category || 'All'}</td>
+                  <td className={`py-3 px-4 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-800'
+                  }`}>
                     {job.startedAt ? formatDate(job.startedAt) : '-'}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className={`py-3 px-4 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-800'
+                  }`}>
                     {job.startedAt ? formatDuration(job.startedAt, job.completedAt) : '-'}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className={`py-3 px-4 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-800'
+                  }`}>
                     <div className="text-xs">
                       <div>Found: {job.productsFound}</div>
                       <div>Created: {job.productsCreated}</div>
@@ -598,7 +727,9 @@ export default function ScraperManagement() {
                   </td>
                   <td className="py-3 px-4">
                     {job.errorMessage && (
-                      <div className="text-xs text-red-600 max-w-xs truncate" title={job.errorMessage}>
+                      <div className={`text-xs max-w-xs truncate ${
+                        theme === 'dark' ? 'text-red-400' : 'text-red-600'
+                      }`} title={job.errorMessage}>
                         {job.errorMessage}
                       </div>
                     )}
@@ -610,7 +741,9 @@ export default function ScraperManagement() {
         </div>
 
         {jobs.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className={`text-center py-8 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`}>
             No scraping jobs found.
           </div>
         )}
