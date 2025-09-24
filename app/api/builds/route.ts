@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { buildSchema, validateAndSanitize, buildRateLimiter } from '@/lib/validation';
+import { validateMultipleFields } from '@/utils/profanityFilter';
 import { Prisma } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
@@ -38,6 +39,37 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, description, components, performance, isPublic, tags } = validatedData;
+
+    // Content filtering - check for inappropriate language
+    const fieldsToValidate: Record<string, string> = {
+      name
+    };
+    
+    if (description) {
+      fieldsToValidate.description = description;
+    }
+
+    // Check tags for inappropriate content
+    if (tags && Array.isArray(tags)) {
+      tags.forEach((tag, index) => {
+        if (typeof tag === 'string') {
+          fieldsToValidate[`tag_${index}`] = tag;
+        }
+      });
+    }
+
+    const contentValidation = validateMultipleFields(fieldsToValidate, {
+      allowMildProfanity: false,
+      blockHighSeverity: true
+    });
+
+    if (!contentValidation.isValid) {
+      return NextResponse.json({
+        error: 'Content contains inappropriate language',
+        details: contentValidation.messages,
+        invalidFields: contentValidation.invalidFields
+      }, { status: 400 });
+    }
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }

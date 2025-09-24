@@ -20,6 +20,7 @@
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "cheerio": "^1.1.2",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.525.0",
     "next": "15.4.2",
     "next-auth": "^4.24.11",

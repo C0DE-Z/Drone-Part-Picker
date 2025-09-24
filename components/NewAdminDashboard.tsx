@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import AdminProductManager from './AdminProductManager';
@@ -42,6 +42,21 @@ interface SystemMetrics {
   adminActions: number;
   activeSubscribers: number;
   totalProducts: number;
+}
+
+interface CustomPart {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  specifications: Record<string, string | number>;
+  isPublic: boolean;
+  viewCount?: number;
+  user: {
+    username: string;
+    email: string;
+  };
+  createdAt: string;
 }
 
 // Simple Card components
@@ -124,6 +139,10 @@ export default function NewAdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [classificationGameOpen, setClassificationGameOpen] = useState(false);
+  const [customParts, setCustomParts] = useState<CustomPart[]>([]);
+  const [customPartsLoading, setCustomPartsLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
   const [sampleProducts] = useState([
     { id: '1', name: 'EMAX E3 Series 2808 Motor - 1500KV', description: 'High-performance brushless motor for racing drones', price: 29.99, currentCategory: 'motor' },
     { id: '2', name: 'Holybro Tekko32 F3 Metal 45A 4-in-1 ESC', description: '4-in-1 electronic speed controller with current sensor', price: 79.99, currentCategory: 'stack' },
@@ -185,6 +204,33 @@ export default function NewAdminDashboard() {
       console.error('Error loading dashboard data:', error);
     }
   };
+
+  const loadCustomParts = useCallback(async () => {
+    setCustomPartsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedCategory !== 'All') {
+        params.append('category', selectedCategory);
+      }
+      params.append('public', 'true');
+
+      const response = await fetch(`/api/parts/custom?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCustomParts(data.customParts || []);
+      }
+    } catch (error) {
+      console.error('Error fetching custom parts:', error);
+    } finally {
+      setCustomPartsLoading(false);
+    }
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    if (activeTab === 'custom-parts' && isAdmin) {
+      loadCustomParts();
+    }
+  }, [activeTab, selectedCategory, isAdmin, loadCustomParts]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
@@ -277,6 +323,7 @@ export default function NewAdminDashboard() {
     { id: 'resort', name: 'Resort', icon: '🔄' },
     { id: 'classification', name: 'Classification', icon: '🤖' },
     { id: 'scraper', name: 'Scraper', icon: '🕷️' },
+    { id: 'custom-parts', name: 'Custom Parts', icon: '🔧' },
     { id: 'settings', name: 'Settings', icon: '⚙️' }
   ];
 
@@ -809,6 +856,131 @@ export default function NewAdminDashboard() {
           
           {/* Scraper Tab */}
           {activeTab === 'scraper' && <ScraperManagement theme={localTheme} />}
+          
+          {/* Custom Parts Tab */}
+          {activeTab === 'custom-parts' && (
+            <div className="space-y-6">
+              <Card>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Community Custom Parts</h3>
+                  <div className="flex space-x-2">
+                    <select 
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
+                    >
+                      <option value="All">All Categories</option>
+                      <option value="Motors">Motors</option>
+                      <option value="Frames">Frames</option>
+                      <option value="Stacks">Stacks</option>
+                      <option value="Camera">Camera</option>
+                      <option value="Props">Props</option>
+                      <option value="Batteries">Batteries</option>
+                      <option value="Simple Weight">Simple Weight</option>
+                    </select>
+                    <button 
+                      onClick={loadCustomParts}
+                      className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="Search custom parts..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full max-w-md px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  />
+                </div>
+
+                {customPartsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">Loading custom parts...</p>
+                  </div>
+                ) : customParts.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-gray-300 dark:text-gray-600 text-6xl mb-4">🔧</div>
+                    <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      No custom parts found
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {searchTerm || selectedCategory !== 'All' ? 'Try adjusting your search or filters.' : 'No community custom parts have been shared yet.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {customParts
+                      .filter(part =>
+                        part.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        part.description?.toLowerCase().includes(searchTerm.toLowerCase())
+                      )
+                      .map((part) => (
+                        <div key={part.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{part.name}</h4>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
+                                  {part.category}
+                                </span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                  by {part.user.username}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {part.description && (
+                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">{part.description}</p>
+                          )}
+
+                          {/* Specifications */}
+                          <div className="space-y-2 mb-4">
+                            <h5 className="text-sm font-medium text-gray-900 dark:text-white">Specifications</h5>
+                            <div className="space-y-1">
+                              {Object.entries(part.specifications).slice(0, 3).map(([key, value]) => (
+                                <div key={key} className="flex justify-between text-sm">
+                                  <span className="text-gray-600 dark:text-gray-400 capitalize">{key}:</span>
+                                  <span className="text-gray-900 dark:text-white font-medium">
+                                    {typeof value === 'string' ? value : `${value}`}
+                                  </span>
+                                </div>
+                              ))}
+                              {Object.keys(part.specifications).length > 3 && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  +{Object.keys(part.specifications).length - 3} more specs
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                              <span>{part.viewCount || 0} views</span>
+                              <span>{new Date(part.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            
+                            <div className="flex gap-2 mt-3">
+                              <button className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md transition-colors text-sm font-medium">
+                                View Details
+                              </button>
+                              <button className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors text-sm font-medium">
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </Card>
+            </div>
+          )}
           
           {/* Settings Tab */}
           {activeTab === 'settings' && (

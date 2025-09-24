@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { validateAndSanitize, RateLimiter } from '@/lib/validation';
+import { validateMultipleFields } from '@/utils/profanityFilter';
 import { z } from 'zod';
 
 const reportRateLimit = new RateLimiter(10, 60 * 1000); // 10 reports per minute
@@ -42,6 +43,28 @@ export async function POST(request: NextRequest) {
     }
 
     const { reason, description, targetType, targetId } = validation.data;
+
+    // Content filtering - check for inappropriate language in reports
+    const fieldsToValidate: Record<string, string> = {
+      reason
+    };
+    
+    if (description) {
+      fieldsToValidate.description = description;
+    }
+
+    const contentValidation = validateMultipleFields(fieldsToValidate, {
+      allowMildProfanity: false,
+      blockHighSeverity: true
+    });
+
+    if (!contentValidation.isValid) {
+      return NextResponse.json({
+        error: 'Report contains inappropriate language',
+        details: contentValidation.messages,
+        invalidFields: contentValidation.invalidFields
+      }, { status: 400 });
+    }
 
     // Get reporter user
     const reporter = await prisma.user.findUnique({

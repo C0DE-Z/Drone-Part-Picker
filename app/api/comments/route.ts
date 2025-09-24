@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { commentSchema, validateAndSanitize, commentRateLimiter } from '@/lib/validation';
+import { validateContent } from '@/utils/profanityFilter';
 
 export async function GET(request: NextRequest) {
   try {
@@ -85,6 +86,19 @@ export async function POST(request: NextRequest) {
     }
 
     const { content } = validatedData;
+
+    // Content filtering - check for inappropriate language
+    const contentValidation = validateContent(content, {
+      allowMildProfanity: false,
+      blockHighSeverity: true
+    });
+
+    if (!contentValidation.isValid) {
+      return NextResponse.json({
+        error: contentValidation.message || 'Comment contains inappropriate language',
+        filteredContent: contentValidation.filteredContent
+      }, { status: 400 });
+    }
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
