@@ -48,7 +48,7 @@ export default function ScraperManagement({ theme }: ScraperManagementProps) {
   const [loading, setLoading] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [usePuppeteer, setUsePuppeteer] = useState(false);
+  const [usePuppeteer] = useState(false);
   const [useDeploymentFriendly, setUseDeploymentFriendly] = useState(true);
   const [crawlerVendors, setCrawlerVendors] = useState<string[]>([]);
   const [maxPages, setMaxPages] = useState('500');

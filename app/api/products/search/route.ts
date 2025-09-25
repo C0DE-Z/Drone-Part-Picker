@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const kv = searchParams.get('kv');
     const statorSize = searchParams.get('statorSize');
     const voltage = searchParams.get('voltage');
-    const inStock = searchParams.get('inStock');
+  const inStock = searchParams.get('inStock');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
@@ -74,12 +74,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Price filter through vendor prices
-    if (minPrice || maxPrice || vendor) {
+    if (minPrice || maxPrice || vendor || inStock) {
       where.vendorPrices = {
         some: {
           ...(vendor && { vendor: { name: vendor } }),
           ...(minPrice && { price: { gte: parseFloat(minPrice) } }),
-          ...(maxPrice && { price: { lte: parseFloat(maxPrice) } })
+          ...(maxPrice && { price: { lte: parseFloat(maxPrice) } }),
+          ...(inStock ? { inStock: true } : {})
         }
       };
     }

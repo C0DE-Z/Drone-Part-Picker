@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, ExternalLink, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Search, ExternalLink, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 interface VendorPrice {
   id: string;
@@ -66,11 +67,7 @@ export default function PriceComparison({ searchQuery = '', category = '' }: Pri
     { value: 'HobbyKing', label: 'HobbyKing' }
   ];
 
-  useEffect(() => {
-    searchProducts();
-  }, [search, selectedCategory, selectedVendor, priceRange, inStockOnly, pagination.page]);
-
-  const searchProducts = async () => {
+  const searchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -95,7 +92,11 @@ export default function PriceComparison({ searchQuery = '', category = '' }: Pri
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, selectedCategory, selectedVendor, priceRange.min, priceRange.max, inStockOnly, pagination.page, pagination.limit]);
+
+  useEffect(() => {
+    searchProducts();
+  }, [searchProducts]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -217,11 +218,15 @@ export default function PriceComparison({ searchQuery = '', category = '' }: Pri
                     <div className="p-6">
                       <div className="flex items-start space-x-4">
                         {product.imageUrl && (
-                          <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
-                          />
+                          <div className="w-24 h-24 relative flex-shrink-0">
+                            <Image
+                              src={product.imageUrl}
+                              alt={product.name}
+                              fill
+                              sizes="96px"
+                              className="object-cover rounded-lg"
+                            />
+                          </div>
                         )}
                         
                         <div className="flex-1">
