@@ -314,7 +314,7 @@ export default function Home() {
               )}
               <nav className="hidden md:flex space-x-6">
                 <Link href="/builds/public" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
-                  Cool Builds
+                  Builds
                 </Link>
                 <Link href="/parts/custom" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
                   Custom Parts
