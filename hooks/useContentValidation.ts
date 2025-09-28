@@ -27,10 +27,15 @@ export function useContentValidation(options: UseContentValidationOptions = {}) 
     showFilteredContent = false
   } = options;
 
-  const validateField = useCallback((fieldName: string, value: string) => {
+  const validateField = useCallback((fieldName: string, value: string, forceValidate = false) => {
     if (!value || typeof value !== 'string') {
       // Remove any existing errors for this field
       setErrors(prev => prev.filter(error => error.field !== fieldName));
+      return { isValid: true, filteredContent: value };
+    }
+
+    // Skip validation if validateOnChange is false and this isn't a forced validation
+    if (!validateOnChange && !forceValidate) {
       return { isValid: true, filteredContent: value };
     }
 
@@ -60,7 +65,7 @@ export function useContentValidation(options: UseContentValidationOptions = {}) 
         filteredContent: showFilteredContent ? result.filteredContent : value
       };
     }
-  }, [allowMildProfanity, blockHighSeverity, showFilteredContent]);
+  }, [allowMildProfanity, blockHighSeverity, showFilteredContent, validateOnChange]);
 
   const validateFields = useCallback((fields: Record<string, string>) => {
     setIsValidating(true);
@@ -124,9 +129,9 @@ export function createValidatedInputProps(
   value: string,
   onChange: (value: string) => void,
   validation: ReturnType<typeof useContentValidation>,
-  options: { validateOnChange?: boolean } = {}
+  validationOptions: { validateOnChange?: boolean } = {}
 ) {
-  const { validateOnChange = true } = options;
+  const { validateOnChange = true } = validationOptions;
   const hasError = validation.hasFieldError(fieldName);
   const error = validation.getFieldError(fieldName);
 
@@ -144,7 +149,7 @@ export function createValidatedInputProps(
       }
     },
     onBlur: () => {
-      validation.validateField(fieldName, value);
+      validation.validateField(fieldName, value, true);
     },
     className: hasError 
       ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 

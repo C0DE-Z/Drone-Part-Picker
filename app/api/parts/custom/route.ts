@@ -21,24 +21,101 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const publicOnly = searchParams.get('public') === 'true';
+    const userId = searchParams.get('userId');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
+
+    const session = await getServerSession(authOptions);
 
     const where: {
       category?: string;
       isPublic?: boolean;
+      userId?: string;
     } = {};
     
-    if (category) {
+    if (category && category !== 'All') {
       where.category = category;
     }
     
     if (publicOnly) {
       where.isPublic = true;
+    } else if (userId) {
+      where.userId = userId;
+    } else if (session?.user?.email) {
+      // If user is logged in but no specific filter, show their parts + public parts
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email }
+      });
+      if (user) {
+        // This will be handled in the query below
+      }
     }
 
-    // For now, return an empty array until the Prisma client is regenerated
-    const customParts: unknown[] = [];
+    const customParts = await prisma.customPart.findMany({
+      where: publicOnly ? where : (session?.user?.email ? {
+        OR: [
+          where,
+          { userId: (await prisma.user.findUnique({ where: { email: session.user.email } }))?.id || '' }
+        ]
+      } : where),
+      include: {
+        user: {
+          select: {
+            username: true,
+            name: true,
+            email: true
+          }
+        },
+        _count: {
+          select: {
+            likes: true,
+            comments: true
+          }
+        }
+      },
+      orderBy: {
+        updatedAt: 'desc'
+      },
+      take: limit,
+      skip: offset
+    });
 
-    return NextResponse.json({ customParts });
+    // Transform the data to include creator info and stats
+    const transformedParts = customParts.map(part => ({
+      id: part.id,
+      name: part.name,
+      description: part.description,
+      category: part.category,
+      specifications: part.specifications,
+      isPublic: part.isPublic,
+      modelFile: part.modelFile,
+      modelFormat: part.modelFormat,
+      modelSize: part.modelSize,
+      viewCount: part.viewCount,
+      creator: {
+        username: part.user.username || part.user.name || 'Anonymous',
+        email: part.user.email
+      },
+      stats: {
+        likes: part._count.likes,
+        comments: part._count.comments
+      },
+      createdAt: part.createdAt.toISOString(),
+      updatedAt: part.updatedAt.toISOString()
+    }));
+
+    // Get total count for pagination
+    const total = await prisma.customPart.count({ where });
+
+    return NextResponse.json({ 
+      customParts: transformedParts,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + limit < total
+      }
+    });
   } catch (error) {
     console.error('Error fetching custom parts:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

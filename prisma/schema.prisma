@@ -415,5 +415,34 @@ enum ScrapingStatus {
   FAILED
 }
 
+model PerformanceFeedback {
+  id                        String   @id @default(cuid())
+  predictionId              String
+  userId                    String
+  
+  // Predicted performance values
+  predictedThrust           Float
+  predictedFlightTime       Float
+  predictedTopSpeed         Float
+  predictedPowerConsumption Float
+  predictedThrustToWeight   Float
+  predictedTotalWeight      Float
+  
+  // Actual performance values
+  actualFlightTime          Float?
+  actualTopSpeed            Float?
+  actualThrustToWeight      Float?
+  batteryUsage              Float?
+  overallSatisfaction       Int      // 1-5 rating
+  comments                  String?
+  
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  
+  @@index([predictionId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
 
 

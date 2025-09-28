@@ -1,12 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { existsSync } from 'fs';
 
-const MAX_FILE_SIZE = 40 * 1024 * 1024; // 40MB in bytes
-const ALLOWED_FORMATS = ['glb', 'gltf', 'obj', 'stl', 'fbx', 'ply'];
+const MAX_FILE_SIZE = 40 * 1024 * 1024; // 40MB
+const ALLOWED_TYPES = ['.stl', '.obj', '.gltf', '.glb', '.3mf', '.ply'];
+const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads', '3d-models');
+
+async function ensureUploadDir() {
+  if (!existsSync(UPLOAD_DIR)) {
+    await mkdir(UPLOAD_DIR, { recursive: true });
+  }
+}
+
+function validateFile(file: File): { isValid: boolean; error?: string } {
+  // Check file size
+  if (file.size > MAX_FILE_SIZE) {
+    return {
+      isValid: false,
+      error: `File size too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`
+    };
+  }
+  
+  // Check file type
+  const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+  if (!ALLOWED_TYPES.includes(extension)) {
+    return {
+      isValid: false,
+      error: `Unsupported file type. Allowed types: ${ALLOWED_TYPES.join(', ')}`
+    };
+  }
+  
+  return { isValid: true };
+}
+
+function generateFileName(originalName: string, userId: string): string {
+  const timestamp = Date.now();
+  const extension = '.' + originalName.split('.').pop()?.toLowerCase();
+  const baseName = originalName.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '_');
+  return `${userId}_${timestamp}_${baseName}${extension}`;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,175 +52,58 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const file = formData.get('model') as File;
-    const partId = formData.get('partId') as string;
+    const file = formData.get('file') as File;
+    const type = formData.get('type') as string;
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    if (!partId) {
-      return NextResponse.json({ error: 'Part ID is required' }, { status: 400 });
+    if (type !== '3d-model') {
+      return NextResponse.json({ error: 'Invalid upload type' }, { status: 400 });
     }
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: `File size exceeds 40MB limit. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB` },
-        { status: 400 }
-      );
+    // Validate file
+    const validation = validateFile(file);
+    if (!validation.isValid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // Validate file format
-    const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    if (!fileExtension || !ALLOWED_FORMATS.includes(fileExtension)) {
-      return NextResponse.json(
-        { 
-          error: `Invalid file format. Allowed formats: ${ALLOWED_FORMATS.join(', ')}`,
-          allowedFormats: ALLOWED_FORMATS
-        },
-        { status: 400 }
-      );
-    }
-
-    // Check if user owns the part
-    const part = await prisma.customPart.findFirst({
-      where: {
-        id: partId,
-        user: { email: session.user.email }
-      }
-    });
-
-    if (!part) {
-      return NextResponse.json({ error: 'Part not found or unauthorized' }, { status: 404 });
-    }
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', '3d-models');
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch {
-      // Directory might already exist
-    }
+    // Ensure upload directory exists
+    await ensureUploadDir();
 
     // Generate unique filename
-    const timestamp = Date.now();
-    const fileName = `${partId}-${timestamp}.${fileExtension}`;
-    const filePath = join(uploadsDir, fileName);
-    const publicPath = `/uploads/3d-models/${fileName}`;
+    const fileName = generateFileName(file.name, session.user.id || 'unknown');
+    const filePath = join(UPLOAD_DIR, fileName);
 
-    // Save file to disk
+    // Convert File to ArrayBuffer and then to Buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
+    // Write file to disk
     await writeFile(filePath, buffer);
 
-    // Update part in database
-    const updatedPart = await prisma.customPart.update({
-      where: { id: partId },
-      data: {
-        modelFile: publicPath,
-        modelFormat: fileExtension,
-        modelSize: file.size,
-        updatedAt: new Date()
-      },
-      select: {
-        id: true,
-        name: true,
-        modelFile: true,
-        modelFormat: true,
-        modelSize: true,
-        updatedAt: true
-      }
-    });
+    // Return the public URL
+    const publicUrl = `/uploads/3d-models/${fileName}`;
 
     return NextResponse.json({
-      message: 'Model uploaded successfully',
-      part: updatedPart,
-      fileInfo: {
-        originalName: file.name,
-        size: file.size,
-        sizeFormatted: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
-        format: fileExtension,
-        publicUrl: publicPath
-      }
+      success: true,
+      url: publicUrl,
+      fileName: fileName,
+      originalName: file.name,
+      size: file.size,
+      type: file.type
     });
 
   } catch (error) {
     console.error('Error uploading 3D model:', error);
     return NextResponse.json(
-      { error: 'Failed to upload 3D model' },
+      { error: 'Failed to upload file' },
       { status: 500 }
     );
   }
 }
 
-// GET endpoint to retrieve 3D model info for a part
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const partId = searchParams.get('partId');
-
-    if (!partId) {
-      return NextResponse.json({ error: 'Part ID is required' }, { status: 400 });
-    }
-
-    const part = await prisma.customPart.findUnique({
-      where: { id: partId },
-      select: {
-        id: true,
-        name: true,
-        modelFile: true,
-        modelFormat: true,
-        modelSize: true,
-        isPublic: true,
-        user: {
-          select: {
-            username: true,
-            name: true,
-            email: true
-          }
-        }
-      }
-    });
-
-    if (!part) {
-      return NextResponse.json({ error: 'Part not found' }, { status: 404 });
-    }
-
-    // Check if part is public or user has access
-    const session = await getServerSession(authOptions);
-  if (!part.isPublic && (!session?.user?.email || session.user.email !== part.user.email)) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-    }
-
-    return NextResponse.json({
-      part: {
-        id: part.id,
-        name: part.name,
-        hasModel: !!part.modelFile,
-        modelFile: part.modelFile,
-        modelFormat: part.modelFormat,
-        modelSize: part.modelSize,
-        modelSizeFormatted: part.modelSize ? `${(part.modelSize / 1024 / 1024).toFixed(2)}MB` : null,
-        creator: part.user
-      },
-      uploadLimits: {
-        maxSize: MAX_FILE_SIZE,
-        maxSizeFormatted: '40MB',
-        allowedFormats: ALLOWED_FORMATS
-      }
-    });
-
-  } catch (error) {
-    console.error('Error fetching 3D model info:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch 3D model info' },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE endpoint to remove 3D model from a part
 export async function DELETE(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -195,52 +113,31 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const partId = searchParams.get('partId');
+    const fileName = searchParams.get('fileName');
 
-    if (!partId) {
-      return NextResponse.json({ error: 'Part ID is required' }, { status: 400 });
+    if (!fileName) {
+      return NextResponse.json({ error: 'No file name provided' }, { status: 400 });
     }
 
-    // Check if user owns the part
-    const part = await prisma.customPart.findFirst({
-      where: {
-        id: partId,
-        user: { email: session.user.email }
-      }
-    });
-
-    if (!part) {
-      return NextResponse.json({ error: 'Part not found or unauthorized' }, { status: 404 });
+    // Security check: ensure the filename contains the user's ID
+    const userId = session.user.id || 'unknown';
+    if (!fileName.startsWith(userId)) {
+      return NextResponse.json({ error: 'Unauthorized to delete this file' }, { status: 403 });
     }
 
-    // Update part to remove model references
-    const updatedPart = await prisma.customPart.update({
-      where: { id: partId },
-      data: {
-        modelFile: null,
-        modelFormat: null,
-        modelSize: null,
-        updatedAt: new Date()
-      },
-      select: {
-        id: true,
-        name: true,
-        updatedAt: true
-      }
-    });
+    const filePath = join(UPLOAD_DIR, fileName);
+    
+    if (existsSync(filePath)) {
+      const { unlink } = await import('fs/promises');
+      await unlink(filePath);
+    }
 
-    // Note: We're not deleting the actual file from disk for safety
-    // This could be implemented as a cleanup job later
-
-    return NextResponse.json({
-      message: 'Model removed successfully',
-      part: updatedPart
-    });
+    return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('Error removing 3D model:', error);
+    console.error('Error deleting 3D model:', error);
     return NextResponse.json(
-      { error: 'Failed to remove 3D model' },
+      { error: 'Failed to delete file' },
       { status: 500 }
     );
   }
