@@ -39,8 +39,9 @@ export default function ModelImportModal({ open, onClose, onSelect }: Props) {
         throw new Error(data.error || 'Failed to scrape');
       }
       setResults(data);
-    } catch (e: any) {
-      setError(e.message || 'Failed to scrape');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to scrape';
+      setError(message);
     } finally {
       setLoading(false);
     }

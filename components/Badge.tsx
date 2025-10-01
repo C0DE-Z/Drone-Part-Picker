@@ -13,10 +13,13 @@ export interface BadgeData {
 }
 
 interface BadgeProps {
-  badge: BadgeData;
+  // When provided, renders the decorative Badge with icon/tooltip
+  badge?: BadgeData;
   size?: 'sm' | 'md' | 'lg';
   showTooltip?: boolean;
   className?: string;
+  // When no badge is provided, render a simple pill with these children
+  children?: React.ReactNode;
 }
 
 const rarityStyles = {
@@ -64,8 +67,20 @@ export default function Badge({
   badge, 
   size = 'md', 
   showTooltip = true, 
-  className = '' 
+  className = '',
+  children
 }: BadgeProps) {
+  // Simple pill variant for status/labels when no badge data is provided
+  if (!badge) {
+    return (
+      <span
+        className={`inline-flex items-center rounded px-2 py-1 text-xs font-medium ${className}`}
+      >
+        {children}
+      </span>
+    );
+  }
+
   const rarity = rarityStyles[badge.rarity];
   const sizeStyle = sizeStyles[size];
 
