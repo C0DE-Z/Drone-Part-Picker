@@ -5,6 +5,11 @@ import { ScrapedProduct, ScraperConfig, VendorPrice } from '@/types/drone';
 export class WebScraperService {
   private browser: Browser | null = null;
   private scraperConfigs: ScraperConfig[] = [];
+  private retryAttempts = 3;
+  private retryDelay = 2000;
+  private maxConcurrency = 2;
+  private requestQueue: Array<() => Promise<void>> = [];
+  private activeRequests = 0;
 
   constructor() {
     this.initializeScraperConfigs();
@@ -115,13 +120,69 @@ export class WebScraperService {
 
   async closeBrowser(): Promise<void> {
     if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
+      try {
+        await this.browser.close();
+        console.log('✅ Browser closed successfully');
+      } catch (error) {
+        console.error('⚠️ Error closing browser:', error);
+      } finally {
+        this.browser = null;
+      }
     }
   }
 
-  private async delay(ms: number): Promise<void> {
+  private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private async withRetry<T>(operation: () => Promise<T>, context: string): Promise<T> {
+    let lastError: Error;
+    
+    for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
+      try {
+        console.log(`🔄 ${context} (attempt ${attempt}/${this.retryAttempts})`);
+        return await operation();
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`❌ ${context} failed (attempt ${attempt}):`, error);
+        
+        if (attempt < this.retryAttempts) {
+          const delayMs = this.retryDelay * attempt; // Exponential backoff
+          console.log(`⏳ Waiting ${delayMs}ms before retry...`);
+          await this.delay(delayMs);
+        }
+      }
+    }
+    
+    throw new Error(`${context} failed after ${this.retryAttempts} attempts: ${lastError!.message}`);
+  }
+
+  private async queueRequest<T>(operation: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.requestQueue.push(async () => {
+        try {
+          this.activeRequests++;
+          const result = await operation();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        } finally {
+          this.activeRequests--;
+          this.processQueue();
+        }
+      });
+      
+      this.processQueue();
+    });
+  }
+
+  private processQueue(): void {
+    if (this.activeRequests < this.maxConcurrency && this.requestQueue.length > 0) {
+      const nextRequest = this.requestQueue.shift();
+      if (nextRequest) {
+        nextRequest();
+      }
+    }
   }
 
   private parsePrice(priceText: string): number {

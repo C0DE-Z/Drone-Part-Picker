@@ -5,6 +5,7 @@ interface ScraperConfig {
   vendor: string;
   baseUrl: string;
   rateLimit: number;
+  retryAttempts: number;
   headers: Record<string, string>;
   categories: Record<string, CategoryConfig>;
 }
@@ -153,6 +154,7 @@ export class DeploymentFriendlyScraperService {
         vendor: 'GetFPV',
         baseUrl: 'https://www.getfpv.com',
         rateLimit: 2000,
+        retryAttempts: 3,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -216,6 +218,7 @@ export class DeploymentFriendlyScraperService {
         vendor: 'RDQ',
         baseUrl: 'https://www.racedayquads.com',
         rateLimit: 1500,
+        retryAttempts: 3,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -294,6 +297,7 @@ export class DeploymentFriendlyScraperService {
         vendor: 'PyrodDrone',
         baseUrl: 'https://pyrodrone.com',
         rateLimit: 2000,
+        retryAttempts: 3,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',

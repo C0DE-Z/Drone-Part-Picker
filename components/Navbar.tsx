@@ -49,9 +49,6 @@ export default function Navbar() {
             <Link href="/prices" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Price Check
             </Link>
-            <Link href="/guides" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              How-To Guides
-            </Link>
 
             {session ? (
               <div className="flex items-center space-x-4">

@@ -89,40 +89,9 @@ const StatusBadge = ({ status }: { status: string }) => {
 export default function NewAdminDashboard() {
   const { data: session } = useSession();
   
-  // Use a local theme state if the theme context is not available
-  const [localTheme, setLocalTheme] = useState<'light' | 'dark'>('light');
-  
-  // Local theme toggle function
-  const handleThemeToggle = () => {
-    const newTheme = localTheme === 'light' ? 'dark' : 'light';
-    setLocalTheme(newTheme);
-    
-    // Save to localStorage
-    localStorage.setItem('admin-theme', newTheme);
-    
-    // Apply theme to document
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
-  
-  // Initialize theme from system or localStorage
+  // Light-only: always remove dark mode
   useEffect(() => {
-    const savedTheme = localStorage.getItem('admin-theme');
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const initialTheme = (savedTheme === 'dark' || savedTheme === 'light') 
-      ? savedTheme 
-      : systemTheme;
-    
-    setLocalTheme(initialTheme as 'light' | 'dark');
-    
-    if (initialTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.remove('dark');
   }, []);
   
   const [activeTab, setActiveTab] = useState('overview');
@@ -328,16 +297,16 @@ export default function NewAdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-gray-50 transition-colors">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-gray-600">
                 {session?.user?.email}
               </div>
               <StatusBadge status="Admin" />
@@ -345,20 +314,19 @@ export default function NewAdminDashboard() {
           </div>
         </div>
       </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
         <div className="mb-8">
-          <div className="border-b border-gray-200 dark:border-gray-700">
+          <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-2 overflow-x-auto">
               {navItems.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`${
+                  className={`$
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
                   } whitespace-nowrap py-2 px-3 border-b-2 font-medium text-sm flex items-center space-x-2`}
                 >
                   <span>{tab.icon}</span>
@@ -373,8 +341,6 @@ export default function NewAdminDashboard() {
             </nav>
           </div>
         </div>
-
-        {/* Content */}
         <div className="space-y-6">
           {/* Dashboard Overview */}
           {activeTab === 'overview' && (
@@ -382,50 +348,48 @@ export default function NewAdminDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                   <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mr-4">
+                    <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Total Users</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">Total Users</h3>
                       <div className="flex items-baseline">
-                        <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{systemMetrics.totalUsers}</p>
-                        <p className="text-sm text-green-600 dark:text-green-400 ml-2">+12% this month</p>
+                        <p className="text-3xl font-bold text-blue-600">{systemMetrics.totalUsers}</p>
+                        <p className="text-sm text-green-600 ml-2">+12% this month</p>
                       </div>
                     </div>
                   </div>
                 </Card>
-
                 <Card>
                   <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 mr-4">
+                    <div className="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Pending Reports</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">Pending Reports</h3>
                       <div className="flex items-baseline">
-                        <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{systemMetrics.pendingReports}</p>
-                        <p className="text-sm text-yellow-600 dark:text-yellow-400 ml-2">Require attention</p>
+                        <p className="text-3xl font-bold text-yellow-600">{systemMetrics.pendingReports}</p>
+                        <p className="text-sm text-yellow-600 ml-2">Require attention</p>
                       </div>
                     </div>
                   </div>
                 </Card>
-
                 <Card>
                   <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 mr-4">
+                    <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">AI Classifications</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">AI Classifications</h3>
                       <div className="flex items-baseline">
-                        <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{systemMetrics.totalClassifications.toLocaleString()}</p>
-                        <p className="text-sm text-green-600 dark:text-green-400 ml-2">98.4% accuracy</p>
+                        <p className="text-3xl font-bold text-purple-600">{systemMetrics.totalClassifications.toLocaleString()}</p>
+                        <p className="text-sm text-green-600 ml-2">98.4% accuracy</p>
                       </div>
                     </div>
                   </div>
@@ -433,30 +397,30 @@ export default function NewAdminDashboard() {
               </div>
 
               {/* Quick Stats */}
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-800 dark:to-indigo-900 text-white rounded-lg shadow-md p-6">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold">Dashboard Quick Stats</h3>
-                  <button className="px-3 py-1 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                  <button className="px-3 py-1 bg-white text-blue-600 rounded-md text-sm font-medium hover:bg-gray-50 transition-all">
                     Full Report
                   </button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div>
-                    <h4 className="text-sm font-medium text-blue-100 dark:text-blue-200 mb-1">Total Products</h4>
+                    <h4 className="text-sm font-medium text-blue-100 mb-1">Total Products</h4>
                     <p className="text-2xl font-bold">{systemMetrics.totalProducts.toLocaleString()}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-blue-100 dark:text-blue-200 mb-1">Admin Actions</h4>
+                    <h4 className="text-sm font-medium text-blue-100 mb-1">Admin Actions</h4>
                     <p className="text-2xl font-bold">{systemMetrics.adminActions}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-blue-100 dark:text-blue-200 mb-1">Active Subscribers</h4>
+                    <h4 className="text-sm font-medium text-blue-100 mb-1">Active Subscribers</h4>
                     <p className="text-2xl font-bold">{systemMetrics.activeSubscribers}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-blue-100 dark:text-blue-200 mb-1">System Status</h4>
+                    <h4 className="text-sm font-medium text-blue-100 mb-1">System Status</h4>
                     <p className="text-lg font-bold flex items-center">
-                      <span className="w-2 h-2 bg-green-400 dark:bg-green-300 rounded-full mr-2"></span>
+                      <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
                       All Systems Operational
                     </p>
                   </div>
@@ -465,21 +429,21 @@ export default function NewAdminDashboard() {
 
               {/* Recent Activity */}
               <Card>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 mr-3">
-                      <span className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-2 rounded-full inline-flex">
+                      <span className="bg-green-100 text-green-600 p-2 rounded-full inline-flex">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-gray-900">
                         New product added: <span className="font-semibold">T-Motor F60 Pro V</span>
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500">
                         2 hours ago by Admin
                       </p>
                     </div>
@@ -487,17 +451,17 @@ export default function NewAdminDashboard() {
                   
                   <div className="flex items-center">
                     <div className="flex-shrink-0 mr-3">
-                      <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-full inline-flex">
+                      <span className="bg-red-100 text-red-600 p-2 rounded-full inline-flex">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-gray-900">
                         Product deleted: <span className="font-semibold">DYS Samguk Series Shu</span>
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500">
                         5 hours ago by Moderator
                       </p>
                     </div>
@@ -505,17 +469,17 @@ export default function NewAdminDashboard() {
                   
                   <div className="flex items-center">
                     <div className="flex-shrink-0 mr-3">
-                      <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-2 rounded-full inline-flex">
+                      <span className="bg-blue-100 text-blue-600 p-2 rounded-full inline-flex">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-gray-900">
                         Categories updated: <span className="font-semibold">Motors & ESCs</span>
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500">
                         Yesterday by Admin
                       </p>
                     </div>
@@ -523,17 +487,17 @@ export default function NewAdminDashboard() {
                   
                   <div className="flex items-center">
                     <div className="flex-shrink-0 mr-3">
-                      <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 p-2 rounded-full inline-flex">
+                      <span className="bg-yellow-100 text-yellow-600 p-2 rounded-full inline-flex">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-gray-900">
                         Report resolved: <span className="font-semibold">Inappropriate comment</span>
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500">
                         2 days ago by Moderator
                       </p>
                     </div>
@@ -547,21 +511,21 @@ export default function NewAdminDashboard() {
           {activeTab === 'users' && (
             <Card>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">User Management</h3>
+                <h3 className="text-lg font-semibold text-gray-900">User Management</h3>
                 <div className="flex space-x-2">
                   <input 
                     type="text" 
                     placeholder="Search users..." 
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" 
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" 
                   />
-                  <button className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                     Export
                   </button>
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-800">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         User
@@ -577,21 +541,21 @@ export default function NewAdminDashboard() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="bg-white divide-y divide-gray-200">
                     {users.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-600">
+                      <tr key={user.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                              <span className="text-gray-500 dark:text-gray-300 font-medium">
+                            <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
+                              <span className="text-gray-500 font-medium">
                                 {(user.username || user.email).charAt(0).toUpperCase()}
                               </span>
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              <div className="text-sm font-medium text-gray-900">
                                 {user.username || 'No Username'}
                               </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                              <div className="text-sm text-gray-500">
                                 {user.email}
                               </div>
                             </div>
@@ -601,26 +565,26 @@ export default function NewAdminDashboard() {
                           <select
                             value={user.role}
                             onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                            className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                            className="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-900"
                           >
                             <option value="USER">User</option>
                             <option value="MODERATOR">Moderator</option>
                             <option value="ADMIN">Admin</option>
                           </select>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex space-x-2">
                             <button 
-                              className="px-3 py-1 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 rounded-md hover:bg-blue-200 dark:hover:bg-blue-700 text-sm"
+                              className="px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 text-sm"
                               onClick={() => console.log('View user details', user.id)}
                             >
                               View
                             </button>
                             <button 
-                              className="px-3 py-1 bg-yellow-100 dark:bg-yellow-800 text-yellow-700 dark:text-yellow-200 rounded-md hover:bg-yellow-200 dark:hover:bg-yellow-700 text-sm"
+                              className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200 text-sm"
                               onClick={() => console.log('Edit user', user.id)}
                             >
                               Edit
@@ -633,14 +597,14 @@ export default function NewAdminDashboard() {
                 </table>
               </div>
               <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-500">
                   Showing <span className="font-medium">{users.length}</span> users
                 </div>
                 <div className="flex space-x-2">
-                  <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <button className="px-3 py-1 border border-gray-300 bg-white rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Previous
                   </button>
-                  <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <button className="px-3 py-1 border border-gray-300 bg-white rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Next
                   </button>
                 </div>
@@ -652,9 +616,9 @@ export default function NewAdminDashboard() {
           {activeTab === 'reports' && (
             <Card>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Content Reports</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Content Reports</h3>
                 <div className="flex space-x-2">
-                  <select className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800">
+                  <select className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white">
                     <option value="all">All Reports</option>
                     <option value="pending">Pending</option>
                     <option value="resolved">Resolved</option>
@@ -668,34 +632,34 @@ export default function NewAdminDashboard() {
                     <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No reports</h3>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">No reports</h3>
+                    <p className="mt-1 text-sm text-gray-500">
                       There are no content reports to review at this time.
                     </p>
                   </div>
                 ) : (
                   reports.map((report) => (
-                    <div key={report.id} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                    <div key={report.id} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
                       <div className="flex flex-col lg:flex-row lg:items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
                             <StatusBadge status={report.status} />
-                            <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                            <h4 className="text-sm font-medium text-gray-900">
                               {report.type} Report
                             </h4>
                           </div>
                           <div className="space-y-2 text-sm">
                             <div>
-                              <span className="font-medium text-gray-900 dark:text-white">Reason:</span> 
-                              <span className="text-gray-600 dark:text-gray-400 ml-2">{report.reason}</span>
+                              <span className="font-medium text-gray-900">Reason:</span> 
+                              <span className="text-gray-600 ml-2">{report.reason}</span>
                             </div>
                             <div>
-                              <span className="font-medium text-gray-900 dark:text-white">Description:</span>
-                              <div className="text-gray-600 dark:text-gray-400 mt-1 bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                              <span className="font-medium text-gray-900">Description:</span>
+                              <div className="text-gray-600 mt-1 bg-gray-50 p-3 rounded-md border border-gray-200">
                                 {report.description}
                               </div>
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                            <div className="text-xs text-gray-500 mt-2">
                               Reported by <span className="font-medium">{report.reportedBy}</span> on {new Date(report.createdAt).toLocaleDateString()}
                             </div>
                           </div>
@@ -704,13 +668,13 @@ export default function NewAdminDashboard() {
                           <div className="flex space-x-2 mt-4 lg:mt-0 lg:ml-4">
                             <button
                               onClick={() => handleReportAction(report.id, 'resolve')}
-                              className="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                             >
                               Resolve
                             </button>
                             <button
                               onClick={() => handleReportAction(report.id, 'dismiss')}
-                              className="px-4 py-2 bg-gray-500 dark:bg-gray-600 text-white rounded-md hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors"
+                              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
                             >
                               Dismiss
                             </button>
@@ -739,14 +703,14 @@ export default function NewAdminDashboard() {
               <Card>
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">AI Classification System</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                    <h3 className="text-xl font-semibold text-gray-900">AI Classification System</h3>
+                    <p className="text-gray-600 mt-1">
                       Train and monitor our machine learning classification system for drone parts
                     </p>
                   </div>
                   <button
                     onClick={() => setClassificationGameOpen(true)}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:from-blue-600 hover:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-700 transition-all duration-200 flex items-center gap-2"
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 flex items-center gap-2"
                   >
                     <span className="text-xl">🎮</span>
                     Start Training Game
@@ -754,97 +718,97 @@ export default function NewAdminDashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-blue-500 dark:border-blue-400 shadow-sm">
+                  <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl">🎯</span>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Accuracy Focused</h4>
+                      <h4 className="font-semibold text-gray-900">Accuracy Focused</h4>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 text-sm">
+                    <p className="text-gray-700 text-sm">
                       Our AI analyzes product names, descriptions, and technical specifications to categorize components accurately.
                     </p>
                   </div>
 
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-green-500 dark:border-green-400 shadow-sm">
+                  <div className="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl">📊</span>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Multi-Method Analysis</h4>
+                      <h4 className="font-semibold text-gray-900">Multi-Method Analysis</h4>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 text-sm">
+                    <p className="text-gray-700 text-sm">
                       Combines pattern matching, keyword analysis, feature detection, and brand recognition for best results.
                     </p>
                   </div>
 
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-purple-500 dark:border-purple-400 shadow-sm">
+                  <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl">🧠</span>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Continuous Learning</h4>
+                      <h4 className="font-semibold text-gray-900">Continuous Learning</h4>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 text-sm">
+                    <p className="text-gray-700 text-sm">
                       Our system gets smarter over time as it processes more products and receives feedback from users and admins.
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-8">
-                  <h4 className="font-semibold text-lg text-gray-900 dark:text-white mb-4">Classification Performance</h4>
-                  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 grid grid-cols-2 md:grid-cols-4">
+                  <h4 className="font-semibold text-lg text-gray-900 mb-4">Classification Performance</h4>
+                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 grid grid-cols-2 md:grid-cols-4">
                       <div className="text-center px-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Accuracy</div>
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">98.4%</div>
+                        <div className="text-sm text-gray-600 mb-1">Accuracy</div>
+                        <div className="text-2xl font-bold text-green-600">98.4%</div>
                       </div>
                       <div className="text-center px-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Processed</div>
-                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">45,782</div>
+                        <div className="text-sm text-gray-600 mb-1">Processed</div>
+                        <div className="text-2xl font-bold text-blue-600">45,782</div>
                       </div>
                       <div className="text-center px-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Categories</div>
-                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">8</div>
+                        <div className="text-sm text-gray-600 mb-1">Categories</div>
+                        <div className="text-2xl font-bold text-purple-600">8</div>
                       </div>
                       <div className="text-center px-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Learning Rate</div>
-                        <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">+7.8%</div>
+                        <div className="text-sm text-gray-600 mb-1">Learning Rate</div>
+                        <div className="text-2xl font-bold text-orange-600">+7.8%</div>
                       </div>
                     </div>
                     
                     <div className="px-6 py-4">
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Category Accuracy</h5>
+                      <h5 className="text-sm font-medium text-gray-700 mb-3">Category Accuracy</h5>
                       <div className="space-y-3">
                         <div className="flex items-center">
-                          <span className="text-xs font-medium w-16 text-gray-700 dark:text-gray-300">Motors</span>
+                          <span className="text-xs font-medium w-16 text-gray-700">Motors</span>
                           <div className="flex-1 mx-2">
-                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+                            <div className="h-2 bg-gray-200 rounded-full">
                               <div className="h-2 bg-green-500 rounded-full" style={{ width: '99.2%' }}></div>
                             </div>
                           </div>
-                          <span className="text-xs font-medium w-12 text-gray-700 dark:text-gray-300">99.2%</span>
+                          <span className="text-xs font-medium w-12 text-gray-700">99.2%</span>
                         </div>
                         <div className="flex items-center">
-                          <span className="text-xs font-medium w-16 text-gray-700 dark:text-gray-300">Props</span>
+                          <span className="text-xs font-medium w-16 text-gray-700">Props</span>
                           <div className="flex-1 mx-2">
-                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+                            <div className="h-2 bg-gray-200 rounded-full">
                               <div className="h-2 bg-green-500 rounded-full" style={{ width: '98.7%' }}></div>
                             </div>
                           </div>
-                          <span className="text-xs font-medium w-12 text-gray-700 dark:text-gray-300">98.7%</span>
+                          <span className="text-xs font-medium w-12 text-gray-700">98.7%</span>
                         </div>
                         <div className="flex items-center">
-                          <span className="text-xs font-medium w-16 text-gray-700 dark:text-gray-300">Frames</span>
+                          <span className="text-xs font-medium w-16 text-gray-700">Frames</span>
                           <div className="flex-1 mx-2">
-                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+                            <div className="h-2 bg-gray-200 rounded-full">
                               <div className="h-2 bg-green-500 rounded-full" style={{ width: '98.1%' }}></div>
                             </div>
                           </div>
-                          <span className="text-xs font-medium w-12 text-gray-700 dark:text-gray-300">98.1%</span>
+                          <span className="text-xs font-medium w-12 text-gray-700">98.1%</span>
                         </div>
                         <div className="flex items-center">
-                          <span className="text-xs font-medium w-16 text-gray-700 dark:text-gray-300">Batteries</span>
+                          <span className="text-xs font-medium w-16 text-gray-700">Batteries</span>
                           <div className="flex-1 mx-2">
-                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+                            <div className="h-2 bg-gray-200 rounded-full">
                               <div className="h-2 bg-green-500 rounded-full" style={{ width: '97.5%' }}></div>
                             </div>
                           </div>
-                          <span className="text-xs font-medium w-12 text-gray-700 dark:text-gray-300">97.5%</span>
+                          <span className="text-xs font-medium w-12 text-gray-700">97.5%</span>
                         </div>
                       </div>
                     </div>
@@ -855,19 +819,19 @@ export default function NewAdminDashboard() {
           )}
           
           {/* Scraper Tab */}
-          {activeTab === 'scraper' && <ScraperManagement theme={localTheme} />}
+          {activeTab === 'scraper' && <ScraperManagement theme="light" />}
           
           {/* Custom Parts Tab */}
           {activeTab === 'custom-parts' && (
             <div className="space-y-6">
               <Card>
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Community Custom Parts</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Community Custom Parts</h3>
                   <div className="flex space-x-2">
                     <select 
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white"
                     >
                       <option value="All">All Categories</option>
                       <option value="Motors">Motors</option>
@@ -880,7 +844,7 @@ export default function NewAdminDashboard() {
                     </select>
                     <button 
                       onClick={loadCustomParts}
-                      className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                     >
                       Refresh
                     </button>
@@ -893,22 +857,22 @@ export default function NewAdminDashboard() {
                     placeholder="Search custom parts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full max-w-md px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 {customPartsLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">Loading custom parts...</p>
+                    <p className="mt-2 text-gray-600">Loading custom parts...</p>
                   </div>
                 ) : customParts.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="text-gray-300 dark:text-gray-600 text-6xl mb-4">🔧</div>
-                    <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <div className="text-gray-300 text-6xl mb-4">🔧</div>
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">
                       No custom parts found
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-gray-500">
                       {searchTerm || selectedCategory !== 'All' ? 'Try adjusting your search or filters.' : 'No community custom parts have been shared yet.'}
                     </p>
                   </div>
@@ -920,15 +884,15 @@ export default function NewAdminDashboard() {
                         part.description?.toLowerCase().includes(searchTerm.toLowerCase())
                       )
                       .map((part) => (
-                        <div key={part.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
+                        <div key={part.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex-1">
-                              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{part.name}</h4>
+                              <h4 className="text-lg font-semibold text-gray-900 mb-1">{part.name}</h4>
                               <div className="flex items-center gap-2">
-                                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
+                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
                                   {part.category}
                                 </span>
-                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                <span className="text-sm text-gray-500">
                                   by {part.user.username}
                                 </span>
                               </div>
@@ -936,37 +900,37 @@ export default function NewAdminDashboard() {
                           </div>
                           
                           {part.description && (
-                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">{part.description}</p>
+                            <p className="text-gray-600 text-sm mb-4 line-clamp-2">{part.description}</p>
                           )}
 
                           {/* Specifications */}
                           <div className="space-y-2 mb-4">
-                            <h5 className="text-sm font-medium text-gray-900 dark:text-white">Specifications</h5>
+                            <h5 className="text-sm font-medium text-gray-900">Specifications</h5>
                             <div className="space-y-1">
                               {Object.entries(part.specifications).slice(0, 3).map(([key, value]) => (
                                 <div key={key} className="flex justify-between text-sm">
-                                  <span className="text-gray-600 dark:text-gray-400 capitalize">{key}:</span>
-                                  <span className="text-gray-900 dark:text-white font-medium">
+                                  <span className="text-gray-600 capitalize">{key}:</span>
+                                  <span className="text-gray-900 font-medium">
                                     {typeof value === 'string' ? value : `${value}`}
                                   </span>
                                 </div>
                               ))}
                               {Object.keys(part.specifications).length > 3 && (
-                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                <div className="text-xs text-gray-500">
                                   +{Object.keys(part.specifications).length - 3} more specs
                                 </div>
                               )}
                             </div>
                           </div>
                           
-                          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="flex items-center justify-between text-xs text-gray-500">
                               <span>{part.viewCount || 0} views</span>
                               <span>{new Date(part.createdAt).toLocaleDateString()}</span>
                             </div>
                             
                             <div className="flex gap-2 mt-3">
-                              <button className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md transition-colors text-sm font-medium">
+                              <button className="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors text-sm font-medium">
                                 View Details
                               </button>
                               <button className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors text-sm font-medium">
@@ -985,57 +949,41 @@ export default function NewAdminDashboard() {
           {/* Settings Tab */}
           {activeTab === 'settings' && (
             <Card>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Admin Settings</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Admin Settings</h3>
               
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">System Preferences</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">System Preferences</h4>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">Enable Dark Mode</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Default appearance for admin dashboard</div>
+                        <div className="text-sm font-medium text-gray-900">Email Notifications</div>
+                        <div className="text-xs text-gray-500">Get notified about important system events</div>
                       </div>
                       <label className="inline-flex items-center cursor-pointer">
-                        <input 
-                          type="checkbox" 
-                          checked={localTheme === 'dark'} 
-                          onChange={handleThemeToggle}
-                          className="sr-only peer" 
-                        />
-                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:after:bg-gray-200 after:border-gray-300 after:border dark:after:border-gray-600 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <input type="checkbox" value="" className="sr-only peer" defaultChecked />
+                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">Email Notifications</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Get notified about important system events</div>
+                        <div className="text-sm font-medium text-gray-900">Auto-Moderate Comments</div>
+                        <div className="text-xs text-gray-500">Let AI filter inappropriate content</div>
                       </div>
                       <label className="inline-flex items-center cursor-pointer">
                         <input type="checkbox" value="" className="sr-only peer" defaultChecked />
-                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">Auto-Moderate Comments</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Let AI filter inappropriate content</div>
-                      </div>
-                      <label className="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" className="sr-only peer" defaultChecked />
-                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                   </div>
                 </div>
                 
-                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Security Settings</h4>
+                <div className="pt-6 border-t border-gray-200">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Security Settings</h4>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Two-Factor Authentication</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Two-Factor Authentication</label>
                       <div className="flex items-center space-x-2">
                         <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Enabled</span>
                         <button className="text-sm text-blue-600 hover:text-blue-800">Configure</button>
@@ -1043,36 +991,36 @@ export default function NewAdminDashboard() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">API Access</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">API Access</label>
                       <div className="flex items-center space-x-4">
-                        <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 sm:text-sm rounded-md">
+                        <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                           <option>Full Access</option>
                           <option>Read Only</option>
                           <option>No Access</option>
                         </select>
-                        <button className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm">Generate API Key</button>
+                        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">Generate API Key</button>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Database Management</h4>
+                <div className="pt-6 border-t border-gray-200">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Database Management</h4>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">Database Backup</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Last backup: 3 days ago</div>
+                        <div className="text-sm font-medium text-gray-900">Database Backup</div>
+                        <div className="text-xs text-gray-500">Last backup: 3 days ago</div>
                       </div>
-                      <button className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm">Run Backup</button>
+                      <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">Run Backup</button>
                     </div>
                     
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">Clear Cache</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Cached items: 2,341</div>
+                        <div className="text-sm font-medium text-gray-900">Clear Cache</div>
+                        <div className="text-xs text-gray-500">Cached items: 2,341</div>
                       </div>
-                      <button className="px-4 py-2 bg-yellow-600 dark:bg-yellow-700 text-white rounded-md hover:bg-yellow-700 dark:hover:bg-yellow-600 transition-colors text-sm">Clear Now</button>
+                      <button className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors text-sm">Clear Now</button>
                     </div>
                   </div>
                 </div>
