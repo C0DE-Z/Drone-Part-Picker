@@ -14,10 +14,13 @@ const customJestConfig = {
     '^@/components/(.*)$': '<rootDir>/components/$1',
     '^@/pages/(.*)$': '<rootDir>/pages/$1',
     '^@/lib/(.*)$': '<rootDir>/lib/$1',
+    '^@/services/(.*)$': '<rootDir>/services/$1',
     '^@/utils/(.*)$': '<rootDir>/utils/$1',
     '^@/types/(.*)$': '<rootDir>/types/$1',
     '^@/contexts/(.*)$': '<rootDir>/contexts/$1',
     '^@/hooks/(.*)$': '<rootDir>/hooks/$1',
+    '^cheerio$': '<rootDir>/test/__mocks__/cheerio.ts',
+    '^three/examples/jsm/(.*)$': '<rootDir>/test/__mocks__/three-examples/$1',
   },
   testEnvironment: 'jest-environment-jsdom',
   collectCoverageFrom: [
@@ -33,7 +36,7 @@ const customJestConfig = {
     '<rootDir>/**/*.(test|spec).{js,jsx,ts,tsx}'
   ],
   transformIgnorePatterns: [
-    '/node_modules/',
+    '/node_modules/(?!(three|cheerio)/)',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],

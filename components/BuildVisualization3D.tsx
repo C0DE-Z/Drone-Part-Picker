@@ -27,6 +27,8 @@ import { cacheService } from '@/lib/simple-cache';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import ModelImportModal from './ModelImportModal';
 
@@ -466,7 +468,7 @@ export default function BuildVisualization3D({
     setLoading(false);
   };
 
-  // Map Build3D components into basic three.js placeholders or load GLTF models
+  // Map Build3D components into basic three.js placeholders or load external models
   useEffect(() => {
     if (!currentBuild || !sceneRef.current) return;
     const scene = sceneRef.current;
@@ -477,39 +479,86 @@ export default function BuildVisualization3D({
     });
     objectsRef.current = {};
 
-    const loader = new GLTFLoader();
+  const gltfLoader = new GLTFLoader();
+  const objLoader = new OBJLoader();
+  const stlLoader = new STLLoader();
 
     currentBuild.components.forEach((comp) => {
       if (!comp.visible) return;
       if (comp.modelUrl) {
-        // Attempt to load external model
-        try {
-          loader.load(
-            comp.modelUrl,
-            (gltf: GLTF) => {
-              const root = gltf.scene;
-              root.position.set(comp.position[0], comp.position[1], comp.position[2]);
-              root.rotation.set(
-                THREE.MathUtils.degToRad(comp.rotation[0]),
-                THREE.MathUtils.degToRad(comp.rotation[1]),
-                THREE.MathUtils.degToRad(comp.rotation[2])
-              );
-              root.scale.set(comp.scale[0], comp.scale[1], comp.scale[2]);
-              scene.add(root);
-              objectsRef.current[comp.id] = root;
-            },
-            undefined,
-            () => {
-              // Fallback to placeholder if load fails
-              const placeholder = createPlaceholder(comp);
-              scene.add(placeholder);
-              objectsRef.current[comp.id] = placeholder;
-            }
+        // Attempt to load external model, selecting loader by extension
+        const url = comp.modelUrl;
+        const lower = url.toLowerCase();
+        const placeAndRegister = (object: THREE.Object3D) => {
+          object.position.set(comp.position[0], comp.position[1], comp.position[2]);
+          object.rotation.set(
+            THREE.MathUtils.degToRad(comp.rotation[0]),
+            THREE.MathUtils.degToRad(comp.rotation[1]),
+            THREE.MathUtils.degToRad(comp.rotation[2])
           );
-        } catch {
+          object.scale.set(comp.scale[0], comp.scale[1], comp.scale[2]);
+          scene.add(object);
+          objectsRef.current[comp.id] = object;
+        };
+
+        const onError = () => {
           const placeholder = createPlaceholder(comp);
           scene.add(placeholder);
           objectsRef.current[comp.id] = placeholder;
+        };
+
+        try {
+          if (lower.endsWith('.gltf') || lower.endsWith('.glb')) {
+            gltfLoader.load(
+              url,
+              (gltf: GLTF) => {
+                const root = gltf.scene;
+                placeAndRegister(root);
+              },
+              undefined,
+              onError
+            );
+          } else if (lower.endsWith('.obj')) {
+            objLoader.load(
+              url,
+              (obj: THREE.Group) => {
+                // Some OBJ files have no material; ensure basic material if needed
+                obj.traverse((child: THREE.Object3D) => {
+                  const maybeMesh = child as THREE.Mesh;
+                  if ((maybeMesh as unknown as { isMesh?: boolean }).isMesh && !maybeMesh.material) {
+                    maybeMesh.material = new THREE.MeshStandardMaterial({ color: comp.color || '#888888' });
+                  }
+                });
+                placeAndRegister(obj);
+              },
+              undefined,
+              onError
+            );
+          } else if (lower.endsWith('.stl')) {
+            stlLoader.load(
+              url,
+              (geometry: THREE.BufferGeometry) => {
+                const mat = new THREE.MeshStandardMaterial({ color: comp.color || '#888888' });
+                const mesh = new THREE.Mesh(geometry, mat);
+                placeAndRegister(mesh);
+              },
+              undefined,
+              onError
+            );
+          } else {
+            // Unknown extension -> try GLTF first, else placeholder
+            gltfLoader.load(
+              url,
+              (gltf: GLTF) => {
+                const root = gltf.scene;
+                placeAndRegister(root);
+              },
+              undefined,
+              onError
+            );
+          }
+        } catch {
+          onError();
         }
       } else {
         const placeholder = createPlaceholder(comp);

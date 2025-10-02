@@ -24,11 +24,22 @@ export default function ModelImportModal({ open, onClose, onSelect }: Props) {
 
   if (!open) return null;
 
+  const isDirectModelUrl = (u: string) => /\.(gltf|glb|obj|stl)(\?|#|$)/i.test(u.trim());
+
   const scrape = async () => {
     setLoading(true);
     setError(null);
     setResults(null);
     try {
+      // If it's a direct model URL, short-circuit and present it as a single result
+      if (isDirectModelUrl(url)) {
+        setResults({
+          source: url,
+          models: [{ url, type: (url.split('.').pop()?.toLowerCase() as 'gltf' | 'glb' | 'obj' | 'stl' | 'unknown') || 'unknown' }],
+          pageTitle: 'Direct model link'
+        });
+        return;
+      }
       const res = await fetch('/api/models/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -107,8 +118,16 @@ export default function ModelImportModal({ open, onClose, onSelect }: Props) {
                   </div>
                 ))}
                 {results.models.length === 0 && (
-                  <div className="text-sm text-gray-500 py-6 text-center">
-                    No direct .glb/.gltf/.obj/.stl links found on this page.
+                  <div className="text-sm text-gray-500 py-6 text-center space-y-3">
+                    <div>No direct .glb/.gltf/.obj/.stl links found on this page.</div>
+                    {isDirectModelUrl(url) ? (
+                      <button
+                        onClick={() => onSelect(url)}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded border text-sm hover:bg-gray-50"
+                      >
+                        <FileDown className="w-4 h-4" /> Use typed URL
+                      </button>
+                    ) : null}
                   </div>
                 )}
               </div>

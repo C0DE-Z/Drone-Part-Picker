@@ -2,6 +2,20 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import BuildVisualization3D from '@/components/BuildVisualization3D';
+
+type VizComponent = {
+  id: string;
+  name: string;
+  type: 'frame' | 'motor' | 'prop' | 'battery' | 'camera' | 'stack' | 'other';
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+  color: string;
+  opacity: number;
+  visible: boolean;
+  metadata: { dimensions: [number, number, number]; weight: number };
+};
 import { useSession } from 'next-auth/react';
 import LikeButton from '@/components/LikeButton';
 import Comments from '@/components/Comments';
@@ -160,6 +174,89 @@ export default function BuildDetails({ params }: { params: Promise<{ id: string 
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* 3D Visualization */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">3D Visualization</h2>
+              <BuildVisualization3D
+                components={[
+                  // Map known component data to visualization placeholders
+                  build.components?.frame ? {
+                    id: 'frame-1',
+                    name: build.components.frame.name,
+                    type: 'frame',
+                    position: [0, 0, 0],
+                    rotation: [0, 0, 0],
+                    scale: [1, 1, 1],
+                    color: '#2d2d2d',
+                    opacity: 0.95,
+                    visible: true,
+                    metadata: { dimensions: [200, 200, 30], weight: Number(build.components.frame.data.weight) || 85 }
+                  } : undefined,
+                  build.components?.motor ? {
+                    id: 'motor-1',
+                    name: build.components.motor.name,
+                    type: 'motor',
+                    position: [0.75, -0.2, 0.75],
+                    rotation: [0, 0, 0],
+                    scale: [1, 1, 1],
+                    color: '#4a5568',
+                    opacity: 1,
+                    visible: true,
+                    metadata: { dimensions: [28, 28, 18], weight: Number(build.components.motor.data.weight) || 32 }
+                  } : undefined,
+                  build.components?.prop ? {
+                    id: 'prop-1',
+                    name: build.components.prop.name,
+                    type: 'prop',
+                    position: [0.75, 0, 0.75],
+                    rotation: [0, 0, 0],
+                    scale: [1, 1, 1],
+                    color: '#888888',
+                    opacity: 1,
+                    visible: true,
+                    metadata: { dimensions: [120, 5, 5], weight: Number(build.components.prop.data.weight) || 4 }
+                  } : undefined,
+                  build.components?.battery ? {
+                    id: 'battery-1',
+                    name: build.components.battery.name,
+                    type: 'battery',
+                    position: [0, -0.5, 0],
+                    rotation: [0, 0, 0],
+                    scale: [1, 1, 1],
+                    color: '#ffd700',
+                    opacity: 1,
+                    visible: true,
+                    metadata: { dimensions: [105, 35, 25], weight: Number(build.components.battery.data.weight) || 245 }
+                  } : undefined,
+                  build.components?.camera ? {
+                    id: 'camera-1',
+                    name: build.components.camera.name,
+                    type: 'camera',
+                    position: [0, 0.2, 1.2],
+                    rotation: [15, 0, 0],
+                    scale: [1, 1, 1],
+                    color: '#1a1a1a',
+                    opacity: 1,
+                    visible: true,
+                    metadata: { dimensions: [19, 19, 18], weight: Number(build.components.camera.data.weight) || 8 }
+                  } : undefined,
+                  build.components?.stack ? {
+                    id: 'stack-1',
+                    name: build.components.stack.name,
+                    type: 'stack',
+                    position: [0, 0.3, 0],
+                    rotation: [0, 0, 0],
+                    scale: [1, 1, 1],
+                    color: '#2563eb',
+                    opacity: 1,
+                    visible: true,
+                    metadata: { dimensions: [30, 30, 15], weight: Number(build.components.stack.data.weight) || 12 }
+                  } : undefined,
+                ].filter(Boolean) as VizComponent[]}
+              />
+              <p className="text-xs text-gray-500 mt-2">Tip: Click a component to toggle visibility, import a 3D model URL, or export a screenshot.</p>
             </div>
 
             {/* Components */}
