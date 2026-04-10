@@ -25,11 +25,18 @@ export class WeightCalculator {
     };
 
     if (components.motor) {
-      weights.motor = this.parseWeight(components.motor.data.weight) * 4; // 4 motors
+      const explicitMotorWeight = this.parseWeight(components.motor.data.weight);
+      const perMotorWeight = explicitMotorWeight > 0
+        ? explicitMotorWeight
+        : this.estimateMotorWeight(components.motor.data.statorSize);
+      weights.motor = perMotorWeight * 4; // 4 motors
     }
     
     if (components.frame) {
-      weights.frame = this.parseWeight(components.frame.data.weight);
+      const explicitFrameWeight = this.parseWeight(components.frame.data.weight);
+      weights.frame = explicitFrameWeight > 0
+        ? explicitFrameWeight
+        : this.estimateFrameWeight(components.frame.data.wheelbase);
     }
     
     if (components.stack) {
@@ -40,15 +47,25 @@ export class WeightCalculator {
     }
     
     if (components.camera) {
-      weights.camera = this.parseWeight(components.camera.data.weight);
+      const explicitCameraWeight = this.parseWeight(components.camera.data.weight);
+      weights.camera = explicitCameraWeight > 0
+        ? explicitCameraWeight
+        : this.estimateCameraWeight();
     }
     
     if (components.prop) {
-      weights.prop = this.parseWeight(components.prop.data.weight) * 4; // 4 props
+      const explicitPropWeight = this.parseWeight(components.prop.data.weight);
+      const perPropWeight = explicitPropWeight > 0
+        ? explicitPropWeight
+        : this.estimatePropWeight(components.prop.data.size, components.prop.data.blades);
+      weights.prop = perPropWeight * 4; // 4 props
     }
     
     if (components.battery) {
-      weights.battery = this.parseWeight(components.battery.data.weight);
+      const explicitBatteryWeight = this.parseWeight(components.battery.data.weight);
+      weights.battery = explicitBatteryWeight > 0
+        ? explicitBatteryWeight
+        : this.estimateBatteryWeight(components.battery.data.capacity, components.battery.data.voltage);
     }
 
     if (components.customWeights) {
@@ -81,6 +98,60 @@ export class WeightCalculator {
 
     // Default to grams.
     return value;
+  }
+
+  private static parseNumber(value: string | undefined, fallback = 0): number {
+    if (!value) return fallback;
+    const match = value.match(/(\d+\.?\d*)/);
+    return match ? parseFloat(match[1]) : fallback;
+  }
+
+  private static clamp(value: number, min: number, max: number): number {
+    if (!Number.isFinite(value)) return min;
+    return Math.max(min, Math.min(max, value));
+  }
+
+  private static estimateMotorWeight(statorSize: string | undefined): number {
+    const raw = statorSize || '';
+    const compact = raw.match(/(\d{4})/);
+
+    let statorDiameterMm = 22;
+    if (compact) {
+      statorDiameterMm = parseInt(compact[1].slice(0, 2), 10);
+    } else {
+      statorDiameterMm = this.parseNumber(raw, 22);
+    }
+
+    const estimated = 0.06 * statorDiameterMm * statorDiameterMm;
+    return this.clamp(Math.round(estimated), 7, 95);
+  }
+
+  private static estimateFrameWeight(wheelbase: string | undefined): number {
+    const wheelbaseMm = this.parseNumber(wheelbase, 220);
+    const estimated = 20 + wheelbaseMm * 0.45;
+    return this.clamp(Math.round(estimated), 35, 450);
+  }
+
+  private static estimateCameraWeight(): number {
+    return 16;
+  }
+
+  private static estimatePropWeight(size: string | undefined, blades: number | undefined): number {
+    const sizeIn = this.parseNumber(size, 5);
+    const bladeCount = blades && blades > 0 ? blades : 3;
+    const estimated = sizeIn * (0.35 + bladeCount * 0.18);
+    return this.clamp(Math.round(estimated * 10) / 10, 0.6, 12);
+  }
+
+  private static estimateBatteryWeight(capacity: string | undefined, voltage: string | undefined): number {
+    const capacityMah = this.parseNumber(capacity, 1300);
+    const cellsMatch = (voltage || '').match(/(\d+)S/i);
+    const cells = cellsMatch ? parseInt(cellsMatch[1], 10) : 4;
+
+    const nominalWh = (capacityMah / 1000) * cells * 3.7;
+    // Approximate LiPo pack specific energy around 140 Wh/kg including packaging and leads.
+    const estimatedMassG = (nominalWh / 140) * 1000;
+    return this.clamp(Math.round(estimatedMassG), 25, 1200);
   }
 
   private static calculateStackWeight(stackType: string): number {
