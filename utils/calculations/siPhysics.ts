@@ -776,9 +776,29 @@ export const computeSIPhysics = (
 export const validateSIPhysics = (result: SIPhysicsResult): SIPhysicsValidation => {
   const warnings: string[] = [];
 
+  const propIn = result.motor.propDiameterIn || 5;
+
+  const maxRealisticTwr = (() => {
+    if (propIn <= 2.5) return 8;
+    if (propIn <= 3.5) return 10;
+    if (propIn <= 4.5) return 13;
+    if (propIn <= 5.5) return 18;
+    if (propIn <= 7.5) return 15;
+    return 13;
+  })();
+
+  const suspiciousUpperFactor = (() => {
+    if (propIn <= 2.5) return 10;
+    if (propIn <= 3.5) return 12;
+    if (propIn <= 4.5) return 15;
+    if (propIn <= 5.5) return 18;
+    if (propIn <= 7.5) return 16;
+    return 14;
+  })();
+
   const flags = {
     thrustTooLow: result.thrust.thrustToWeightRatio < 1.2,
-    thrustTooHigh: result.thrust.thrustToWeightRatio > 8,
+    thrustTooHigh: result.thrust.thrustToWeightRatio > maxRealisticTwr,
     hoverThrottleTooHigh: result.hover.throttlePercent > 80,
     efficiencyOutOfRange:
       result.hover.hoverEfficiencyGramPerWatt < 2
@@ -793,8 +813,8 @@ export const validateSIPhysics = (result: SIPhysicsResult): SIPhysicsValidation 
       result.flight.mixedMin < 1
       || result.flight.mixedMin > 35,
     suspiciousThrustOutput:
-      result.thrust.totalGrams > result.mass.totalGrams * 12
-      || result.thrust.totalGrams < result.mass.totalGrams * 0.9
+      result.thrust.totalGrams > result.mass.totalGrams * suspiciousUpperFactor
+      || result.thrust.totalGrams < result.mass.totalGrams * 0.75
   };
 
   if (flags.thrustTooLow) {
@@ -802,7 +822,7 @@ export const validateSIPhysics = (result: SIPhysicsResult): SIPhysicsValidation 
   }
 
   if (flags.thrustTooHigh) {
-    warnings.push('Thrust-to-weight ratio is above 8:1. Verify motor thrust specifications and unit parsing.');
+    warnings.push(`Thrust-to-weight ratio is above expected range for this prop class (>${maxRealisticTwr}:1). Verify motor thrust specifications and unit parsing.`);
   }
 
   if (flags.hoverThrottleTooHigh) {
