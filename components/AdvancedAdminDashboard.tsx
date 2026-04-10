@@ -565,6 +565,9 @@ export default function AdvancedAdminDashboard() {
 
             <Card>
               <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
+                   Market Insights
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
