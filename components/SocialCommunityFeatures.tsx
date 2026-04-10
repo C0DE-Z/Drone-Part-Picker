@@ -622,9 +622,9 @@ export default function SocialCommunityFeatures({}: SocialCommunityFeaturesProps
               
               <div className="space-y-4">
                 {[
-                  { rank: 1, username: 'FreestyleKing', builds: 8, likes: 2450, followers: 2100, badge: '🏆' },
-                  { rank: 2, username: 'SpeedDemon', builds: 6, likes: 1890, followers: 1250, badge: '🥈' },
-                  { rank: 3, username: 'FilmMaker_Pro', builds: 4, likes: 1456, followers: 580, badge: '🥉' },
+                  { rank: 1, username: 'FreestyleKing', builds: 8, likes: 2450, followers: 2100, badge: '' },
+                  { rank: 2, username: 'SpeedDemon', builds: 6, likes: 1890, followers: 1250, badge: '' },
+                  { rank: 3, username: 'FilmMaker_Pro', builds: 4, likes: 1456, followers: 580, badge: '' },
                   { rank: 4, username: 'TechGuru', builds: 5, likes: 1234, followers: 890, badge: null },
                   { rank: 5, username: 'BuildMaster', builds: 7, likes: 1122, followers: 765, badge: null }
                 ].map((user) => (

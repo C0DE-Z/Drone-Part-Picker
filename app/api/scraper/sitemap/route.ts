@@ -122,14 +122,14 @@ async function scrapeFromSitemapInBackground(jobId: string, vendor: string, maxP
         let product;
         if (existingProduct) {
           // Update existing product
-          console.log(`📦 Updating existing product: "${scrapedProduct.name}" (ID: ${existingProduct.id}) - Has ${existingProduct.vendorPrices.length} existing vendor prices`);
+          console.log(` Updating existing product: "${scrapedProduct.name}" (ID: ${existingProduct.id}) - Has ${existingProduct.vendorPrices.length} existing vendor prices`);
           
           // Merge specifications - preserve existing and add new
           const existingSpecs = (existingProduct.specifications as Record<string, unknown>) || {};
           const newSpecs = scrapedProduct.specifications || {};
           const mergedSpecs = { ...existingSpecs, ...newSpecs };
           
-          console.log(`📊 Merging specs for "${scrapedProduct.name}":`, {
+          console.log(` Merging specs for "${scrapedProduct.name}":`, {
             existing: existingSpecs,
             new: newSpecs,
             merged: mergedSpecs
@@ -146,10 +146,10 @@ async function scrapeFromSitemapInBackground(jobId: string, vendor: string, maxP
             }
           });
           productsUpdated++;
-          console.log(`📦 Updated: ${scrapedProduct.name} (${scrapedProduct.vendor}) - Final specs: ${JSON.stringify(mergedSpecs)}`);
+          console.log(` Updated: ${scrapedProduct.name} (${scrapedProduct.vendor}) - Final specs: ${JSON.stringify(mergedSpecs)}`);
         } else {
           // Create new product
-          console.log(`✨ Creating new product: "${scrapedProduct.name}" (${scrapedProduct.category}) - Specs: ${JSON.stringify(scrapedProduct.specifications)}`);
+          console.log(` Creating new product: "${scrapedProduct.name}" (${scrapedProduct.category}) - Specs: ${JSON.stringify(scrapedProduct.specifications)}`);
           product = await prisma.product.create({
             data: {
               name: scrapedProduct.name,
@@ -162,7 +162,7 @@ async function scrapeFromSitemapInBackground(jobId: string, vendor: string, maxP
             }
           });
           productsCreated++;
-          console.log(`✨ Created: ${scrapedProduct.name} (${scrapedProduct.vendor}) - Specs: ${JSON.stringify(scrapedProduct.specifications)}`);
+          console.log(` Created: ${scrapedProduct.name} (${scrapedProduct.vendor}) - Specs: ${JSON.stringify(scrapedProduct.specifications)}`);
         }
 
         // Update or create vendor price

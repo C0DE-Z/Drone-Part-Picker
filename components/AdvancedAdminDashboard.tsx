@@ -149,7 +149,7 @@ export default function AdvancedAdminDashboard() {
   const [adminActions] = useState<AdminAction[]>([
     {
       id: 'retrain-models',
-      action: '🧠 Retrain the AI Brain',
+      action: ' Retrain the AI Brain',
       description: 'Make our AI even smarter by training it with all the latest part data we have',
       category: 'optimization',
       urgency: 'medium',
@@ -158,7 +158,7 @@ export default function AdvancedAdminDashboard() {
     },
     {
       id: 'run-duplicate-scan',
-      action: '🔍 Hunt for Duplicates',
+      action: ' Hunt for Duplicates',
       description: 'Go through everything and find parts that are basically the same thing',
       category: 'maintenance',
       urgency: 'low',
@@ -167,7 +167,7 @@ export default function AdvancedAdminDashboard() {
     },
     {
       id: 'optimize-cache',
-      action: '⚡ Speed Things Up',
+      action: ' Speed Things Up',
       description: 'Clear out the old cache and make everything load faster',
       category: 'optimization',
       urgency: 'low',
@@ -176,7 +176,7 @@ export default function AdvancedAdminDashboard() {
     },
     {
       id: 'export-learning-data',
-      action: '📊 Export Learning Data',
+      action: ' Export Learning Data',
       description: 'Download all the patterns and feedback our AI has learned so far',
       category: 'analysis',
       urgency: 'low',
@@ -392,10 +392,10 @@ export default function AdvancedAdminDashboard() {
 
   const getImpactIcon = (impact: string) => {
     switch (impact) {
-      case 'high': return '🔥';
-      case 'medium': return '⚡';
-      case 'low': return '💡';
-      default: return '📊';
+      case 'high': return 'h';
+      case 'medium': return 'm';
+      case 'low': return 'l';
+      default: return 'd';
     }
   };
 
@@ -422,7 +422,7 @@ export default function AdvancedAdminDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            🎛️ Mission Control
+             Mission Control
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Where the magic happens - keep an eye on everything and make it even better!
@@ -431,13 +431,13 @@ export default function AdvancedAdminDashboard() {
         
         <div className="flex items-center space-x-4">
           <StatusBadge className="bg-green-100 text-green-800">
-            🚀 Everything&apos;s Running Smooth
+             Everything&apos;s Running Smooth
           </StatusBadge>
           <button
             onClick={loadDashboardData}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            🔄 Refresh
+             Refresh
           </button>
         </div>
       </div>
@@ -469,7 +469,7 @@ export default function AdvancedAdminDashboard() {
                 </div>
                 {status.issues && status.issues.length > 0 && (
                   <div className="text-xs text-yellow-600 mt-2">
-                    ⚠️ {status.issues[0]}
+                    Warning: {status.issues[0]}
                   </div>
                 )}
               </div>
@@ -484,31 +484,31 @@ export default function AdvancedAdminDashboard() {
             isActive={activeTab === 'overview'}
             onClick={() => setActiveTab('overview')}
           >
-            📊 The Big Picture
+             The Big Picture
           </TabsTrigger>
           <TabsTrigger 
             isActive={activeTab === 'classification'}
             onClick={() => setActiveTab('classification')}
           >
-            🎯 Smart Sorting
+             Smart Sorting
           </TabsTrigger>
           <TabsTrigger 
             isActive={activeTab === 'learning'}
             onClick={() => setActiveTab('learning')}
           >
-            🧠 Getting Smarter
+             Getting Smarter
           </TabsTrigger>
           <TabsTrigger 
             isActive={activeTab === 'analytics'}
             onClick={() => setActiveTab('analytics')}
           >
-            🔮 Future Insights
+             Future Insights
           </TabsTrigger>
           <TabsTrigger 
             isActive={activeTab === 'actions'}
             onClick={() => setActiveTab('actions')}
           >
-            ⚡ Power Tools
+             Power Tools
           </TabsTrigger>
         </TabsList>
 
@@ -518,7 +518,7 @@ export default function AdvancedAdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  🎯 Parts We&apos;ve Figured Out
+                   Parts We&apos;ve Figured Out
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -534,7 +534,7 @@ export default function AdvancedAdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  🧠 Things We&apos;ve Learned
+                   Things We&apos;ve Learned
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -550,7 +550,7 @@ export default function AdvancedAdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  🔍 Duplicates We Caught
+                   Duplicates Found
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -565,9 +565,6 @@ export default function AdvancedAdminDashboard() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
-                  💡 Market Insights
-                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -582,7 +579,7 @@ export default function AdvancedAdminDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>🎯 Smart Suggestions</CardTitle>
+              <CardTitle>Suggestions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -780,7 +777,7 @@ export default function AdvancedAdminDashboard() {
         <TabsContent value="actions" activeValue={activeTab} className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>⚡ Power User Tools</CardTitle>
+              <CardTitle>Power User Tools</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -809,7 +806,7 @@ export default function AdvancedAdminDashboard() {
                       onClick={() => executeAdminAction(action.id)}
                       className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                     >
-                      🚀 Do It!
+                       Do It!
                     </button>
                   </div>
                 ))}

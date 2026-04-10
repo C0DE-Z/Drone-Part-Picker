@@ -13,12 +13,12 @@ export default function AdminDiagnostic() {
       const data = await response.json();
       
       if (data.success) {
-        setResortTest(`✅ Resort API Working - Found ${Object.keys(data.data.categoryDistribution || {}).length} categories`);
+        setResortTest(` Resort API Working - Found ${Object.keys(data.data.categoryDistribution || {}).length} categories`);
       } else {
-        setResortTest(`❌ Resort API Error: ${data.error}`);
+        setResortTest(` Resort API Error: ${data.error}`);
       }
     } catch (error) {
-      setResortTest(`❌ Resort API Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setResortTest(` Resort API Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -29,12 +29,12 @@ export default function AdminDiagnostic() {
       const data = await response.json();
       
       if (data.success) {
-        setProductsTest(`✅ Products API Working - Found ${data.data.pagination.total} total products`);
+        setProductsTest(` Products API Working - Found ${data.data.pagination.total} total products`);
       } else {
-        setProductsTest(`❌ Products API Error: ${data.error}`);
+        setProductsTest(` Products API Error: ${data.error}`);
       }
     } catch (error) {
-      setProductsTest(`❌ Products API Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setProductsTest(` Products API Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -68,20 +68,20 @@ export default function AdminDiagnostic() {
         <div className="border rounded-lg p-4 bg-gray-50">
           <h3 className="font-semibold mb-2">Expected Admin Panel Features</h3>
           <ul className="text-sm space-y-1">
-            <li>✅ <strong>Resort Products Tab:</strong> Should allow reclassifying products using the hybrid system</li>
-            <li>✅ <strong>Manage Products Tab:</strong> Should allow viewing, searching, editing, and deleting products</li>
-            <li>✅ <strong>Search & Filter:</strong> Products can be searched by name/brand and filtered by category</li>
-            <li>✅ <strong>Edit Modal:</strong> Click edit on any product to open editing interface</li>
+            <li> <strong>Resort Products Tab:</strong> Should allow reclassifying products using the hybrid system</li>
+            <li> <strong>Manage Products Tab:</strong> Should allow viewing, searching, editing, and deleting products</li>
+            <li> <strong>Search & Filter:</strong> Products can be searched by name/brand and filtered by category</li>
+            <li> <strong>Edit Modal:</strong> Click edit on any product to open editing interface</li>
           </ul>
         </div>
 
         <div className="border rounded-lg p-4 bg-yellow-50">
           <h3 className="font-semibold mb-2">Troubleshooting Tips</h3>
           <ul className="text-sm space-y-1">
-            <li>🔍 <strong>Make sure you&apos;re logged in as an admin user</strong></li>
-            <li>🔍 <strong>Check browser console for any JavaScript errors</strong></li>
-            <li>🔍 <strong>Verify the &quot;Manage Products&quot; and &quot;Product Resort&quot; tabs are visible</strong></li>
-            <li>🔍 <strong>Try refreshing the page if components aren&apos;t loading</strong></li>
+            <li> <strong>Make sure you&apos;re logged in as an admin user</strong></li>
+            <li> <strong>Check browser console for any JavaScript errors</strong></li>
+            <li> <strong>Verify the &quot;Manage Products&quot; and &quot;Product Resort&quot; tabs are visible</strong></li>
+            <li> <strong>Try refreshing the page if components aren&apos;t loading</strong></li>
           </ul>
         </div>
       </div>

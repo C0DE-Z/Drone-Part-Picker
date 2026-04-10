@@ -455,7 +455,7 @@ export default function CustomParts() {
           </div>
         ) : parts.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-300 text-6xl mb-4">🔧</div>
+            <div className="text-gray-300 text-6xl mb-4"></div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               {searchTerm || selectedCategory !== 'All' ? 'No parts found' : 'No custom parts yet'}
             </h3>
@@ -576,7 +576,7 @@ export default function CustomParts() {
                             className="px-3 py-2 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-sm"
                             title="Report this part"
                           >
-                            ⚠️
+                            <AlertTriangle size={14} />
                           </button>
                         </div>
                       </div>
@@ -646,7 +646,7 @@ export default function CustomParts() {
                               className="px-2 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-sm"
                               title="Report this part"
                             >
-                              ⚠️
+                              <AlertTriangle size={14} />
                             </button>
                           </div>
                         </div>

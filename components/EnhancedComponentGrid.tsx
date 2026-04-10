@@ -92,19 +92,19 @@ export default function EnhancedComponentGrid({
 
   if (loading) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-        <div className="text-gray-600 text-sm">Loading components...</div>
-        <div className="text-gray-500 text-xs mt-1">Including real-world pricing and scraped products</div>
+        <div className="text-sm font-medium text-slate-700">Loading components...</div>
+        <div className="mt-1 text-xs text-slate-500">Including real-world pricing and scraped products</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center">
-        <div className="text-amber-600 text-sm mb-2">⚠️ {error}</div>
-        <div className="text-gray-500 text-xs">Showing default components only</div>
+      <div className="flex flex-col items-center justify-center p-8">
+        <div className="mb-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">{error}</div>
+        <div className="text-xs text-slate-500">Showing default components only</div>
         <ComponentGrid
           components={getFilteredComponents()}
           type={getComponentType(activeTab)}
@@ -121,9 +121,8 @@ export default function EnhancedComponentGrid({
     <div className="relative">
       {Object.keys(components).length > 0 && (
         <div className="mb-2 text-right">
-          <span className="text-xs text-gray-500 bg-green-50 px-2 py-1 rounded-full">
+          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
             {Object.keys(components).length} components available
-            <span className="ml-1 text-green-600">💰</span>
           </span>
         </div>
       )}

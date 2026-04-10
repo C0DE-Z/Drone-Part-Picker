@@ -14,101 +14,72 @@ interface ToastProps {
   };
 }
 
-export default function Toast({ 
-  message, 
-  type = 'info', 
-  duration = 5000, 
-  isVisible, 
+const stylesByType: Record<NonNullable<ToastProps['type']>, string> = {
+  success: 'border-emerald-300 bg-emerald-50/95 text-emerald-900',
+  info: 'border-blue-300 bg-blue-50/95 text-blue-900',
+  warning: 'border-amber-300 bg-amber-50/95 text-amber-900',
+  error: 'border-rose-300 bg-rose-50/95 text-rose-900'
+};
+
+export default function Toast({
+  message,
+  type = 'info',
+  duration = 5000,
+  isVisible,
   onClose,
-  action 
+  action
 }: ToastProps) {
   const [isShowing, setIsShowing] = useState(false);
 
   useEffect(() => {
-    if (isVisible) {
-      setIsShowing(true);
-      const timer = setTimeout(() => {
-        setIsShowing(false);
-        setTimeout(onClose, 300); // Wait for animation to complete
-      }, duration);
-
-      return () => clearTimeout(timer);
+    if (!isVisible) {
+      return;
     }
+
+    setIsShowing(true);
+    const timer = setTimeout(() => {
+      setIsShowing(false);
+      setTimeout(onClose, 200);
+    }, duration);
+
+    return () => clearTimeout(timer);
   }, [isVisible, duration, onClose]);
 
-  const getToastStyle = () => {
-    switch (type) {
-      case 'success':
-        return 'bg-gradient-to-br from-emerald-500/20 to-green-600/30 border-emerald-400/30 text-emerald-50';
-      case 'warning':
-        return 'bg-gradient-to-br from-amber-500/20 to-yellow-600/30 border-amber-400/30 text-amber-50';
-      case 'error':
-        return 'bg-gradient-to-br from-red-500/20 to-rose-600/30 border-red-400/30 text-red-50';
-      default:
-        return 'bg-gradient-to-br from-blue-500/20 to-indigo-600/30 border-blue-400/30 text-blue-50';
-    }
-  };
-
-
-  const getIcon = () => {
-    // Only show icon if message doesn't already start with a checkmark or icon
-    if (type === 'success' && message.trim().startsWith('✅')) return null;
-    switch (type) {
-      case 'success':
-        return '✅';
-      case 'warning':
-        return '⚠️';
-      case 'error':
-        return '❌';
-      default:
-        return 'ℹ️';
-    }
-  };
-
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return null;
+  }
 
   return (
-    <div className={`fixed top-4 right-4 z-50 transform transition-all duration-500 ease-out ${
-      isShowing ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-full opacity-0 scale-95'
-    }`}>
-      <div className={`${getToastStyle()} backdrop-blur-xl border rounded-2xl shadow-2xl p-5 min-w-[320px] max-w-[500px] 
-                      relative overflow-hidden before:absolute before:inset-0 before:bg-white/5 before:rounded-2xl 
-                      before:backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl
-                      ring-1 ring-white/10`}>
-        {/* Liquid glass shimmer effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent 
-                        transform -skew-x-12 translate-x-[-100%] animate-shimmer opacity-60"></div>
-        
-        <div className="relative z-10 flex items-start justify-between">
-          <div className="flex items-start space-x-3">
-            {getIcon() && (
-              <span className="text-xl flex-shrink-0 drop-shadow-lg animate-pulse">
-                {getIcon()}
-              </span>
-            )}
-            <div className="flex-1">
-              <p className="text-sm font-medium leading-relaxed drop-shadow-sm">{message}</p>
-              {action && (
-                <button
-                  onClick={action.onClick}
-                  className="mt-3 text-sm underline hover:no-underline opacity-90 hover:opacity-100 
-                           transition-all duration-200 hover:scale-105 font-medium"
-                >
-                  {action.label}
-                </button>
-              )}
-            </div>
+    <div
+      className={`fixed right-4 top-4 z-50 max-w-[520px] transform transition-all duration-300 ${
+        isShowing ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'
+      }`}
+      role="status"
+      aria-live="polite"
+    >
+      <div className={`rounded-xl border p-4 shadow-lg shadow-slate-900/10 backdrop-blur-sm ${stylesByType[type]}`}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium leading-relaxed">{message}</p>
+            {action ? (
+              <button
+                onClick={action.onClick}
+                className="mt-2 text-xs font-semibold underline decoration-1 underline-offset-2 hover:no-underline"
+              >
+                {action.label}
+              </button>
+            ) : null}
           </div>
+
           <button
             onClick={() => {
               setIsShowing(false);
-              setTimeout(onClose, 300);
+              setTimeout(onClose, 200);
             }}
-            className="text-current hover:bg-white/20 ml-3 flex-shrink-0 w-6 h-6 rounded-full 
-                     flex items-center justify-center transition-all duration-200 hover:scale-110 
-                     hover:rotate-90 backdrop-blur-sm"
+            className="rounded-lg border border-current/25 px-2 py-1 text-xs font-medium hover:bg-white/40"
+            aria-label="Close notification"
           >
-            ✕
+            Close
           </button>
         </div>
       </div>

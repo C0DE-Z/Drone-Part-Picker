@@ -29,11 +29,19 @@ export default async function RootLayout({
   
   return (
     <html lang="en" suppressHydrationWarning>
-  <head></head>
-  <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}>
-    <Analytics/>
+      <body
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-slate-900`}
+      >
+        <Analytics />
         <SessionProvider session={session}>
-          {children}
+          <div className="relative min-h-screen">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-blue-200/30 via-sky-100/20 to-transparent"
+            />
+            <div className="relative z-10">{children}</div>
+          </div>
         </SessionProvider>
       </body>
     </html>

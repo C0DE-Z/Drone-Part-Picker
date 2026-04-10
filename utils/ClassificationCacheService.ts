@@ -87,7 +87,7 @@ export class ClassificationCacheService {
     entry.hitCount++;
     this.stats.cacheHits++;
     
-    console.log(`🎯 Cache HIT for "${productName}" (${entry.confidence}% confidence, ${entry.hitCount} hits)`);
+    console.log(` Cache HIT for "${productName}" (${entry.confidence}% confidence, ${entry.hitCount} hits)`);
     return entry.result;
   }
 
@@ -103,7 +103,7 @@ export class ClassificationCacheService {
   ): void {
     // Only cache results with sufficient confidence
     if (confidence < this.MIN_CONFIDENCE_TO_CACHE) {
-      console.log(`⚠️ Not caching low confidence result (${confidence}%) for "${productName}"`);
+      console.log(`Not caching low confidence result (${confidence}%) for "${productName}"`);
       return;
     }
 
@@ -122,7 +122,7 @@ export class ClassificationCacheService {
     };
 
     this.cache.set(key, entry);
-    console.log(`💾 Cached classification for "${productName}" (${confidence}% confidence)`);
+    console.log(` Cached classification for "${productName}" (${confidence}% confidence)`);
   }
 
   /**
@@ -145,7 +145,7 @@ export class ClassificationCacheService {
 
     if (oldestKey) {
       this.cache.delete(oldestKey);
-      console.log(`🗑️ Evicted LRU cache entry (${lowestHitCount} hits)`);
+      console.log(`Evicted LRU cache entry (${lowestHitCount} hits)`);
     }
   }
 
@@ -166,7 +166,7 @@ export class ClassificationCacheService {
     }
 
     if (expiredCount > 0) {
-      console.log(`🧹 Cleared ${expiredCount} expired cache entries`);
+      console.log(` Cleared ${expiredCount} expired cache entries`);
     }
   }
 
@@ -211,14 +211,14 @@ export class ClassificationCacheService {
       cacheHits: 0,
       cacheMisses: 0
     };
-    console.log('🧽 Cache cleared');
+    console.log(' Cache cleared');
   }
 
   /**
    * Warm up cache with common products
    */
   public async warmUp(commonProducts: Array<{name: string, description?: string}>): Promise<void> {
-    console.log(`🔥 Warming up cache with ${commonProducts.length} common products`);
+    console.log(` Warming up cache with ${commonProducts.length} common products`);
     
     // Note: In a real implementation, you'd call the classification service here
     // For now, this is a placeholder for the warm-up logic
@@ -287,7 +287,7 @@ export class ClassificationCacheService {
     });
 
     if (invalidatedCount > 0) {
-      console.log(`🔄 Invalidated ${invalidatedCount} cache entries containing keywords: ${keywords.join(', ')}`);
+      console.log(` Invalidated ${invalidatedCount} cache entries containing keywords: ${keywords.join(', ')}`);
     }
 
     return invalidatedCount;

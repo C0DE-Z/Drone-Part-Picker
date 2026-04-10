@@ -45,34 +45,34 @@ export class ComponentClassificationService {
     const text = `${name} ${description || ''}`.toLowerCase().trim();
     const specs = specifications || {};
     
-    console.log(`🔍 Classifying: "${name}"`);
-    console.log(`📝 Full text: "${text}"`);
-    console.log(`📊 Specs: ${JSON.stringify(specs)}`);
+    console.log(` Classifying: "${name}"`);
+    console.log(` Full text: "${text}"`);
+    console.log(` Specs: ${JSON.stringify(specs)}`);
     
     // Step 1: Use definitive brand-based classification
     const brandResult = this.classifyByBrand(text);
     if (brandResult.confidence >= 90) {
-      console.log(`✅ High-confidence brand classification: ${brandResult.category}`);
+      console.log(` High-confidence brand classification: ${brandResult.category}`);
       return brandResult;
     }
     
     // Step 2: Use definitive keyword patterns
     const keywordResult = this.classifyByDefinitiveKeywords(text, specs);
     if (keywordResult.confidence >= 85) {
-      console.log(`✅ High-confidence keyword classification: ${keywordResult.category}`);
+      console.log(` High-confidence keyword classification: ${keywordResult.category}`);
       return keywordResult;
     }
     
     // Step 3: Use enhanced pattern matching
     const patternResult = this.classifyByPatterns(text);
     if (patternResult.confidence >= 80) {
-      console.log(`✅ Pattern-based classification: ${patternResult.category}`);
+      console.log(` Pattern-based classification: ${patternResult.category}`);
       return patternResult;
     }
     
     // Step 4: Use scoring-based fallback
     const scoringResult = this.classifyByScoring(text, specs);
-    console.log(`📊 Scoring-based classification: ${scoringResult.category} (${scoringResult.confidence}%)`);
+    console.log(` Scoring-based classification: ${scoringResult.category} (${scoringResult.confidence}%)`);
     
     return scoringResult;
   }

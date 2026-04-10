@@ -4,7 +4,7 @@ const badges = [
     name: 'Admin',
     description: 'Site Administrator',
     type: 'ADMIN',
-    icon: '👑',
+    icon: '',
     color: '#DC2626',
     rarity: 'legendary'
   },
@@ -20,7 +20,7 @@ const badges = [
     name: 'Verified',
     description: 'Verified Account',
     type: 'VERIFIED',
-    icon: '✅',
+    icon: '',
     color: '#059669',
     rarity: 'rare'
   },
@@ -28,7 +28,7 @@ const badges = [
     name: 'Early User',
     description: 'Beta Tester',
     type: 'EARLY_USER',
-    icon: '🚀',
+    icon: '',
     color: '#2563EB',
     rarity: 'rare'
   },
@@ -36,7 +36,7 @@ const badges = [
     name: 'Top Contributor',
     description: 'Highly Active Community Member',
     type: 'TOP_CONTRIBUTOR',
-    icon: '⭐',
+    icon: '',
     color: '#F59E0B',
     rarity: 'epic'
   },
@@ -44,7 +44,7 @@ const badges = [
     name: 'Drone Expert',
     description: 'Recognized Drone Building Expert',
     type: 'DRONE_EXPERT',
-    icon: '🔧',
+    icon: '',
     color: '#10B981',
     rarity: 'epic'
   }
@@ -64,9 +64,9 @@ async function seedBadges() {
       });
       
       if (response.ok) {
-        console.log(`✅ Created badge: ${badge.name}`);
+        console.log(` Created badge: ${badge.name}`);
       } else {
-        console.log(`❌ Failed to create badge: ${badge.name}`);
+        console.log(` Failed to create badge: ${badge.name}`);
       }
     } catch (error) {
       console.error(`Error creating badge ${badge.name}:`, error);

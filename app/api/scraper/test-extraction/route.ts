@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
             success: true,
             product
           });
-          console.log('✓ Successfully scraped:', product.name);
+          console.log('Successfully scraped:', product.name);
           console.log('  Specifications:', product.specifications);
         } else {
           results.push({
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error('✗ Failed to scrape URL:', url, errorMessage);
+        console.error('Failed to scrape URL:', url, errorMessage);
         results.push({
           url,
           success: false,

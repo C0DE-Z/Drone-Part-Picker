@@ -28,12 +28,12 @@ interface ClassificationGameModalProps {
 }
 
 const CATEGORIES = [
-  { id: 'motor', name: 'Motors', icon: '⚡', color: 'from-blue-500 to-blue-600' },
-  { id: 'stack', name: 'ESC/FC', icon: '🔗', color: 'from-green-500 to-green-600' },
-  { id: 'frame', name: 'Frames', icon: '🏗️', color: 'from-purple-500 to-purple-600' },
-  { id: 'prop', name: 'Props', icon: '🌀', color: 'from-yellow-500 to-yellow-600' },
-  { id: 'battery', name: 'Batteries', icon: '🔋', color: 'from-red-500 to-red-600' },
-  { id: 'camera', name: 'Cameras', icon: '📷', color: 'from-indigo-500 to-indigo-600' },
+  { id: 'motor', name: 'Motors', icon: '', color: 'from-blue-500 to-blue-600' },
+  { id: 'stack', name: 'ESC/FC', icon: '', color: 'from-green-500 to-green-600' },
+  { id: 'frame', name: 'Frames', icon: 'FR', color: 'from-purple-500 to-purple-600' },
+  { id: 'prop', name: 'Props', icon: '', color: 'from-yellow-500 to-yellow-600' },
+  { id: 'battery', name: 'Batteries', icon: '', color: 'from-red-500 to-red-600' },
+  { id: 'camera', name: 'Cameras', icon: '', color: 'from-indigo-500 to-indigo-600' },
 ];
 
 export default function ClassificationGameModal({ 
@@ -85,8 +85,6 @@ export default function ClassificationGameModal({
         return product;
       });
       
-      // Update products with AI suggestions (you'd need to pass this back to parent)
-      console.log('🚀 Enhanced AI Classifications generated:', updatedProducts);
     }
   }, [isOpen, products, enhancedClassifier, aiService]);
 
@@ -178,7 +176,7 @@ export default function ClassificationGameModal({
           // Results View
           <div className="p-8 text-center">
             <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Classification Results! 🎉
+              Classification Results! 
             </h2>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -228,7 +226,7 @@ export default function ClassificationGameModal({
                   onClick={onClose}
                   className="text-white/80 hover:text-white text-xl"
                 >
-                  ✕
+                  ×
                 </button>
               </div>
               <div className="mt-2 text-white/90">
@@ -244,8 +242,8 @@ export default function ClassificationGameModal({
 
             {/* Stats Bar */}
             <div className="bg-gray-50 px-6 py-3 flex gap-6 text-sm">
-              <div className="text-green-600">✓ {gameStats.correct} Correct</div>
-              <div className="text-red-600">✗ {gameStats.incorrect} Wrong</div>
+              <div className="text-green-600">Correct: {gameStats.correct}</div>
+              <div className="text-red-600">Wrong: {gameStats.incorrect}</div>
               <div className="text-yellow-600">⊘ {gameStats.skipped} Skipped</div>
             </div>
 
@@ -279,7 +277,7 @@ export default function ClassificationGameModal({
                   {currentProduct.aiSuggested && (
                     <div className="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-lg">🤖</span>
+                        <span className="text-lg"></span>
                         <span className="font-semibold">AI Suggests:</span>
                         <span className="text-lg font-bold text-blue-600">
                           {CATEGORIES.find(c => c.id === currentProduct.aiSuggested?.category)?.name || 'Unknown'}
@@ -298,7 +296,7 @@ export default function ClassificationGameModal({
                   {currentProduct.currentCategory && (
                     <div className="mt-4 p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">✅</span>
+                        <span className="text-lg"></span>
                         <span className="font-semibold">Correct Category:</span>
                         <span className="text-lg font-bold text-green-600">
                           {CATEGORIES.find(c => c.id === currentProduct.currentCategory)?.name || 'Unknown'}

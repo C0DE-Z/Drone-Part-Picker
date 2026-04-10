@@ -56,16 +56,16 @@ export async function GET() {
     }
 
     let overallStatus = 'healthy';
-    let statusMessage = '✅ All database features are available';
+    let statusMessage = ' All database features are available';
     let statusColor = 'text-green-600';
 
     if (badgeSystemStatus === 'missing' || userBadgeSystemStatus === 'missing' || partModelStatus === 'missing') {
       overallStatus = 'migration_needed';
-      statusMessage = '⚠️ Database migration needed - Some features unavailable';
+      statusMessage = 'Database migration needed - Some features unavailable';
       statusColor = 'text-red-600';
     } else if (badgeSystemStatus === 'empty' && userBadgeCount === 0) {
       overallStatus = 'setup_needed';
-      statusMessage = '⚠️ Database setup needed - Badge system not initialized';
+      statusMessage = 'Database setup needed - Badge system not initialized';
       statusColor = 'text-yellow-600';
     }
 

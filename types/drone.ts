@@ -150,23 +150,48 @@ export interface PerformanceEstimate {
   maxThrustGrams: number; // in grams for calculations
   estimatedTopSpeed: number;
   estimatedFlightTime: number;
-  powerConsumption: number;
+  powerConsumption: number; // watts
   hovering: {
     throttlePercentage: number;
     currentDraw: number;
     hoverTime: number;
+    hoverPowerWatts?: number;
   };
   motors: {
     kv: number;
     voltage: number;
+    fullVoltage?: number;
     estimatedRPM: number;
+    estimatedRPMNominal?: number;
+    estimatedRPMFull?: number;
     propSize: string;
   };
   battery: {
     voltage: number;
+    fullVoltage?: number;
     capacity: number;
     cells: number;
     dischargeRate: number;
+    usableCapacityAh?: number;
+  };
+  flightEstimates?: {
+    hover: number;
+    cruise: number;
+    aggressive: number;
+  };
+  validation?: {
+    isRealistic: boolean;
+    warnings: string[];
+    flags: {
+      thrustTooLow: boolean;
+      thrustTooHigh: boolean;
+      hoverThrottleTooHigh: boolean;
+      efficiencyOutOfRange: boolean;
+      topSpeedOutOfRange: boolean;
+      currentExceedsBatteryCapability: boolean;
+      flightTimeOutOfRange: boolean;
+      suspiciousThrustOutput: boolean;
+    };
   };
   totalPrice: number;
   priceBreakdown: {
@@ -218,7 +243,7 @@ export interface ScrapedProduct {
   description?: string;
   sku?: string;
   brand?: string;
-  category: 'motor' | 'frame' | 'stack' | 'camera' | 'prop' | 'battery';
+  category: string;
   specifications?: Record<string, string>;
   lastUpdated: Date;
 }

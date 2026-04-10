@@ -188,7 +188,7 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({ isOpen, onClose, 
               onClick={onClose}
               className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-all duration-150"
             >
-              ✕
+              ×
             </button>
           </div>
         </div>

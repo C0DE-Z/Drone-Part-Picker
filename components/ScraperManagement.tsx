@@ -507,7 +507,7 @@ export default function ScraperManagement({ theme }: ScraperManagementProps) {
       }`}>
         <h2 className={`text-xl font-semibold mb-4 ${
           theme === 'dark' ? 'text-white' : 'text-gray-900'
-        }`}>🗺️ Sitemap-based Scraping (Recommended)</h2>
+        }`}>Sitemap-based Scraping (Recommended)</h2>
         <p className={`mb-4 ${
           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
         }`}>
@@ -574,7 +574,7 @@ export default function ScraperManagement({ theme }: ScraperManagementProps) {
       }`}>
         <h2 className={`text-xl font-semibold mb-4 ${
           theme === 'dark' ? 'text-white' : 'text-gray-900'
-        }`}>🕷️ Web Crawler (For sites without sitemaps)</h2>
+        }`}>Web Crawler (for sites without sitemaps)</h2>
         <p className={`mb-4 ${
           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
         }`}>

@@ -122,7 +122,7 @@ export class WebScraperService {
     if (this.browser) {
       try {
         await this.browser.close();
-        console.log('✅ Browser closed successfully');
+        console.log(' Browser closed successfully');
       } catch (error) {
         console.error('⚠️ Error closing browser:', error);
       } finally {
@@ -140,15 +140,15 @@ export class WebScraperService {
     
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
-        console.log(`🔄 ${context} (attempt ${attempt}/${this.retryAttempts})`);
+        console.log(` ${context} (attempt ${attempt}/${this.retryAttempts})`);
         return await operation();
       } catch (error) {
         lastError = error as Error;
-        console.error(`❌ ${context} failed (attempt ${attempt}):`, error);
+        console.error(` ${context} failed (attempt ${attempt}):`, error);
         
         if (attempt < this.retryAttempts) {
           const delayMs = this.retryDelay * attempt; // Exponential backoff
-          console.log(`⏳ Waiting ${delayMs}ms before retry...`);
+          console.log(` Waiting ${delayMs}ms before retry...`);
           await this.delay(delayMs);
         }
       }

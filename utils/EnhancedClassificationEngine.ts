@@ -257,40 +257,40 @@ export class EnhancedClassificationEngine {
    */
   public classifyProduct(context: ProductContext): ClassificationResult {
     const startTime = Date.now();
-    console.log(`🚀 Enhanced Classification Engine v2.0`);
-    console.log(`📦 Classifying: "${context.name}"`);
+    console.log(` Enhanced Classification Engine v2.0`);
+    console.log(` Classifying: "${context.name}"`);
     
     // Step 1: Brand-based classification (99% confidence when matched)
     const brandResult = this.classifyByBrand(context);
     if (brandResult.confidence >= 95) {
-      console.log(`✅ Definitive brand classification: ${brandResult.category} (${brandResult.confidence}%)`);
+      console.log(` Definitive brand classification: ${brandResult.category} (${brandResult.confidence}%)`);
       return this.finalizeResult(brandResult, startTime);
     }
 
     // Step 2: Definitive pattern matching with exclusion checks
     const patternResult = this.classifyByDefinitivePatterns(context);
     if (patternResult.confidence >= 90) {
-      console.log(`✅ Definitive pattern classification: ${patternResult.category} (${patternResult.confidence}%)`);
+      console.log(` Definitive pattern classification: ${patternResult.category} (${patternResult.confidence}%)`);
       return this.finalizeResult(patternResult, startTime);
     }
 
     // Step 3: Context-aware keyword analysis
     const keywordResult = this.classifyByEnhancedKeywords(context);
     if (keywordResult.confidence >= 85) {
-      console.log(`✅ High-confidence keyword classification: ${keywordResult.category} (${keywordResult.confidence}%)`);
+      console.log(` High-confidence keyword classification: ${keywordResult.category} (${keywordResult.confidence}%)`);
       return this.finalizeResult(keywordResult, startTime);
     }
 
     // Step 4: Semantic analysis and specification extraction
     const semanticResult = this.classifyBySemanticAnalysis(context);
     if (semanticResult.confidence >= 80) {
-      console.log(`✅ Semantic classification: ${semanticResult.category} (${semanticResult.confidence}%)`);
+      console.log(` Semantic classification: ${semanticResult.category} (${semanticResult.confidence}%)`);
       return this.finalizeResult(semanticResult, startTime);
     }
 
     // Step 5: Fallback scoring with weighted combination
     const fallbackResult = this.classifyByWeightedScoring(context);
-    console.log(`⚠️ Fallback classification: ${fallbackResult.category} (${fallbackResult.confidence}%)`);
+    console.log(`Fallback classification: ${fallbackResult.category} (${fallbackResult.confidence}%)`);
     
     return this.finalizeResult(fallbackResult, startTime);
   }
@@ -652,16 +652,16 @@ export class EnhancedClassificationEngine {
 
   private finalizeResult(result: ClassificationResult, startTime: number): ClassificationResult {
     const processingTime = Date.now() - startTime;
-    console.log(`⚡ Classification completed in ${processingTime}ms`);
-    console.log(`📊 Result: ${result.category} (${result.confidence}% confidence via ${result.method})`);
-    console.log(`💭 Reasoning: ${result.reasoning.join(', ')}`);
+    console.log(` Classification completed in ${processingTime}ms`);
+    console.log(` Result: ${result.category} (${result.confidence}% confidence via ${result.method})`);
+    console.log(` Reasoning: ${result.reasoning.join(', ')}`);
     
     if (result.warnings.length > 0) {
-      console.log(`⚠️ Warnings: ${result.warnings.join(', ')}`);
+      console.log(`Warnings: ${result.warnings.join(', ')}`);
     }
     
     if (Object.keys(result.specifications).length > 0) {
-      console.log(`📋 Specifications: ${JSON.stringify(result.specifications)}`);
+      console.log(` Specifications: ${JSON.stringify(result.specifications)}`);
     }
 
     return result;
@@ -674,7 +674,7 @@ export class EnhancedClassificationEngine {
     const result = this.classifyProduct(context);
     const isCorrect = result.category === expectedCategory;
     
-    console.log(`🧪 Validation: ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'}`);
+    console.log(` Validation: ${isCorrect ? ' CORRECT' : ' INCORRECT'}`);
     console.log(`   Expected: ${expectedCategory}, Got: ${result.category} (${result.confidence}%)`);
     
     return isCorrect;

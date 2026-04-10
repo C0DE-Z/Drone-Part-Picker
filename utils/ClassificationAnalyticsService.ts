@@ -108,11 +108,11 @@ export class ClassificationAnalyticsService {
 
     // Log significant events
     if (event.confidence < 70) {
-      console.log(`⚠️ Low confidence classification: "${event.productName}" -> ${event.predictedCategory} (${event.confidence}%)`);
+      console.log(`Low confidence classification: "${event.productName}" -> ${event.predictedCategory} (${event.confidence}%)`);
     }
 
     if (event.isCorrect === false) {
-      console.log(`❌ Incorrect classification: "${event.productName}" predicted as ${event.predictedCategory}, actually ${event.actualCategory}`);
+      console.log(` Incorrect classification: "${event.productName}" predicted as ${event.predictedCategory}, actually ${event.actualCategory}`);
     }
   }
 
@@ -136,7 +136,7 @@ export class ClassificationAnalyticsService {
       this.events[eventIndex].isCorrect = feedback === 'correct' || 
         (feedback === 'improved' && predictedCategory === actualCategory);
       
-      console.log(`📝 User feedback recorded: "${productName}" ${feedback}`);
+      console.log(` User feedback recorded: "${productName}" ${feedback}`);
     } else {
       // Create a new feedback event
       this.logClassification({
@@ -162,7 +162,7 @@ export class ClassificationAnalyticsService {
     const cutoffTime = Date.now() - (timeRangeHours * 60 * 60 * 1000);
     const relevantEvents = this.events.filter(event => event.timestamp >= cutoffTime);
 
-    console.log(`📊 Generating analytics report for ${relevantEvents.length} events in last ${timeRangeHours}h`);
+    console.log(` Generating analytics report for ${relevantEvents.length} events in last ${timeRangeHours}h`);
 
     const accuracy = this.calculateAccuracyMetrics(relevantEvents);
     const performance = this.calculatePerformanceMetrics(relevantEvents);
@@ -387,42 +387,42 @@ export class ClassificationAnalyticsService {
 
     // Accuracy insights
     if (accuracy.accuracyPercentage >= 95) {
-      insights.push(`🎯 Exceptional accuracy achieved: ${accuracy.accuracyPercentage}%`);
+      insights.push(` Exceptional accuracy achieved: ${accuracy.accuracyPercentage}%`);
     } else if (accuracy.accuracyPercentage >= 90) {
-      insights.push(`✅ Good accuracy: ${accuracy.accuracyPercentage}%`);
+      insights.push(` Good accuracy: ${accuracy.accuracyPercentage}%`);
     } else {
-      insights.push(`⚠️ Accuracy needs improvement: ${accuracy.accuracyPercentage}%`);
+      insights.push(`Accuracy needs improvement: ${accuracy.accuracyPercentage}%`);
     }
 
     // Performance insights
     if (performance.cacheHitRate >= 60) {
-      insights.push(`⚡ Excellent cache performance: ${performance.cacheHitRate}% hit rate`);
+      insights.push(` Excellent cache performance: ${performance.cacheHitRate}% hit rate`);
     } else if (performance.cacheHitRate >= 30) {
-      insights.push(`📊 Moderate cache utilization: ${performance.cacheHitRate}% hit rate`);
+      insights.push(` Moderate cache utilization: ${performance.cacheHitRate}% hit rate`);
     } else {
-      insights.push(`💾 Low cache utilization: ${performance.cacheHitRate}% hit rate`);
+      insights.push(` Low cache utilization: ${performance.cacheHitRate}% hit rate`);
     }
 
     // Processing time insights
     if (performance.averageProcessingTime < 100) {
-      insights.push(`🚀 Fast processing: ${performance.averageProcessingTime}ms average`);
+      insights.push(` Fast processing: ${performance.averageProcessingTime}ms average`);
     } else if (performance.averageProcessingTime < 500) {
-      insights.push(`⏱️ Moderate processing speed: ${performance.averageProcessingTime}ms average`);
+      insights.push(`Moderate processing speed: ${performance.averageProcessingTime}ms average`);
     } else {
-      insights.push(`🐌 Slow processing detected: ${performance.averageProcessingTime}ms average`);
+      insights.push(` Slow processing detected: ${performance.averageProcessingTime}ms average`);
     }
 
     // Usage pattern insights
     const topCategory = Object.entries(usage.categoriesDistribution)
       .sort(([,a], [,b]) => b - a)[0];
     if (topCategory) {
-      insights.push(`📈 Most classified category: ${topCategory[0]} (${topCategory[1]} classifications)`);
+      insights.push(` Most classified category: ${topCategory[0]} (${topCategory[1]} classifications)`);
     }
 
     // Error pattern insights
     if (usage.commonErrors.length > 0) {
       const topError = usage.commonErrors[0];
-      insights.push(`❗ Most common error: ${topError.predicted} → ${topError.actual} (${topError.count} occurrences)`);
+      insights.push(` Most common error: ${topError.predicted} → ${topError.actual} (${topError.count} occurrences)`);
     }
 
     return insights;
@@ -496,7 +496,7 @@ export class ClassificationAnalyticsService {
       this.events = this.events.filter(event => event.timestamp >= cutoffTime);
       
       if (this.events.length < initialLength) {
-        console.log(`🧹 Cleaned up ${initialLength - this.events.length} old analytics events`);
+        console.log(` Cleaned up ${initialLength - this.events.length} old analytics events`);
       }
     }, 60 * 60 * 1000);
   }
@@ -527,7 +527,7 @@ export class ClassificationAnalyticsService {
 
   public importData(events: ClassificationEvent[]): void {
     this.events = [...events];
-    console.log(`📊 Imported ${events.length} analytics events`);
+    console.log(` Imported ${events.length} analytics events`);
   }
 
   public clearData(): void {
@@ -538,6 +538,6 @@ export class ClassificationAnalyticsService {
       cacheHits: 0,
       errors: 0
     };
-    console.log('🧽 Analytics data cleared');
+    console.log(' Analytics data cleared');
   }
 }

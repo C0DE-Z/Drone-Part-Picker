@@ -33,33 +33,45 @@ function AuthControls() {
     }
   }, [session]);
 
-  if (status === 'loading') return <div>Loading...</div>;
+  if (status === 'loading') {
+    return (
+      <div className="rounded-lg border border-slate-200/80 bg-white/90 px-3 py-1.5 text-sm text-slate-500 shadow-sm">
+        Loading account...
+      </div>
+    );
+  }
 
   if (session) {
     return (
-      <div className="flex items-center gap-4">
-  <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Link
+          href="/dashboard"
+          className="rounded-lg border border-slate-300/70 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
+        >
           My Builds
         </Link>
         {userProfile?.username && (
           <>
-            <Link href={`/profile/${userProfile.username}`} className="text-gray-700 hover:text-gray-900">
+            <Link
+              href={`/profile/${userProfile.username}`}
+              className="hidden rounded-lg border border-slate-300/70 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-700 md:inline-flex"
+            >
               Profile
             </Link>
-            <span className="text-gray-700">Hi, {userProfile.username}</span>
+            <span className="hidden max-w-[160px] truncate text-sm text-slate-600 lg:block">Hi, {userProfile.username}</span>
           </>
         )}
         {isAdmin && (
           <Link 
             href="/admin" 
-            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 font-medium"
+            className="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-rose-700"
           >
             Admin
           </Link>
         )}
         <button
           onClick={() => signOut()}
-          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+          className="rounded-lg border border-slate-300/80 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-100"
         >
           Sign Out
         </button>
@@ -69,10 +81,16 @@ function AuthControls() {
 
   return (
     <div className="flex gap-2">
-  <Link href="/auth/signin" className="px-4 py-2 text-gray-700 hover:text-gray-900">
+      <Link
+        href="/auth/signin"
+        className="rounded-lg border border-slate-300/80 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
+      >
         Sign In
       </Link>
-  <Link href="/auth/signup" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+      <Link
+        href="/auth/signup"
+        className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white shadow-md shadow-blue-600/25 hover:bg-blue-700"
+      >
         Sign Up
       </Link>
     </div>
@@ -284,39 +302,42 @@ export default function Home() {
     }
   };
 
-  const tabs: { key: keyof DroneComponents; label: string; icon: string }[] = [
-    { key: 'Motors', label: 'Motors', icon: '⚡' },
-    { key: 'Frames', label: 'Frames', icon: '🔧' },
-    { key: 'Stacks', label: 'Flight Controllers', icon: '💻' },
-    { key: 'Camera', label: 'Cameras', icon: '📹' },
-    { key: 'Props', label: 'Propellers', icon: '🌀' },
-    { key: 'Batteries', label: 'Batteries', icon: '🔋' },
-    { key: 'Simple Weight', label: 'Simple Weight', icon: '⚖️' }
+  const tabs: { key: keyof DroneComponents; label: string; short: string }[] = [
+    { key: 'Motors', label: 'Motors', short: 'Motors' },
+    { key: 'Frames', label: 'Frames', short: 'Frames' },
+    { key: 'Stacks', label: 'Flight Controllers', short: 'Stacks' },
+    { key: 'Camera', label: 'Cameras', short: 'Camera' },
+    { key: 'Props', label: 'Propellers', short: 'Props' },
+    { key: 'Batteries', label: 'Batteries', short: 'Battery' },
+    { key: 'Simple Weight', label: 'Simple Weight', short: 'Weight' }
   ];
 
   const checkComponentCompatibility = () => true;
 
   return (
-  <div className="min-h-screen bg-gray-50 transition-colors">
+    <div className="min-h-screen">
       {/* Header */}
-  <header className="bg-white border-b border-gray-200 shadow-sm transition-all duration-300 hover:shadow-md">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 shadow-sm backdrop-blur-xl">
+        <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-gray-700 transition-all duration-300 transform hover:scale-105">
+              <Link
+                href="/"
+                className="text-xl font-semibold tracking-tight text-slate-900 transition-colors hover:text-blue-700 sm:text-2xl"
+              >
                 DronePartPicker
               </Link>
               {isLoadingBuild && (
-                <div className="flex items-center space-x-2 text-blue-600">
+                <div className="flex items-center space-x-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-blue-700">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span className="text-sm font-medium">Loading build...</span>
+                  <span className="text-xs font-semibold sm:text-sm">Loading build...</span>
                 </div>
               )}
-              <nav className="hidden md:flex space-x-6">
-                <Link href="/builds/public" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
+              <nav className="hidden md:flex items-center space-x-2">
+                <Link href="/builds/public" className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-blue-700">
                   Builds
                 </Link>
-                <Link href="/parts/custom" className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 hover:scale-105">
+                <Link href="/parts/custom" className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-blue-700">
                   Custom Parts
                 </Link>
               </nav>
@@ -326,9 +347,10 @@ export default function Home() {
               <div className="md:hidden">
                 <button
                   onClick={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
-                  className="text-gray-700 hover:text-gray-900 p-2 transition-all duration-200 hover:scale-110"
+                  className="rounded-lg border border-slate-300/80 bg-white px-3 py-1.5 text-sm text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
+                  aria-label="Toggle advanced settings"
                 >
-                  ⚙️
+                  Settings
                 </button>
               </div>
               <AuthControls />
@@ -338,24 +360,24 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 gap-6">
           {/* Component Selection */}
           <div className="xl:col-span-2 lg:col-span-2">
-            <div className="bg-white rounded-lg shadow border border-gray-200 transition-all duration-300 hover:shadow-lg">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-xl font-bold text-gray-900">🎯 Pick Your Parts</h3>
-                <p className="text-sm text-gray-600 mt-1">Build your dream drone piece by piece!</p>
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-lg shadow-slate-900/5 backdrop-blur-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-slate-900/10">
+              <div className="border-b border-slate-200 bg-white/80 p-5">
+                <h3 className="text-xl font-semibold tracking-tight text-slate-900">Select Components</h3>
+                <p className="mt-1 text-sm text-slate-600">Configure your build with validated part data.</p>
               </div>
 
               {/* Component Tabs */}
-              <div className="border-b border-gray-200 bg-gray-50 relative">
+              <div className="relative border-b border-slate-200 bg-slate-50/80">
                 {/* Scroll indicators with arrows */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none flex items-center">
-                  <div className="text-gray-600 text-xs ml-1">‹</div>
+                <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 flex w-8 items-center bg-gradient-to-r from-slate-100 via-slate-100/80 to-transparent">
+                  <div className="ml-1 text-xs text-slate-400">‹</div>
                 </div>
-                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none flex items-center justify-end">
-                  <div className="text-gray-600 text-xs mr-1">›</div>
+                <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 flex w-8 items-center justify-end bg-gradient-to-l from-slate-100 via-slate-100/80 to-transparent">
+                  <div className="mr-1 text-xs text-slate-400">›</div>
                 </div>
                 
                 <nav className="flex overflow-x-auto px-2 pt-2 pb-3 scroll-smooth custom-scrollbar" style={{ scrollBehavior: 'smooth' }}>
@@ -363,35 +385,34 @@ export default function Home() {
                     <button
                       key={String(tab.key)}
                       onClick={() => setActiveTab(tab.key)}
-      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 mx-1 rounded-lg transition-all duration-300 ease-in-out whitespace-nowrap text-sm sm:text-base transform hover:scale-105 ${
+                      className={`mx-1 flex items-center gap-1 whitespace-nowrap rounded-xl border px-3 py-2.5 text-sm font-medium transition-all duration-200 sm:gap-2 sm:px-4 sm:text-[15px] ${
             activeTab === tab.key
-        ? 'bg-blue-600 text-white shadow-lg scale-105'
-              : 'text-gray-700 hover:text-gray-900 hover:bg-white hover:shadow-md'
+                          ? 'scale-[1.02] border-blue-300 bg-blue-600 text-white shadow-md shadow-blue-600/25'
+                          : 'border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-white hover:text-slate-900 hover:shadow-sm'
             }`}
                       style={{ 
                         minWidth: 'fit-content',
                       }}
                     >
-                      <span className="text-sm sm:text-base transition-transform duration-200">{tab.icon}</span>
                       <span className="hidden sm:inline font-medium">{tab.label}</span>
-                      <span className="sm:hidden text-xs font-medium">{tab.label.split(' ')[0]}</span>
+                      <span className="sm:hidden text-xs font-medium">{tab.short}</span>
                     </button>
                   ))}
                 </nav>
               </div>
 
               {/* Search */}
-              <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:gap-4">
                 <input
                   type="text"
                   placeholder={`Search ${tabs.find(t => t.key === activeTab)?.label.toLowerCase()}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg text-sm sm:text-base transition-all duration-300 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-white"
+                  className="flex-1 rounded-xl border border-slate-300/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 sm:text-base"
                 />
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg whitespace-nowrap text-sm sm:text-base transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
+                  className="whitespace-nowrap rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 sm:text-base"
                 >
                   <span className="sm:hidden">+ Add</span>
                   <span className="hidden sm:inline">+ Add Custom</span>
@@ -414,7 +435,7 @@ export default function Home() {
 
           {/* Sidebar */}
           <div className="xl:col-span-1 lg:col-span-1">
-            <div className="transition-all duration-500 ease-out transform hover:scale-102">
+            <div className="transition-all duration-300 ease-out hover:translate-y-[-1px]">
               <BuildSummary
                 selectedComponents={selectedComponents}
                 onClearBuild={handleClearBuild}
@@ -435,16 +456,16 @@ export default function Home() {
       <div className="fixed bottom-6 right-6 z-50 animate-in">
             <div 
               onClick={scrollToPerformance}
-        className="group bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-full p-3 sm:p-4 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 flex items-center gap-2 sm:gap-3 hover:bg-white"
+        className="group flex cursor-pointer items-center gap-2 rounded-full border border-slate-200/90 bg-white/95 p-3 shadow-lg shadow-slate-900/10 backdrop-blur-md transition-all duration-300 hover:scale-[1.03] hover:shadow-xl sm:gap-3 sm:p-4"
               style={{ 
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2)' 
               }}
             >
-        <div className="text-gray-700 text-xs sm:text-sm font-medium hidden sm:block group-hover:text-green-600 transition-colors duration-200">
+        <div className="hidden text-xs font-semibold text-slate-700 transition-colors duration-200 group-hover:text-emerald-700 sm:block sm:text-sm">
                 Check Performance
               </div>
-        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-all duration-200 group-hover:shadow-sm">
-                <div className="text-green-600 text-base sm:text-lg animate-bounce-arrow">📊</div>
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 transition-all duration-200 group-hover:bg-emerald-200 group-hover:shadow-sm sm:h-8 sm:w-8">
+                <div className="text-xs font-semibold text-emerald-700 sm:text-sm">View</div>
               </div>
             </div>
           </div>
@@ -453,7 +474,7 @@ export default function Home() {
         {/* Performance Panel */}
         {performance && (
           <div className="mt-6 transition-all duration-700 ease-out animate-in" data-section="performance">
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 transition-all duration-500">🚀 How Will It Fly?</h2>
+            <h2 className="mb-4 text-2xl font-semibold tracking-tight text-slate-900 transition-all duration-500">Performance Analysis</h2>
             <div className="transition-all duration-700 ease-out transform">
               <PerformancePanel performance={performance} />
             </div>
@@ -481,12 +502,12 @@ export default function Home() {
         />
 
         <Toast
-          message="🎉 Your drone build is complete! Ready to see how awesome it&apos;ll be?"
+          message="Build configuration complete. Open the performance analysis section."
           type="success"
           isVisible={showBuildCompleteToast}
           onClose={() => setShowBuildCompleteToast(false)}
           action={{
-            label: "Show Me! →",
+            label: "Open analysis",
             onClick: () => {
               scrollToPerformance();
               setShowBuildCompleteToast(false);
@@ -495,7 +516,7 @@ export default function Home() {
         />
 
         <Toast
-          message="✅ Build loaded - let&apos;s check it out!"
+          message="Build loaded successfully."
           type="success"
           isVisible={showLoadSuccessToast}
           onClose={() => setShowLoadSuccessToast(false)}

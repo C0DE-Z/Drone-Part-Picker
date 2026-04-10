@@ -177,7 +177,7 @@ export default function AdvancedUserProfile({ userId, onProfileUpdate }: Advance
             id: 'first-build',
             name: 'First Build',
             description: 'Completed your first drone build',
-            icon: '🏆',
+            icon: '',
             unlockedAt: new Date('2023-06-20'),
             rarity: 'common'
           },
@@ -185,7 +185,7 @@ export default function AdvancedUserProfile({ userId, onProfileUpdate }: Advance
             id: 'speed-demon',
             name: 'Speed Demon',
             description: 'Built a drone with 100+ mph top speed',
-            icon: '⚡',
+            icon: '',
             unlockedAt: new Date('2023-08-15'),
             rarity: 'rare'
           }

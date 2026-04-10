@@ -254,7 +254,7 @@ export default function MobileOptimizedWrapper({
                 onClick={() => setShowMobileMenu(false)}
               >
                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  🔧
+                  
                 </div>
                 <div>
                   <div className="font-medium">Build Creator</div>
@@ -268,7 +268,7 @@ export default function MobileOptimizedWrapper({
                 onClick={() => setShowMobileMenu(false)}
               >
                 <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  🌍
+                  
                 </div>
                 <div>
                   <div className="font-medium">Public Builds</div>
@@ -282,7 +282,7 @@ export default function MobileOptimizedWrapper({
                 onClick={() => setShowMobileMenu(false)}
               >
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  📊
+                  
                 </div>
                 <div>
                   <div className="font-medium">My Dashboard</div>
@@ -296,7 +296,7 @@ export default function MobileOptimizedWrapper({
                 onClick={() => setShowMobileMenu(false)}
               >
                 <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                  🎯
+                  
                 </div>
                 <div>
                   <div className="font-medium">Custom Parts</div>

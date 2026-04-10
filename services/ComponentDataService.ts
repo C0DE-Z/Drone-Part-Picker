@@ -117,8 +117,8 @@ export class ComponentDataService {
       );
       
       const enhancedResult = classificationResult.enhanced;
-      console.log(`🚀 Enhanced classification for "${productName}": ${enhancedResult.category} (${enhancedResult.confidence}%)`);
-      console.log(`🎯 Reasoning: ${enhancedResult.reasoning}`);
+      console.log(` Enhanced classification for "${productName}": ${enhancedResult.category} (${enhancedResult.confidence}%)`);
+      console.log(` Reasoning: ${enhancedResult.reasoning}`);
       
       // Enhanced classifier has much higher accuracy, use lower confidence threshold
       if (enhancedResult.confidence >= 60) {
@@ -133,7 +133,7 @@ export class ComponentDataService {
         
         const mappedType = mapping[enhancedResult.category];
         if (mappedType) {
-          console.log(`✅ Using enhanced classification: ${mappedType}`);
+          console.log(` Using enhanced classification: ${mappedType}`);
           return mappedType;
         }
       }
@@ -146,7 +146,7 @@ export class ComponentDataService {
         specs
       );
       
-      console.log(`📊 Legacy classification backup: ${legacyResult.category} (${legacyResult.confidence}%)`);
+      console.log(` Legacy classification backup: ${legacyResult.category} (${legacyResult.confidence}%)`);
       
       if (legacyResult.confidence >= 75) {
         const mapping: Record<string, keyof DroneComponents> = {
@@ -211,7 +211,7 @@ export class ComponentDataService {
         
         // Auto-reclassify if confidence is very high (enhanced engine is much more accurate)
         if (enhancedResult.confidence >= 85) {
-          console.log(`🔄 Auto-reclassifying "${product.name}" from ${type} to ${correctType} (high confidence)`);
+          console.log(` Auto-reclassifying "${product.name}" from ${type} to ${correctType} (high confidence)`);
           return this.convertScrapedToComponent(product, correctType);
         }
       }

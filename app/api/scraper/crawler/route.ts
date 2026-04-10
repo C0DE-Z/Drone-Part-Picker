@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
               }
             });
 
-            console.log(`🔍 Deduplication check for "${product.name}" (${product.category}):`, {
+            console.log(` Deduplication check for "${product.name}" (${product.category}):`, {
               sku: product.sku,
               foundExisting: !!existingProduct,
               existingId: existingProduct?.id,
@@ -88,14 +88,14 @@ export async function POST(request: NextRequest) {
             });
 
             if (existingProduct) {
-              console.log(`📦 Updating existing product: "${product.name}" (ID: ${existingProduct.id})`);
+              console.log(` Updating existing product: "${product.name}" (ID: ${existingProduct.id})`);
               
               // Merge specifications - preserve existing specs and add new ones
               const existingSpecs = (existingProduct.specifications as Record<string, unknown>) || {};
               const newSpecs = product.specifications || {};
               const mergedSpecs = { ...existingSpecs, ...newSpecs };
               
-              console.log(`📊 Merging specs for "${product.name}":`, {
+              console.log(` Merging specs for "${product.name}":`, {
                 existing: existingSpecs,
                 new: newSpecs,
                 merged: mergedSpecs
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
 
               updatedCount++;
             } else {
-              console.log(`✨ Creating new product: "${product.name}" (${product.category}) with specs:`, product.specifications);
+              console.log(` Creating new product: "${product.name}" (${product.category}) with specs:`, product.specifications);
               
               // Create new product with specifications
               const newProduct = await prisma.product.create({

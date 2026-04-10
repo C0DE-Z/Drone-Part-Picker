@@ -3,10 +3,8 @@
 
 const badWords = [
   // Basic profanity
-  'fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap',
-  'piss', 'dick', 'cock', 'pussy', 'whore', 'slut', 'faggot', 'nigger',
-  'retard', 'gay', 'homo', 'lesbian', 'tranny', 'trannie',
-  
+ 'dick', 'cock', 'pussy', 'whore', 'slut', 'faggot', 'nigger',
+  'retard', 'gay', 'homo', 'lesbian', 'tranny', 'trannie', 'nigglet',
   // Stronger profanity
   'motherfucker', 'asshole', 'dickhead', 'bullshit', 'horseshit',
   'clusterfuck', 'fuckface', 'shithead', 'dumbass', 'jackass',
@@ -22,12 +20,8 @@ const badWords = [
   // Hate speech
   'kkk', 'white power', 'heil', 'jihad', 'infidel',
   
-  // Common variations and leetspeak
-  'f*ck', 'sh*t', 'a$$', 'b*tch', 'h3ll', 'a55', 'fuk', 'sht',
-  'btch', 'azz', 'phuck', 'sheeet', 'dayum', 'fokk',
   
   // Scam/spam related
-  'scam', 'fraud', 'fake', 'counterfeit', 'stolen', 'hacked',
   'free money', 'get rich quick', 'work from home', 'make money fast',
   
   // Inappropriate references
@@ -37,12 +31,6 @@ const badWords = [
 
 // Additional patterns to catch variations
 const suspiciousPatterns = [
-  /f+u+c+k+/gi,
-  /s+h+i+t+/gi,
-  /b+i+t+c+h+/gi,
-  /a+s+s+h+o+l+e+/gi,
-  /d+a+m+n+/gi,
-  /h+e+l+l+/gi,
   /[f][*@#$%^&!][uc][k]/gi,
   /[s][*@#$%^&!][h][*@#$%^&!][t]/gi,
   /[a][*@#$%^&!][s][s]/gi,

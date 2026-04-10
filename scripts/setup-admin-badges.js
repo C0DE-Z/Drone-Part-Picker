@@ -12,7 +12,7 @@ async function setupAdminBadges() {
         name: 'Admin',
         description: 'Site Administrator',
         type: 'ADMIN',
-        icon: '👑',
+        icon: '',
         color: '#DC2626',
         rarity: 'legendary'
       },
@@ -28,7 +28,7 @@ async function setupAdminBadges() {
         name: 'Verified',
         description: 'Verified Account',
         type: 'VERIFIED',
-        icon: '✅',
+        icon: '',
         color: '#059669',
         rarity: 'rare'
       },
@@ -36,7 +36,7 @@ async function setupAdminBadges() {
         name: 'Early User',
         description: 'One of the first users',
         type: 'EARLY_USER',
-        icon: '🌟',
+        icon: '',
         color: '#F59E0B',
         rarity: 'epic'
       },
@@ -44,7 +44,7 @@ async function setupAdminBadges() {
         name: 'Top Contributor',
         description: 'Outstanding community contributor',
         type: 'TOP_CONTRIBUTOR',
-        icon: '🏆',
+        icon: '',
         color: '#8B5CF6',
         rarity: 'legendary'
       },
@@ -52,7 +52,7 @@ async function setupAdminBadges() {
         name: 'Drone Expert',
         description: 'Recognized drone building expert',
         type: 'DRONE_EXPERT',
-        icon: '🚁',
+        icon: '',
         color: '#10B981',
         rarity: 'epic'
       }
@@ -181,7 +181,7 @@ async function setupAdminBadges() {
       }
     }
 
-    console.log('✅ Admin badges setup complete!');
+    console.log(' Admin badges setup complete!');
   } catch (error) {
     console.error('Error setting up admin badges:', error);
   } finally {

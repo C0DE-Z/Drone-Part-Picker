@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Toast from '@/components/Toast';
+import { ArrowLeft, Link2, Loader2, Save, UserCircle2 } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -50,6 +51,10 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
     twitter: '',
     username: ''
   });
+
+  const sectionClass = 'rounded-2xl border border-slate-200/90 bg-white/90 p-6 shadow-lg shadow-slate-900/5 backdrop-blur-sm';
+  const labelClass = 'mb-2 block text-sm font-medium text-slate-700';
+  const inputClass = 'w-full rounded-xl border border-slate-300/90 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100';
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -129,10 +134,10 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="rounded-2xl border border-slate-200 bg-white/90 p-8 text-center shadow-lg shadow-slate-900/5 backdrop-blur-sm">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <p className="mt-4 text-sm font-medium text-slate-600">Loading profile editor...</p>
         </div>
       </div>
     );
@@ -140,13 +145,13 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
 
   if (!session || !user?.isOwnProfile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-6">You can only edit your own profile.</p>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white/90 p-8 text-center shadow-lg shadow-slate-900/5 backdrop-blur-sm">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Access Denied</h1>
+          <p className="mt-2 text-slate-600">You can only edit your own profile.</p>
           <button
             onClick={() => router.back()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="mt-6 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/25 hover:bg-blue-700"
           >
             Go Back
           </button>
@@ -156,19 +161,20 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
+    <div className="min-h-screen py-8 sm:py-10">
+      <div className="mx-auto w-full max-w-3xl px-4">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <div className={`${sectionClass} mb-8`}>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Edit Profile</h1>
-              <p className="text-gray-600 mt-2">Update your public profile information</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Edit Profile</h1>
+              <p className="mt-2 text-sm text-slate-600 sm:text-base">Update your public profile information</p>
             </div>
             <button
               onClick={() => router.push(`/profile/${username}`)}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
             >
+              <ArrowLeft className="h-4 w-4" />
               Cancel
             </button>
           </div>
@@ -176,103 +182,103 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
 
         {/* Edit Form */}
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-              <span>👤</span>
+          <div className={sectionClass}>
+            <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold text-slate-900">
+              <UserCircle2 className="h-5 w-5 text-blue-600" />
               Basic Information
             </h2>
             
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClass}>
                   Username
                 </label>
                 <input
                   type="text"
                   value={formData.username}
                   onChange={(e) => handleInputChange('username', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className={inputClass}
                   placeholder="Enter your username"
                 />
-                <p className="text-xs text-gray-500 mt-1">Your username will be used in your profile URL</p>
+                <p className="mt-1 text-xs text-slate-500">Your username will be used in your profile URL.</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClass}>
                   Location
                 </label>
                 <input
                   type="text"
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className={inputClass}
                   placeholder="Where are you based?"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClass}>
                   Bio
                 </label>
                 <textarea
                   value={formData.bio}
                   onChange={(e) => handleInputChange('bio', e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                  placeholder="Tell us about yourself and your drone building experience..."
+                  className={`${inputClass} resize-none`}
+                  placeholder="Tell others about your flying style, build goals, and experience."
                 />
-                <p className="text-xs text-gray-500 mt-1">This will be displayed on your public profile</p>
+                <p className="mt-1 text-xs text-slate-500">This appears on your public profile.</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-              <span>🔗</span>
+          <div className={sectionClass}>
+            <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold text-slate-900">
+              <Link2 className="h-5 w-5 text-blue-600" />
               Social Links
             </h2>
             
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClass}>
                   Website
                 </label>
                 <input
                   type="url"
                   value={formData.website}
                   onChange={(e) => handleInputChange('website', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className={inputClass}
                   placeholder="https://yourwebsite.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClass}>
                   GitHub Username
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">github.com/</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">github.com/</span>
                   <input
                     type="text"
                     value={formData.github}
                     onChange={(e) => handleInputChange('github', e.target.value)}
-                    className="w-full pl-24 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className={`${inputClass} pl-24`}
                     placeholder="username"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={labelClass}>
                   Twitter Username
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">twitter.com/</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">twitter.com/</span>
                   <input
                     type="text"
                     value={formData.twitter}
                     onChange={(e) => handleInputChange('twitter', e.target.value)}
-                    className="w-full pl-24 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className={`${inputClass} pl-24`}
                     placeholder="username"
                   />
                 </div>
@@ -285,29 +291,32 @@ export default function ProfileEditPage({ params }: ProfileEditPageProps) {
             <button
               type="button"
               onClick={() => router.push(`/profile/${username}`)}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Saving...
                 </>
               ) : (
-                'Save Changes'
+                <>
+                  <Save className="h-4 w-4" />
+                  Save Changes
+                </>
               )}
             </button>
           </div>
         </form>
 
         <Toast
-          message="✅ Profile updated successfully!"
+          message="Profile updated successfully."
           type="success"
           isVisible={showSuccessToast}
           onClose={() => setShowSuccessToast(false)}

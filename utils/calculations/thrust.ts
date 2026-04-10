@@ -1,167 +1,54 @@
 import { SelectedComponents } from '@/types/drone';
-import { WeightCalculator } from './weight';
+import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
+import { computeSIPhysics, roundTo, validateSIPhysics } from './siPhysics';
 
 export interface ThrustData {
   totalThrust: number; // grams
   thrustPerMotor: number; // grams
+  totalThrustNewtons?: number;
   thrustToWeightRatio: number;
   isOptimal: boolean;
   recommendations?: string[];
+  validation?: ReturnType<typeof validateSIPhysics>;
 }
 
 export class ThrustCalculator {
-  static calculateThrust(components: SelectedComponents): ThrustData {
+  static calculateThrust(
+    components: SelectedComponents,
+    settings: AdvancedSettings = defaultAdvancedSettings
+  ): ThrustData {
     if (!components.motor || !components.prop) {
       return {
         totalThrust: 0,
         thrustPerMotor: 0,
+        totalThrustNewtons: 0,
         thrustToWeightRatio: 0,
         isOptimal: false,
         recommendations: ['Motor and propeller required for thrust calculation']
       };
     }
-    
-    const weights = WeightCalculator.calculateWeights(components);
-    const thrustPerMotor = this.calculateSingleMotorThrust(components);
-    const totalThrust = thrustPerMotor * 4; // 4 motors
-    const thrustToWeightRatio = totalThrust / weights.total;
-    
-    // Debug logging for thrust calculations
-    console.log('🚁 Thrust Debug:', {
-      totalWeight: weights.total,
-      thrustPerMotor: thrustPerMotor,
-      totalThrust: totalThrust,
-      thrustToWeightRatio: thrustToWeightRatio,
-      weightBreakdown: weights
-    });
-    
+
+    const core = computeSIPhysics(components, settings);
+    const validation = validateSIPhysics(core);
+    const thrustPerMotor = (core.thrust.perMotorN / 9.80665) * 1000;
+    const totalThrust = core.thrust.totalGrams;
+    const thrustToWeightRatio = core.thrust.thrustToWeightRatio;
+
     const analysis = this.analyzeThrustToWeight(thrustToWeightRatio);
-    
+    const recommendations = [
+      ...analysis.recommendations,
+      ...(validation.warnings ?? [])
+    ];
+
     return {
-      totalThrust,
-      thrustPerMotor,
-      thrustToWeightRatio,
-      isOptimal: analysis.isOptimal,
-      recommendations: analysis.recommendations
+      totalThrust: Math.round(totalThrust),
+      thrustPerMotor: Math.round(thrustPerMotor),
+      totalThrustNewtons: roundTo(core.thrust.totalN, 2),
+      thrustToWeightRatio: roundTo(thrustToWeightRatio, 2),
+      isOptimal: analysis.isOptimal && validation.isRealistic,
+      recommendations,
+      validation
     };
-  }
-
-  private static calculateSingleMotorThrust(components: SelectedComponents): number {
-    if (!components.motor || !components.prop) return 0;
-    
-    // Get basic specifications
-    const kv = components.motor.data.kv || 2000;
-    const voltage = this.getBatteryVoltage(components.battery?.data.voltage || '4S');
-    const propDiameter = this.parseNumeric(components.prop.data.size) || 5;
-    const propPitch = this.parseNumeric(components.prop.data.pitch) || 4.5;
-    const motorStatorSize = this.parseNumeric(components.motor.data.statorSize) || 22;
-    
-    // Calculate base thrust from specifications
-    const specThrustStr = components.motor.data.maxThrust;
-    const specThrustMatch = specThrustStr.match(/(\d+\.?\d*)/);
-    const specThrust = specThrustMatch ? parseFloat(specThrustMatch[1]) * 1000 : 0; // Convert kg to grams
-    
-    console.log('🔧 Motor Thrust Debug:', {
-      specThrustStr: specThrustStr,
-      specThrust: specThrust,
-      kv: kv,
-      voltage: voltage,
-      propDiameter: propDiameter,
-      propPitch: propPitch,
-      motorStatorSize: motorStatorSize
-    });
-    
-    if (specThrust === 0) {
-      // Estimate thrust if no spec available
-      return this.estimateThrustFromSpecs(kv, voltage, propDiameter, propPitch, motorStatorSize);
-    }
-    
-    // Apply motor/prop matching factor
-    const matchingFactor = this.calculateMotorPropMatching(kv, voltage, propDiameter, propPitch, motorStatorSize);
-    
-    // Apply environmental factors
-    const environmentalFactor = this.getEnvironmentalFactor();
-    
-    // Calculate final thrust with all adjustments
-    let finalThrust = specThrust * matchingFactor * environmentalFactor;
-    
-    // Apply realistic bounds
-    const minThrust = specThrust * 0.7; // Minimum 70% of spec
-    const maxThrust = specThrust * 1.3; // Maximum 130% of spec
-    finalThrust = Math.max(minThrust, Math.min(finalThrust, maxThrust));
-    
-    console.log('⚡ Final Thrust Calculation:', {
-      specThrust: specThrust,
-      matchingFactor: matchingFactor,
-      environmentalFactor: environmentalFactor,
-      beforeBounds: specThrust * matchingFactor * environmentalFactor,
-      minThrust: minThrust,
-      maxThrust: maxThrust,
-      finalThrust: finalThrust
-    });
-    
-    return Math.round(finalThrust);
-  }
-
-  private static estimateThrustFromSpecs(
-    kv: number, 
-    voltage: number, 
-    propDiameter: number, 
-    propPitch: number, 
-    statorSize: number
-  ): number {
-    // Simplified thrust estimation based on motor power and prop loading
-    const motorPower = (kv * voltage * statorSize) / 1000; // Rough power estimate
-    const diskArea = Math.PI * Math.pow((propDiameter * 0.0254) / 2, 2); // m²
-    const diskLoading = 40; // Typical disk loading in N/m²
-    
-    const estimatedThrust = diskArea * diskLoading * 1000; // Convert to grams
-    
-    // Scale by motor power
-    const powerFactor = Math.sqrt(motorPower / 100); // Normalize around 100W
-    
-    return Math.round(estimatedThrust * powerFactor);
-  }
-
-  private static calculateMotorPropMatching(
-    kv: number, 
-    voltage: number, 
-    propDiameter: number, 
-    propPitch: number, 
-    statorSize: number
-  ): number {
-    // Calculate optimal prop size for motor
-    const motorPower = (kv * voltage * statorSize) / 10000;
-    const optimalDiameter = Math.sqrt(motorPower * 8);
-    const optimalPitch = optimalDiameter * 0.85;
-    
-    // Calculate matching scores
-    const diameterMatch = 1 - Math.abs(propDiameter - optimalDiameter) / Math.max(propDiameter, optimalDiameter);
-    const pitchMatch = 1 - Math.abs(propPitch - optimalPitch) / Math.max(propPitch, optimalPitch);
-    
-    const overallMatch = (diameterMatch * 0.6 + pitchMatch * 0.4);
-    
-    // Convert to efficiency factor (0.85 to 1.15 range)
-    return Math.max(0.85, Math.min(1.15, 0.9 + overallMatch * 0.2));
-  }
-
-  private static getEnvironmentalFactor(): number {
-    // Standard conditions factor (can be enhanced with actual environment data)
-    return 0.95; // 5% reduction for real-world conditions
-  }
-
-  private static parseNumeric(value: string | number): number {
-    if (typeof value === 'number') return value;
-    const match = value.match(/(\d+\.?\d*)/);
-    return match ? parseFloat(match[1]) : 0;
-  }
-
-  private static getBatteryVoltage(voltageStr: string): number {
-    const match = voltageStr.match(/(\d+)S/);
-    if (match) {
-      return parseInt(match[1]) * 3.7; // 3.7V per cell nominal
-    }
-    return 14.8; // Default 4S voltage
   }
 
   private static analyzeThrustToWeight(twr: number): {
@@ -195,14 +82,9 @@ export class ThrustCalculator {
 
   static calculateHoverThrottle(thrustData: ThrustData, totalWeight: number): number {
     if (thrustData.totalThrust === 0) return 0;
-    
-    const hoverThrustRequired = totalWeight; // grams
-    const hoverThrustPercentage = (hoverThrustRequired / thrustData.totalThrust) * 100;
-    
-    // Apply non-linear throttle curve adjustment
-    const baseThrottle = Math.sqrt(hoverThrustPercentage / 100) * 100;
-    
-    // Clamp to reasonable values
-    return Math.min(75, Math.max(15, Math.round(baseThrottle)));
+
+    // Hover thrust is directly proportional to weight in steady-state hover.
+    const hoverThrustPercentage = (totalWeight / thrustData.totalThrust) * 100;
+    return Math.round(Math.min(100, Math.max(0, hoverThrustPercentage)));
   }
 }

@@ -120,8 +120,8 @@ export class EnhancedClassificationIntegrationService {
       ...additionalContext
     };
 
-    console.log(`🔬 Integrated Classification Service`);
-    console.log(`📦 Product: "${name}"`);
+    console.log(` Integrated Classification Service`);
+    console.log(` Product: "${name}"`);
 
     // Get enhanced classification
     const enhancedResult = this.enhancedEngine.classifyProduct(context);
@@ -251,26 +251,26 @@ export class EnhancedClassificationIntegrationService {
   }
 
   private logComparisonResults(result: IntegratedClassificationResult): void {
-    console.log(`📊 === Classification Results ===`);
-    console.log(`🎯 Enhanced: ${result.enhanced.category} (${result.enhanced.confidence}% via ${result.enhanced.method})`);
+    console.log(` === Classification Results ===`);
+    console.log(` Enhanced: ${result.enhanced.category} (${result.enhanced.confidence}% via ${result.enhanced.method})`);
     
     if (result.legacy) {
-      console.log(`🏛️ Legacy: ${result.legacy.category} (${result.legacy.confidence}%)`);
-      console.log(`🤝 Agreement: ${result.analysis.agreement ? '✅ YES' : '❌ NO'}`);
+      console.log(`Legacy: ${result.legacy.category} (${result.legacy.confidence}%)`);
+      console.log(` Agreement: ${result.analysis.agreement ? ' YES' : ' NO'}`);
       
       if (!result.analysis.agreement) {
-        console.log(`⚖️ Confidence Difference: ${result.analysis.confidenceDifference.toFixed(1)}%`);
+        console.log(`Confidence Difference: ${result.analysis.confidenceDifference.toFixed(1)}%`);
       }
     }
     
-    console.log(`⚡ Performance: ${result.performance.processingTimeMs}ms, Score: ${result.performance.accuracyScore.toFixed(1)}%`);
+    console.log(` Performance: ${result.performance.processingTimeMs}ms, Score: ${result.performance.accuracyScore.toFixed(1)}%`);
     
     if (result.analysis.warnings.length > 0) {
-      console.log(`⚠️ Warnings: ${result.analysis.warnings.join(', ')}`);
+      console.log(`Warnings: ${result.analysis.warnings.join(', ')}`);
     }
     
     if (Object.keys(result.enhanced.specifications).length > 0) {
-      console.log(`📋 Specs: ${JSON.stringify(result.enhanced.specifications)}`);
+      console.log(` Specs: ${JSON.stringify(result.enhanced.specifications)}`);
     }
   }
 
@@ -283,8 +283,8 @@ export class EnhancedClassificationIntegrationService {
     failedTests: Array<{ test: typeof EnhancedClassificationIntegrationService.TEST_CASES[0], result: IntegratedClassificationResult }>;
     accuracyPercentage: number;
   } {
-    console.log(`🧪 Running Enhanced Classification Validation Tests`);
-    console.log(`📝 Test Cases: ${EnhancedClassificationIntegrationService.TEST_CASES.length}`);
+    console.log(` Running Enhanced Classification Validation Tests`);
+    console.log(` Test Cases: ${EnhancedClassificationIntegrationService.TEST_CASES.length}`);
     
     const results = {
       totalTests: EnhancedClassificationIntegrationService.TEST_CASES.length,
@@ -294,29 +294,29 @@ export class EnhancedClassificationIntegrationService {
     };
 
     for (const testCase of EnhancedClassificationIntegrationService.TEST_CASES) {
-      console.log(`\n🔍 Testing: "${testCase.name}"`);
+      console.log(`\n Testing: "${testCase.name}"`);
       
       const result = this.classifyProduct(testCase.name, testCase.description);
       const isCorrect = result.enhanced.category === testCase.expected;
       
       if (isCorrect) {
         results.passedTests++;
-        console.log(`✅ PASSED: ${testCase.expected} (${result.enhanced.confidence}%)`);
+        console.log(` PASSED: ${testCase.expected} (${result.enhanced.confidence}%)`);
       } else {
         results.failedTests.push({ test: testCase, result });
-        console.log(`❌ FAILED: Expected ${testCase.expected}, got ${result.enhanced.category} (${result.enhanced.confidence}%)`);
+        console.log(` FAILED: Expected ${testCase.expected}, got ${result.enhanced.category} (${result.enhanced.confidence}%)`);
       }
     }
 
     results.accuracyPercentage = (results.passedTests / results.totalTests) * 100;
     
-    console.log(`\n📊 === Validation Summary ===`);
-    console.log(`✅ Passed: ${results.passedTests}/${results.totalTests}`);
-    console.log(`❌ Failed: ${results.failedTests.length}/${results.totalTests}`);
-    console.log(`🎯 Accuracy: ${results.accuracyPercentage.toFixed(1)}%`);
+    console.log(`\n === Validation Summary ===`);
+    console.log(` Passed: ${results.passedTests}/${results.totalTests}`);
+    console.log(` Failed: ${results.failedTests.length}/${results.totalTests}`);
+    console.log(` Accuracy: ${results.accuracyPercentage.toFixed(1)}%`);
     
     if (results.failedTests.length > 0) {
-      console.log(`\n🔍 Failed Test Analysis:`);
+      console.log(`\n Failed Test Analysis:`);
       for (const failure of results.failedTests) {
         console.log(`   • "${failure.test.name}"`);
         console.log(`     Expected: ${failure.test.expected}, Got: ${failure.result.enhanced.category}`);
@@ -344,7 +344,7 @@ export class EnhancedClassificationIntegrationService {
       return result;
     }
     
-    console.log(`⚠️ Classification below threshold: ${result.enhanced.confidence}% < ${minConfidence}%`);
+    console.log(`Classification below threshold: ${result.enhanced.confidence}% < ${minConfidence}%`);
     return null;
   }
 
@@ -354,7 +354,7 @@ export class EnhancedClassificationIntegrationService {
   public classifyBatch(
     products: Array<{ name: string; description?: string; context?: Partial<ProductContext> }>
   ): Array<IntegratedClassificationResult> {
-    console.log(`📦 Batch classifying ${products.length} products`);
+    console.log(` Batch classifying ${products.length} products`);
     const startTime = Date.now();
     
     const results = products.map((product, index) => {
@@ -369,16 +369,16 @@ export class EnhancedClassificationIntegrationService {
     const totalTime = Date.now() - startTime;
     const avgTime = totalTime / products.length;
     
-    console.log(`\n📊 Batch Classification Summary:`);
-    console.log(`⚡ Total Time: ${totalTime}ms`);
-    console.log(`⚡ Average Time: ${avgTime.toFixed(1)}ms per product`);
+    console.log(`\n Batch Classification Summary:`);
+    console.log(` Total Time: ${totalTime}ms`);
+    console.log(` Average Time: ${avgTime.toFixed(1)}ms per product`);
     
     const categories = results.reduce((acc, result) => {
       acc[result.enhanced.category] = (acc[result.enhanced.category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
-    console.log(`📊 Category Distribution:`);
+    console.log(` Category Distribution:`);
     for (const [category, count] of Object.entries(categories)) {
       console.log(`   ${category}: ${count} products`);
     }

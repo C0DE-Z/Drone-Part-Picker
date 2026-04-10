@@ -132,9 +132,9 @@ for (const testCase of testCases) {
   
   if (success) {
     passed++
-    console.log(`✅ "${testCase.name}" -> ${result}`)
+    console.log(` "${testCase.name}" -> ${result}`)
   } else {
-    console.log(`❌ "${testCase.name}" -> ${result} (expected: ${testCase.expected})`)
+    console.log(` "${testCase.name}" -> ${result} (expected: ${testCase.expected})`)
   }
 }
 
@@ -142,7 +142,7 @@ console.log(`\n=== Summary ===`)
 console.log(`Passed: ${passed}/${total} (${Math.round(passed/total*100)}%)`)
 
 if (passed === total) {
-  console.log("🎉 All tests passed! Classification logic is working correctly.")
+  console.log(" All tests passed! Classification logic is working correctly.")
 } else {
   console.log("⚠️  Some tests failed. Review the classification logic.")
 }

@@ -60,7 +60,7 @@ export async function DELETE(request: NextRequest) {
           where: { id: postId }
         });
 
-        console.log(`✅ Deleted build "${build.name}" by ${build.user.email}`);
+        console.log(` Deleted build "${build.name}" by ${build.user.email}`);
         break;
 
       case 'part':
@@ -82,7 +82,7 @@ export async function DELETE(request: NextRequest) {
           where: { id: postId }
         });
 
-        console.log(`✅ Deleted part "${part.name}" by ${part.user.email}`);
+        console.log(` Deleted part "${part.name}" by ${part.user.email}`);
         break;
 
       case 'comment':
@@ -111,7 +111,7 @@ export async function DELETE(request: NextRequest) {
         });
 
         const targetName = comment.build?.name || comment.part?.name || 'Unknown';
-        console.log(`✅ Deleted comment by ${comment.user.email} on "${targetName}"`);
+        console.log(` Deleted comment by ${comment.user.email} on "${targetName}"`);
         break;
 
       default:

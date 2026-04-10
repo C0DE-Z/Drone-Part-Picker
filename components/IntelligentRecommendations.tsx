@@ -518,7 +518,7 @@ export default function IntelligentRecommendations({
               onChange={(e) => setFilters(prev => ({ ...prev, minRating: parseFloat(e.target.value) }))}
               className="w-20"
             />
-            <span className="text-xs text-gray-600">{filters.minRating}★</span>
+            <span className="text-xs text-gray-600">{filters.minRating} rating</span>
           </div>
         </div>
       </div>

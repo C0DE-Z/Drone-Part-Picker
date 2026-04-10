@@ -134,7 +134,7 @@ export default function ClassificationMonitoringDashboard({ onClose }: Classific
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                🤖 AI Classification Monitor
+                 AI Classification Monitor
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
                 Real-time performance tracking of our enhanced classification system
@@ -152,7 +152,7 @@ export default function ClassificationMonitoringDashboard({ onClose }: Classific
         <div className="p-6 space-y-6">
           {/* System Status */}
           <div className="flex items-center space-x-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-            <div className="text-green-600 text-2xl">✅</div>
+            <div className="text-green-600 text-2xl"></div>
             <div>
               <h3 className="font-semibold text-green-800 dark:text-green-200">
                 Enhanced Classification System v2.0 Online
@@ -167,7 +167,7 @@ export default function ClassificationMonitoringDashboard({ onClose }: Classific
                   id: 'ai_enhanced', 
                   name: 'AI Enhanced', 
                   type: 'CUSTOM',
-                  icon: '🤖',
+                  icon: '',
                   color: '#10b981',
                   rarity: 'legendary'
                 }} 
@@ -245,7 +245,7 @@ export default function ClassificationMonitoringDashboard({ onClose }: Classific
           {/* Category Performance */}
           <div className="border rounded-lg p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              📊 Category Performance
+               Category Performance
             </h3>
             <div className="space-y-3">
               {metrics.topCategories.map((category, index) => (
@@ -280,7 +280,7 @@ export default function ClassificationMonitoringDashboard({ onClose }: Classific
           {/* Recent Classifications */}
           <div className="border rounded-lg p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              🕒 Recent Classifications
+               Recent Classifications
             </h3>
             <div className="space-y-3">
               {metrics.recentClassifications.map((item) => (
@@ -294,7 +294,7 @@ export default function ClassificationMonitoringDashboard({ onClose }: Classific
                         {item.category}
                       </span>
                       {item.wasCorrect && (
-                        <span className="text-green-600 text-sm">✓</span>
+                        <span className="text-green-600 text-xs font-semibold">OK</span>
                       )}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
@@ -317,32 +317,32 @@ export default function ClassificationMonitoringDashboard({ onClose }: Classific
           {/* AI Enhancement Features */}
           <div className="border rounded-lg p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              🚀 Active AI Features
+               Active AI Features
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <span className="text-green-600 text-xl">🧠</span>
+                <span className="text-green-600 text-xl"></span>
                 <div>
                   <div className="font-medium text-green-800 dark:text-green-200">Enhanced Classification Engine</div>
                   <div className="text-xs text-green-600 dark:text-green-300">99.4% accuracy</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <span className="text-blue-600 text-xl">👁️</span>
+                <span className="text-blue-600 text-xs font-semibold">IMG</span>
                 <div>
                   <div className="font-medium text-blue-800 dark:text-blue-200">Image Classification</div>
                   <div className="text-xs text-blue-600 dark:text-blue-300">91.2% visual accuracy</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <span className="text-purple-600 text-xl">🔍</span>
+                <span className="text-purple-600 text-xl"></span>
                 <div>
                   <div className="font-medium text-purple-800 dark:text-purple-200">Smart Duplicate Detection</div>
                   <div className="text-xs text-purple-600 dark:text-purple-300">93.2% merge accuracy</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <span className="text-orange-600 text-xl">📈</span>
+                <span className="text-orange-600 text-xl"></span>
                 <div>
                   <div className="font-medium text-orange-800 dark:text-orange-200">Predictive Analytics</div>
                   <div className="text-xs text-orange-600 dark:text-orange-300">86.7% prediction accuracy</div>

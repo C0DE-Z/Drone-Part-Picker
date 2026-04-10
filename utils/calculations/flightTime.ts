@@ -1,12 +1,16 @@
-import { SelectedComponents, Battery } from '@/types/drone';
+import { SelectedComponents } from '@/types/drone';
 import { AdvancedSettings, defaultAdvancedSettings } from '@/types/advancedSettings';
 import { PowerCalculator } from './power';
+import { buildBatteryProfile, computeSIPhysics, roundTo, validateSIPhysics } from './siPhysics';
 
 export interface FlightTimeData {
   estimatedFlightTime: number; // minutes
   hoverTime: number; // minutes
   sportTime: number; // minutes
   batteryUtilization: number; // percentage
+  cruiseTime?: number;
+  aggressiveTime?: number;
+  validation?: ReturnType<typeof validateSIPhysics>;
   recommendations?: string[];
 }
 
@@ -26,23 +30,29 @@ export class FlightTimeCalculator {
       };
     }
 
+    const core = computeSIPhysics(components, settings);
+    const validation = validateSIPhysics(core);
+
+    const estimatedFlightTime = core.flight.mixedMin;
+    const hoverTime = core.flight.hoverMin;
+    const cruiseTime = core.flight.cruiseMin;
+    const aggressiveTime = core.flight.aggressiveMin;
+    const sportTime = aggressiveTime;
+
+    const batteryUtilization = core.flight.batteryUtilizationPercent;
     const batterySpecs = this.parseBatterySpecs(components.battery.data);
-    const effectiveCapacity = this.calculateEffectiveCapacity(batterySpecs, settings);
-    
-    // Calculate flight times for different scenarios
-    const hoverTime = this.calculateScenarioTime(effectiveCapacity, powerData.hoverCurrent);
-    const sportTime = this.calculateScenarioTime(effectiveCapacity, powerData.sportCurrent);
-    const estimatedFlightTime = this.calculateScenarioTime(effectiveCapacity, powerData.averageCurrent);
-    
-    const batteryUtilization = this.calculateBatteryUtilization(powerData.averageCurrent, batterySpecs);
     const analysis = this.analyzeFlightTime(estimatedFlightTime, batterySpecs, components);
-    
+    const recommendations = [...analysis.recommendations, ...validation.warnings];
+
     return {
-      estimatedFlightTime: Math.round(estimatedFlightTime * 10) / 10,
-      hoverTime: Math.round(hoverTime * 10) / 10,
-      sportTime: Math.round(sportTime * 10) / 10,
-      batteryUtilization: Math.round(batteryUtilization),
-      recommendations: analysis.recommendations
+      estimatedFlightTime: roundTo(estimatedFlightTime, 1),
+      hoverTime: roundTo(hoverTime, 1),
+      sportTime: roundTo(sportTime, 1),
+      cruiseTime: roundTo(cruiseTime, 1),
+      aggressiveTime: roundTo(aggressiveTime, 1),
+      batteryUtilization: roundTo(batteryUtilization, 0),
+      validation,
+      recommendations
     };
   }
 
@@ -65,8 +75,9 @@ export class FlightTimeCalculator {
   ): number {
     let effectiveCapacity = batterySpecs.capacity;
     
-    // Apply usable capacity factor (typically 80-90% for LiPo)
-    effectiveCapacity *= settings.battery.usableCapacityFactor;
+    // Apply usable capacity factor (default target is around 80% for LiPo)
+    const usableFactor = Math.min(0.95, Math.max(0.6, settings.battery.usableCapacityFactor || 0.8));
+    effectiveCapacity *= usableFactor;
     
     // Temperature effects
     const { temperature } = settings.environment;
@@ -184,7 +195,7 @@ export class FlightTimeCalculator {
     
     // Account for efficiency factors
     const temperatureFactor = settings.battery.temperatureEfficiency.optimal;
-    const usabilityFactor = settings.battery.usableCapacityFactor;
+    const usabilityFactor = Math.min(0.95, Math.max(0.6, settings.battery.usableCapacityFactor || 0.8));
     const ageFactor = settings.battery.ageFactor;
     const safetyMargin = 0.9;
     
@@ -195,5 +206,12 @@ export class FlightTimeCalculator {
     // Round to common battery capacities
     const commonCapacities = [650, 850, 1050, 1300, 1500, 1800, 2200, 2600, 3300, 4200, 5200];
     return commonCapacities.find(cap => cap >= recommendedCapacity) || Math.ceil(recommendedCapacity / 100) * 100;
+  }
+
+  static buildBatteryModel(
+    components: SelectedComponents,
+    settings: AdvancedSettings = defaultAdvancedSettings
+  ) {
+    return buildBatteryProfile(components, settings);
   }
 }

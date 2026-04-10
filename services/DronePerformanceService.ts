@@ -4,6 +4,7 @@ import { WeightCalculator, WeightBreakdown } from '@/utils/calculations/weight';
 import { ThrustCalculator, ThrustData } from '@/utils/calculations/thrust';
 import { PowerCalculator, PowerData } from '@/utils/calculations/power';
 import { FlightTimeCalculator } from '@/utils/calculations/flightTime';
+import { computeSIPhysics, roundTo, validateSIPhysics } from '@/utils/calculations/siPhysics';
 import { estimateComponentPrice } from '@/utils/math/cost';
 
 type ComponentData = {
@@ -16,33 +17,40 @@ export class DronePerformanceService {
     components: SelectedComponents, 
     advancedSettings: AdvancedSettings = defaultAdvancedSettings
   ): PerformanceEstimate {
-    // Calculate individual aspects
+    const core = computeSIPhysics(components, advancedSettings);
+    const validation = validateSIPhysics(core);
+
+    // Keep existing public module boundaries while internally using the SI core.
     const weights = WeightCalculator.calculateWeights(components);
-    const thrustData = ThrustCalculator.calculateThrust(components);
-    const powerData = PowerCalculator.calculatePowerConsumption(components);
+    const thrustData = ThrustCalculator.calculateThrust(components, advancedSettings);
+    const powerData = PowerCalculator.calculatePowerConsumption(components, advancedSettings);
     const flightTimeData = FlightTimeCalculator.calculateFlightTime(components, powerData, advancedSettings);
-    
-    // Calculate derived metrics
+
     const hoveringMetrics = this.calculateHoveringMetrics(components, weights, thrustData, powerData);
-    const motorMetrics = this.getMotorMetrics(components);
-    const batteryMetrics = this.getBatteryMetrics(components);
+    const motorMetrics = this.getMotorMetrics(components, core);
+    const batteryMetrics = this.getBatteryMetrics(components, core);
     const pricing = this.calculatePricing(components);
     const compatibility = this.checkCompatibility(components);
-    
-    // Calculate top speed
-    const estimatedTopSpeed = this.estimateTopSpeed(components, thrustData.thrustToWeightRatio);
+
+    const estimatedTopSpeed = Math.round(core.speed.estimatedTopSpeedKmh);
     
     return {
       totalWeight: Math.round(weights.total * 10) / 10,
-      thrustToWeightRatio: Math.round(thrustData.thrustToWeightRatio * 100) / 100,
+      thrustToWeightRatio: roundTo(thrustData.thrustToWeightRatio, 2),
       maxThrust: Math.round((thrustData.totalThrust / 1000) * 100) / 100, // Convert to kg
-      maxThrustGrams: thrustData.totalThrust,
+      maxThrustGrams: Math.round(thrustData.totalThrust),
       estimatedTopSpeed,
       estimatedFlightTime: flightTimeData.estimatedFlightTime,
-      powerConsumption: powerData.powerConsumption,
+      powerConsumption: roundTo(core.power.averagePowerW, 1),
       hovering: hoveringMetrics,
       motors: motorMetrics,
       battery: batteryMetrics,
+      flightEstimates: {
+        hover: roundTo(core.flight.hoverMin, 1),
+        cruise: roundTo(core.flight.cruiseMin, 1),
+        aggressive: roundTo(core.flight.aggressiveMin, 1)
+      },
+      validation,
       totalPrice: pricing.total,
       priceBreakdown: pricing.breakdown,
       compatibility
@@ -53,9 +61,11 @@ export class DronePerformanceService {
     components: SelectedComponents,
     advancedSettings: AdvancedSettings = defaultAdvancedSettings
   ) {
+    const core = computeSIPhysics(components, advancedSettings);
+    const validation = validateSIPhysics(core);
     const weights = WeightCalculator.calculateWeights(components);
-    const thrustData = ThrustCalculator.calculateThrust(components);
-    const powerData = PowerCalculator.calculatePowerConsumption(components);
+    const thrustData = ThrustCalculator.calculateThrust(components, advancedSettings);
+    const powerData = PowerCalculator.calculatePowerConsumption(components, advancedSettings);
     const flightTimeData = FlightTimeCalculator.calculateFlightTime(components, powerData, advancedSettings);
     
     return {
@@ -64,7 +74,9 @@ export class DronePerformanceService {
       power: powerData,
       flightTime: flightTimeData,
       weightDistribution: WeightCalculator.getWeightDistribution(weights),
-      hoverThrottle: ThrustCalculator.calculateHoverThrottle(thrustData, weights.total)
+      hoverThrottle: ThrustCalculator.calculateHoverThrottle(thrustData, weights.total),
+      siCore: core,
+      validation
     };
   }
 
@@ -75,57 +87,58 @@ export class DronePerformanceService {
     powerData: PowerData
   ) {
     const hoverThrottle = ThrustCalculator.calculateHoverThrottle(thrustData, weights.total);
-    
-    // Calculate hover time (pure hovering scenario)
+
+    // Hover time from SI model (already uses usable battery capacity and current draw).
     let hoverTime = 0;
-    if (components.battery?.data.capacity) {
-      const capacityMatch = components.battery.data.capacity.match(/(\d+)/);
-      const capacity = capacityMatch ? parseInt(capacityMatch[1]) : 1300;
-      const usableCapacity = capacity * 0.90; // 90% usable for hovering
-      hoverTime = (usableCapacity / 1000) / powerData.hoverCurrent * 60; // minutes
+    if (powerData.hoverCurrent > 0 && components.battery?.data.capacity) {
+      const batteryModel = FlightTimeCalculator.buildBatteryModel(components, defaultAdvancedSettings);
+      hoverTime = (batteryModel.usableCapacityAh / powerData.hoverCurrent) * 60;
     }
     
     return {
       throttlePercentage: hoverThrottle,
-      currentDraw: powerData.hoverCurrent,
-      hoverTime: Math.round(hoverTime * 10) / 10
+      currentDraw: roundTo(powerData.hoverCurrent, 1),
+      hoverPowerWatts: roundTo(powerData.hoverPower || 0, 1),
+      hoverTime: roundTo(hoverTime, 1)
     };
   }
 
-  private static getMotorMetrics(components: SelectedComponents) {
-    const kv = components.motor?.data.kv || 0;
-    const voltage = this.getBatteryVoltage(components.battery?.data.voltage || '4S');
-    const estimatedRPM = Math.round(kv * voltage);
+  private static getMotorMetrics(
+    components: SelectedComponents,
+    core: ReturnType<typeof computeSIPhysics>
+  ) {
+    const kv = core.motor.kv;
+    const voltage = core.battery.nominalVoltage;
+    const fullVoltage = core.battery.fullVoltage;
+    const estimatedRPM = Math.round(core.motor.loadedRpmNominal);
     const propSize = components.prop?.data.size || 'N/A';
     
     return {
       kv,
-      voltage: Math.round(voltage * 10) / 10,
+      voltage: roundTo(voltage, 1),
+      fullVoltage: roundTo(fullVoltage, 1),
       estimatedRPM,
+      estimatedRPMNominal: Math.round(core.motor.loadedRpmNominal),
+      estimatedRPMFull: Math.round(core.motor.loadedRpmFull),
       propSize
     };
   }
 
-  private static getBatteryMetrics(components: SelectedComponents) {
+  private static getBatteryMetrics(
+    components: SelectedComponents,
+    core: ReturnType<typeof computeSIPhysics>
+  ) {
     if (!components.battery) {
-      return { voltage: 0, capacity: 0, cells: 0, dischargeRate: 0 };
+      return { voltage: 0, fullVoltage: 0, capacity: 0, cells: 0, dischargeRate: 0, usableCapacityAh: 0 };
     }
-
-    const voltageStr = components.battery.data.voltage || '4S';
-    const capacityStr = components.battery.data.capacity || '1300mAh';
-    const cRatingStr = components.battery.data.cRating || '50C';
-    
-    const cells = parseInt(voltageStr.match(/(\d+)S/)?.[1] || '4');
-    const voltage = cells * 3.7;
-    const capacity = parseInt(capacityStr.match(/(\d+)/)?.[1] || '1300');
-    const cRating = parseInt(cRatingStr.match(/(\d+)/)?.[1] || '50');
-    const dischargeRate = Math.round((capacity * cRating / 1000) * 10) / 10;
     
     return {
-      voltage: Math.round(voltage * 10) / 10,
-      capacity,
-      cells,
-      dischargeRate
+      voltage: roundTo(core.battery.nominalVoltage, 1),
+      fullVoltage: roundTo(core.battery.fullVoltage, 1),
+      capacity: Math.round(core.battery.capacityAh * 1000),
+      cells: core.battery.cells,
+      dischargeRate: roundTo(core.battery.maxContinuousCurrentA, 1),
+      usableCapacityAh: roundTo(core.battery.usableCapacityAh, 2)
     };
   }
 
@@ -252,45 +265,6 @@ export class DronePerformanceService {
     const propSize = components.prop.data.size;
     
     return framePropSize.includes(propSize.replace(' inch', ''));
-  }
-
-  private static estimateTopSpeed(components: SelectedComponents, twr: number): number {
-    if (!components.motor || !components.prop || !components.frame) return 0;
-    
-    const kv = components.motor.data.kv || 2000;
-    const propDiameter = this.parseWeight(components.prop.data.size) || 5;
-    const propPitch = this.parseWeight(components.prop.data.pitch) || 4.5;
-    const voltage = this.getBatteryVoltage(components.battery?.data.voltage || '4S');
-    const frameWheelbase = this.parseWeight(components.frame.data.wheelbase) || 220;
-    
-    // Calculate propeller speed
-    const noLoadRPM = kv * voltage;
-    const loadedRPM = noLoadRPM * 0.75; // Account for load
-    const propSpeedMeterPerSecond = (loadedRPM / 60) * (propPitch * 0.0254);
-    
-    // Calculate aerodynamic limitations
-    const frameArea = Math.pow(frameWheelbase / 1000, 2);
-    const dragCoefficient = 0.8 + (frameWheelbase / 1000) * 0.2;
-    const airDensity = 1.225;
-    
-    // Apply TWR and frame size corrections
-    let correctionFactor = 1.0;
-    if (twr >= 3.5) correctionFactor *= 1.1;
-    else if (twr < 2.0) correctionFactor *= 0.9;
-    
-    if (frameWheelbase <= 150) correctionFactor *= 1.15;
-    else if (frameWheelbase >= 280) correctionFactor *= 0.9;
-    
-    const topSpeedKmh = propSpeedMeterPerSecond * 3.6 * correctionFactor * 0.7; // 0.7 for efficiency
-    
-    // Apply realistic limits based on frame size
-    let maxRealisticSpeed = 200;
-    if (frameWheelbase <= 100) maxRealisticSpeed = 120;
-    else if (frameWheelbase <= 150) maxRealisticSpeed = 150;
-    else if (frameWheelbase <= 220) maxRealisticSpeed = 200;
-    else maxRealisticSpeed = 220;
-    
-    return Math.round(Math.min(topSpeedKmh, maxRealisticSpeed));
   }
 
   private static parseWeight(weightStr: string | undefined): number {

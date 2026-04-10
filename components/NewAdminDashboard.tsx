@@ -284,16 +284,16 @@ export default function NewAdminDashboard() {
   }
 
   const navItems = [
-    { id: 'overview', name: 'Dashboard', icon: '📊' },
-    { id: 'users', name: 'Users', icon: '👥' },
-    { id: 'reports', name: 'Reports', icon: '🚨', badge: reports.filter(r => r.status === 'PENDING').length },
-    { id: 'products', name: 'Products', icon: '📦' },
-    { id: 'variants', name: 'Variants', icon: '🔀' },
-    { id: 'resort', name: 'Resort', icon: '🔄' },
-    { id: 'classification', name: 'Classification', icon: '🤖' },
-    { id: 'scraper', name: 'Scraper', icon: '🕷️' },
-    { id: 'custom-parts', name: 'Custom Parts', icon: '🔧' },
-    { id: 'settings', name: 'Settings', icon: '⚙️' }
+    { id: 'overview', name: 'Dashboard', icon: '' },
+    { id: 'users', name: 'Users', icon: '' },
+    { id: 'reports', name: 'Reports', icon: '', badge: reports.filter(r => r.status === 'PENDING').length },
+    { id: 'products', name: 'Products', icon: '' },
+    { id: 'variants', name: 'Variants', icon: '' },
+    { id: 'resort', name: 'Resort', icon: '' },
+    { id: 'classification', name: 'Classification', icon: '' },
+    { id: 'scraper', name: 'Scraper', icon: '' },
+    { id: 'custom-parts', name: 'Custom Parts', icon: '' },
+    { id: 'settings', name: 'Settings', icon: '' }
   ];
 
   return (
@@ -712,7 +712,7 @@ export default function NewAdminDashboard() {
                     onClick={() => setClassificationGameOpen(true)}
                     className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 flex items-center gap-2"
                   >
-                    <span className="text-xl">🎮</span>
+                    <span className="text-xl"></span>
                     Start Training Game
                   </button>
                 </div>
@@ -720,7 +720,7 @@ export default function NewAdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">🎯</span>
+                      <span className="text-2xl"></span>
                       <h4 className="font-semibold text-gray-900">Accuracy Focused</h4>
                     </div>
                     <p className="text-gray-700 text-sm">
@@ -730,7 +730,7 @@ export default function NewAdminDashboard() {
 
                   <div className="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">📊</span>
+                      <span className="text-2xl"></span>
                       <h4 className="font-semibold text-gray-900">Multi-Method Analysis</h4>
                     </div>
                     <p className="text-gray-700 text-sm">
@@ -740,7 +740,7 @@ export default function NewAdminDashboard() {
 
                   <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">🧠</span>
+                      <span className="text-2xl"></span>
                       <h4 className="font-semibold text-gray-900">Continuous Learning</h4>
                     </div>
                     <p className="text-gray-700 text-sm">
@@ -868,7 +868,7 @@ export default function NewAdminDashboard() {
                   </div>
                 ) : customParts.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="text-gray-300 text-6xl mb-4">🔧</div>
+                    <div className="text-gray-300 text-6xl mb-4"></div>
                     <h3 className="text-xl font-semibold text-gray-700 mb-2">
                       No custom parts found
                     </h3>

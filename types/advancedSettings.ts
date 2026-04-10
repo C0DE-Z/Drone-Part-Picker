@@ -10,7 +10,7 @@ export interface AdvancedSettings {
 
   // Battery Settings
   battery: {
-    usableCapacityFactor: number; // Base usable capacity (0-1, default 0.85)
+    usableCapacityFactor: number; // Base usable capacity (0-1, default 0.80)
     temperatureEfficiency: {
       freezing: number; // < 0°C (default 0.70)
       cold: number; // < 10°C (default 0.85)
@@ -142,7 +142,7 @@ export const defaultAdvancedSettings: AdvancedSettings = {
     airDensity: 1.225,
   },
   battery: {
-    usableCapacityFactor: 0.85,
+    usableCapacityFactor: 0.80,
     temperatureEfficiency: {
       freezing: 0.70,
       cold: 0.85,

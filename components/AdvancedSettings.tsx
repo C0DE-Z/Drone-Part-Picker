@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { AlertTriangle, Settings } from 'lucide-react';
 import { AdvancedSettings, defaultAdvancedSettings } from '../types/advancedSettings';
 
 interface AdvancedSettingsProps {
@@ -93,13 +94,13 @@ export default function AdvancedSettingsComponent({
   };
 
   const tabs = [
-    { id: 'environment', name: 'Environment', icon: '🌍' },
-    { id: 'battery', name: 'Battery', icon: '🔋' },
-    { id: 'motor', name: 'Motor', icon: '⚙️' },
-    { id: 'propeller', name: 'Propeller', icon: '🚁' },
-    { id: 'flight', name: 'Flight Style', icon: '🎯' },
-    { id: 'system', name: 'System', icon: '⚡' },
-    { id: 'limits', name: 'Limits', icon: '⚠️' }
+    { id: 'environment', name: 'Environment', icon: '' },
+    { id: 'battery', name: 'Battery', icon: '' },
+    { id: 'motor', name: 'Motor', icon: <Settings className="h-4 w-4" /> },
+    { id: 'propeller', name: 'Propeller', icon: '' },
+    { id: 'flight', name: 'Flight Style', icon: '' },
+    { id: 'system', name: 'System', icon: '' },
+    { id: 'limits', name: 'Limits', icon: <AlertTriangle className="h-4 w-4" /> }
   ];
 
   if (!isOpen) {
@@ -110,7 +111,7 @@ export default function AdvancedSettingsComponent({
           theme === 'dark' ? 'bg-blue-700 hover:bg-blue-600' : 'bg-blue-600 hover:bg-blue-700'
         }`}
       >
-        <span>⚙️</span>
+        <Settings className="h-4 w-4" />
         <span className="hidden sm:inline">Advanced Settings</span>
         <span className="sm:hidden">Settings</span>
       </button>
@@ -154,7 +155,7 @@ export default function AdvancedSettingsComponent({
               }`}
               aria-label="Close"
             >
-              ✕
+              ×
             </button>
           </div>
         </div>

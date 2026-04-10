@@ -155,7 +155,7 @@ export default function PublicBuilds() {
           </div>
         ) : sortedBuilds.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-500 text-6xl mb-4">🚁</div>
+            <div className="text-gray-500 text-6xl mb-4"></div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               {searchTerm ? 'No builds found' : 'No public builds yet'}
             </h3>
@@ -169,7 +169,7 @@ export default function PublicBuilds() {
               href="/"
               className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
             >
-              🚁 Create Your First Build
+               Create Your First Build
             </Link>
           </div>
         ) : (
@@ -280,7 +280,7 @@ export default function PublicBuilds() {
                       className="text-xs"
                     />
                     <button className="flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-xs">
-                      💬 {build.commentsCount || 0} comments
+                       {build.commentsCount || 0} comments
                     </button>
                   </div>
                   

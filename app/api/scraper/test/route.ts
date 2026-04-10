@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
       testUrl: `${vendor} ${category}`,
       deployment: 'friendly',
-      message: result.success 
-        ? `Successfully scraped ${result.products.length} products` 
+      message: result.success
+        ? `Scraped ${result.products.length} products`
         : `Scraping failed: ${result.error}`
     });
     
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     
     console.log(`Full test scraping for ${vendor} ${category} (max ${maxProducts})`);
     
+    const metadata = await deploymentFriendlyScraperService.scrapeCategoryWithMetadata(vendor, category, maxProducts);
     const products = await deploymentFriendlyScraperService.scrapeCategory(vendor, category, maxProducts);
     
     return NextResponse.json({
@@ -46,8 +47,11 @@ export async function POST(request: NextRequest) {
       count: products.length,
       vendor,
       category,
+      lowConfidenceCount: metadata.lowConfidenceCount,
+      invalidCount: metadata.invalidCount,
+      dedupedCount: metadata.dedupedCount,
       timestamp: new Date().toISOString(),
-      message: `Successfully scraped ${products.length} products from ${vendor} ${category}`
+      message: `Scraped ${products.length} products from ${vendor} ${category}`
     });
     
   } catch (error) {

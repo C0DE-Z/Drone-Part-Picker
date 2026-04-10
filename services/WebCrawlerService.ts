@@ -750,18 +750,18 @@ export class WebCrawlerService {
   public determineCategoryByScoring(productName: string, description: string): string {
     const textToAnalyze = `${productName} ${description}`.toLowerCase();
     
-    console.log(`🔍 Analyzing: "${productName}"`);
-    console.log(`📝 Text to analyze: "${textToAnalyze}"`);
+    console.log(` Analyzing: "${productName}"`);
+    console.log(` Text to analyze: "${textToAnalyze}"`);
     
     // Step 1: Try rule-based classification first (high confidence)
     const ruleBasedResult = this.classifyByRules(textToAnalyze);
     const ruleConfidence = this.getRuleConfidence(textToAnalyze, ruleBasedResult);
     
-    console.log(`🎯 Rule-based result: ${ruleBasedResult} (confidence: ${ruleConfidence}%)`);
+    console.log(` Rule-based result: ${ruleBasedResult} (confidence: ${ruleConfidence}%)`);
     
     // Step 2: If rule-based confidence is high enough, use it
     if (ruleConfidence >= 85) {
-      console.log(`✅ High confidence rule-based classification: ${ruleBasedResult}`);
+      console.log(` High confidence rule-based classification: ${ruleBasedResult}`);
       return ruleBasedResult;
     }
     
@@ -770,14 +770,14 @@ export class WebCrawlerService {
     const scoringResult = this.enhancedScoringClassification(textToAnalyze);
     const scoringConfidence = this.getScoringConfidence(textToAnalyze, scoringResult);
     
-    console.log(`🎯 Scoring result: ${scoringResult} (confidence: ${scoringConfidence}%)`);
+    console.log(` Scoring result: ${scoringResult} (confidence: ${scoringConfidence}%)`);
     
     // Step 4: Choose the result with higher confidence
     if (ruleConfidence >= scoringConfidence) {
-      console.log(`📂 Final classification (rule-based): ${ruleBasedResult}`);
+      console.log(` Final classification (rule-based): ${ruleBasedResult}`);
       return ruleBasedResult;
     } else {
-      console.log(`📂 Final classification (scoring): ${scoringResult}`);
+      console.log(` Final classification (scoring): ${scoringResult}`);
       return scoringResult;
     }
   }
@@ -805,19 +805,19 @@ export class WebCrawlerService {
     // Battery brands are almost 100% definitive
     const batteryBrands = ['tattu', 'gnb', 'cnhl', 'gens ace', 'turnigy', 'zippy', 'ovonic', 'zeee', 'goldbat', 'dinogy'];
     if (batteryBrands.some(brand => text.includes(brand))) {
-      console.log(`✅ Battery brand detected`);
+      console.log(` Battery brand detected`);
       return true;
     }
     
     // Strong battery indicators
     if ((text.includes('lipo') || text.includes('battery')) && text.includes('mah')) {
-      console.log(`✅ Battery: lipo/battery + mAh`);
+      console.log(` Battery: lipo/battery + mAh`);
       return true;
     }
     
     // Cell count with voltage or battery context
     if (/\d+s.*(?:lipo|battery)|(?:lipo|battery).*\d+s/.test(text)) {
-      console.log(`✅ Battery: cell count pattern`);
+      console.log(` Battery: cell count pattern`);
       return true;
     }
     
@@ -828,19 +828,19 @@ export class WebCrawlerService {
     // Prop brands are highly definitive
     const propBrands = ['gemfan', 'hqprop', 'hq prop', 'dalprop', 'dal', 'ethix'];
     if (propBrands.some(brand => text.includes(brand))) {
-      console.log(`✅ Prop brand detected`);
+      console.log(` Prop brand detected`);
       return true;
     }
     
     // Definitive prop indicators
     if (text.includes('propeller') || text.includes('propellers')) {
-      console.log(`✅ Prop: propeller keyword`);
+      console.log(` Prop: propeller keyword`);
       return true;
     }
     
     // Prop size patterns with blade count
     if (/\d+x\d+x\d+|\d+x\d+\.\d+.*blade|\d{4}.*(?:prop|blade)/.test(text)) {
-      console.log(`✅ Prop: size pattern with blades`);
+      console.log(` Prop: size pattern with blades`);
       return true;
     }
     
@@ -850,13 +850,13 @@ export class WebCrawlerService {
   private isDefinitelyFrame(text: string): boolean {
     // Frame is usually very clear
     if (text.includes('frame') && !text.includes('flight controller') && !text.includes('esc')) {
-      console.log(`✅ Frame: frame keyword without electronics`);
+      console.log(` Frame: frame keyword without electronics`);
       return true;
     }
     
     // Wheelbase is definitive for frames
     if (text.includes('wheelbase') || /\d+mm.*frame/.test(text)) {
-      console.log(`✅ Frame: wheelbase or frame size`);
+      console.log(` Frame: wheelbase or frame size`);
       return true;
     }
     
@@ -867,25 +867,25 @@ export class WebCrawlerService {
     // Digital FPV systems
     if (text.includes('dji air unit') || text.includes('air unit') || 
         text.includes('walksnail avatar') || text.includes('hdzero')) {
-      console.log(`✅ Camera: digital FPV system`);
+      console.log(` Camera: digital FPV system`);
       return true;
     }
     
     // Camera brands
     const cameraBrands = ['runcam', 'foxeer', 'caddx'];
     if (cameraBrands.some(brand => text.includes(brand))) {
-      console.log(`✅ Camera: camera brand`);
+      console.log(` Camera: camera brand`);
       return true;
     }
     
     // Exclude action cameras (they should be "other")
     if (text.includes('gopro') || text.includes('action camera')) {
-      console.log(`❌ Camera: action camera excluded`);
+      console.log(` Camera: action camera excluded`);
       return false;
     }
     
     if (text.includes('fpv camera') || (text.includes('camera') && text.includes('tvl'))) {
-      console.log(`✅ Camera: FPV camera or TVL spec`);
+      console.log(` Camera: FPV camera or TVL spec`);
       return true;
     }
     
@@ -895,13 +895,13 @@ export class WebCrawlerService {
   private classifyEscStack(text: string): string | null {
     // 4-in-1 ESCs are always stack
     if (text.includes('4in1') || text.includes('4-in-1') || text.includes('four in one')) {
-      console.log(`✅ Stack: 4-in-1 ESC`);
+      console.log(` Stack: 4-in-1 ESC`);
       return 'stack';
     }
     
     // All-in-one systems
     if (text.includes('aio') || text.includes('all in one') || text.includes('all-in-one')) {
-      console.log(`✅ Stack: AIO system`);
+      console.log(` Stack: AIO system`);
       return 'stack';
     }
     
@@ -910,7 +910,7 @@ export class WebCrawlerService {
         /\d+a\b|\d+\s*amp/.test(text)) {
       // Check if it's NOT integrated with FC
       if (!text.includes('flight controller') && !text.includes('aio') && !text.includes('fc')) {
-        console.log(`✅ Stack: Individual ESC`);
+        console.log(` Stack: Individual ESC`);
         return 'stack';
       }
     }
@@ -918,13 +918,13 @@ export class WebCrawlerService {
     // Flight controllers
     if (text.includes('flight controller') || 
         (text.includes('fc') && /f\d+|stm32/.test(text))) {
-      console.log(`✅ Stack: Flight controller`);
+      console.log(` Stack: Flight controller`);
       return 'stack';
     }
     
     // Processor indicators for FC
     if (/f411|f722|f405|f745|stm32/.test(text) && !text.includes('motor')) {
-      console.log(`✅ Stack: FC processor`);
+      console.log(` Stack: FC processor`);
       return 'stack';
     }
     
@@ -934,30 +934,30 @@ export class WebCrawlerService {
   private isDefinitelyMotor(text: string): boolean {
     // Power systems are ALWAYS motors (even if they mention props)
     if (text.includes('power system')) {
-      console.log(`✅ Motor: power system (overrides other indicators)`);
+      console.log(` Motor: power system (overrides other indicators)`);
       return true;
     }
     
     // T-Motor products (unless they're FCs) - specifically VELOX power systems
     if (text.includes('t-motor') && !text.includes('flight controller') && !text.includes('aio')) {
       if (text.includes('velox') || text.includes('power')) {
-        console.log(`✅ Motor: T-Motor power product`);
+        console.log(` Motor: T-Motor power product`);
         return true;
       }
-      console.log(`✅ Motor: T-Motor product`);
+      console.log(` Motor: T-Motor product`);
       return true;
     }
     
     // Motor with KV rating
     if (text.includes('motor') && /\d+kv/.test(text)) {
-      console.log(`✅ Motor: motor + KV rating`);
+      console.log(` Motor: motor + KV rating`);
       return true;
     }
     
     // Brushless motor
     if (text.includes('brushless motor') || 
         (text.includes('brushless') && text.includes('motor'))) {
-      console.log(`✅ Motor: brushless motor`);
+      console.log(` Motor: brushless motor`);
       return true;
     }
     
@@ -1013,8 +1013,8 @@ export class WebCrawlerService {
     const maxScore = Math.max(...Object.values(scores));
     const bestCategory = Object.entries(scores).find(([, score]) => score === maxScore)?.[0];
     
-    console.log(`📊 Fallback scores:`, scores);
-    console.log(`🎯 Fallback result: ${bestCategory || 'motor'}`);
+    console.log(` Fallback scores:`, scores);
+    console.log(` Fallback result: ${bestCategory || 'motor'}`);
     
     return bestCategory || 'motor'; // Default fallback
   }
@@ -1082,7 +1082,7 @@ export class WebCrawlerService {
     const maxScore = Math.max(...Object.values(categoryScores));
     const bestCategory = Object.entries(categoryScores).find(([, score]) => score === maxScore)?.[0];
 
-    console.log(`📊 Enhanced scoring results:`, categoryScores);
+    console.log(` Enhanced scoring results:`, categoryScores);
     
     return bestCategory && maxScore > 0 ? bestCategory : 'motor';
   }
@@ -1414,7 +1414,7 @@ export class WebCrawlerService {
     const specs: Record<string, string> = {};
     const textContent = `${name} ${description}`.toLowerCase();
 
-    console.log(`🔍 Extracting all specs for ${category}: ${name}`);
+    console.log(` Extracting all specs for ${category}: ${name}`);
 
     // Common specifications for all components
     // Extract brand
@@ -1810,7 +1810,7 @@ export class WebCrawlerService {
         break;
     }
 
-    console.log(`✅ Final ${category} specs: ${JSON.stringify(specs)}`);
+    console.log(` Final ${category} specs: ${JSON.stringify(specs)}`);
     return specs;
   }
 
@@ -1884,7 +1884,7 @@ export class WebCrawlerService {
       const allSpecs = this.extractAllSpecifications($, name, description || '', category);
       specifications = { ...specifications, ...allSpecs };
 
-      console.log(`📊 Final specifications for "${name}" (${category}): ${JSON.stringify(specifications, null, 2)}`);
+      console.log(` Final specifications for "${name}" (${category}): ${JSON.stringify(specifications, null, 2)}`);
       console.log(`🏷️ Product details: Name="${name}", Category="${category}", Price=$${price}, InStock=${inStock}`);
 
       return {
@@ -2039,8 +2039,8 @@ export class WebCrawlerService {
     const specs: Record<string, string> = {};
     const textContent = `${name} ${description}`.toLowerCase();
     
-    console.log(`🔍 Extracting motor specs for: ${name}`);
-    console.log(`📝 Text content: ${textContent}`);
+    console.log(` Extracting motor specs for: ${name}`);
+    console.log(` Text content: ${textContent}`);
 
     // Extract KV rating from name or description - prioritize name over description
     const nameKvMatch = name.toLowerCase().match(/(\d+)\s*kv/i);
@@ -2049,10 +2049,10 @@ export class WebCrawlerService {
     // Use name KV if available, otherwise use description KV
     if (nameKvMatch) {
       specs.kv = nameKvMatch[1];
-      console.log(`⚡ Found KV from name: ${specs.kv}`);
+      console.log(` Found KV from name: ${specs.kv}`);
     } else if (descKvMatch) {
       specs.kv = descKvMatch[1];
-      console.log(`⚡ Found KV from description: ${specs.kv}`);
+      console.log(` Found KV from description: ${specs.kv}`);
     }
 
     // Extract stator size (e.g., 2207, 2306, 1407, 2004, 1102, 3115) - prioritize name
@@ -2062,17 +2062,17 @@ export class WebCrawlerService {
     // Use name stator if available and not the same as KV, otherwise use description
     if (nameStatorMatch && nameStatorMatch[1] !== specs.kv) {
       specs.statorSize = nameStatorMatch[1];
-      console.log(`📏 Found stator from name: ${specs.statorSize}`);
+      console.log(` Found stator from name: ${specs.statorSize}`);
     } else if (descStatorMatch && descStatorMatch[1] !== specs.kv) {
       specs.statorSize = descStatorMatch[1];
-      console.log(`📏 Found stator from description: ${specs.statorSize}`);
+      console.log(` Found stator from description: ${specs.statorSize}`);
     }
 
     // Extract motor configuration (e.g., 12N14P)
     const configMatch = textContent.match(/(\d+n\d+p)/i);
     if (configMatch) {
       specs.configuration = configMatch[1].toUpperCase();
-      console.log(`🔧 Found config: ${specs.configuration}`);
+      console.log(` Found config: ${specs.configuration}`);
     }
 
     // Extract voltage rating (e.g., 3-6S, 4S, 6S)
@@ -2086,7 +2086,7 @@ export class WebCrawlerService {
       const voltageMatch = textContent.match(pattern);
       if (voltageMatch) {
         specs.voltage = voltageMatch[1].toUpperCase();
-        console.log(`🔋 Found voltage: ${specs.voltage}`);
+        console.log(` Found voltage: ${specs.voltage}`);
         break;
       }
     }
@@ -2102,7 +2102,7 @@ export class WebCrawlerService {
       const shaftMatch = textContent.match(pattern);
       if (shaftMatch) {
         specs.shaftDiameter = `${shaftMatch[1]}mm`;
-        console.log(`🎯 Found shaft: ${specs.shaftDiameter}`);
+        console.log(` Found shaft: ${specs.shaftDiameter}`);
         break;
       }
     }
@@ -2133,7 +2133,7 @@ export class WebCrawlerService {
       const thrustMatch = textContent.match(pattern);
       if (thrustMatch) {
         specs.thrust = `${thrustMatch[1]}g`;
-        console.log(`🚀 Found thrust: ${specs.thrust}`);
+        console.log(` Found thrust: ${specs.thrust}`);
         break;
       }
     }
@@ -2148,7 +2148,7 @@ export class WebCrawlerService {
         const kvMatch = text.match(/(\d+)\s*kv/i);
         if (kvMatch) {
           specs.kv = kvMatch[1];
-          console.log(`⚡ Found KV from table: ${specs.kv}`);
+          console.log(` Found KV from table: ${specs.kv}`);
         }
       }
       
@@ -2157,7 +2157,7 @@ export class WebCrawlerService {
         const thrustMatch = text.match(/(\d+(?:\.\d+)?)\s*g/i);
         if (thrustMatch) {
           specs.thrust = `${thrustMatch[1]}g`;
-          console.log(`🚀 Found thrust from table: ${specs.thrust}`);
+          console.log(` Found thrust from table: ${specs.thrust}`);
         }
       }
       

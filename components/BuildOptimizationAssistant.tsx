@@ -295,7 +295,7 @@ export default function BuildOptimizationAssistant({
 
       {/* Optimization Goals */}
       <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-purple-900 mb-4">🎯 Optimization Goals</h3>
+        <h3 className="text-lg font-semibold text-purple-900 mb-4">Optimization Goals</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-3">
             <Clock className="w-5 h-5 text-blue-600" />

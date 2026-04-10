@@ -105,22 +105,22 @@ export default function ComponentGrid({
   if (totalItems === 0) {
     return (
       <div className="text-center py-16 transition-all duration-500 ease-out">
-  <div className="text-gray-400 text-4xl mb-4 animate-bounce">🔍</div>
-  <p className="text-gray-600 animate-fade-in">No components found matching &quot;{searchTerm}&quot;</p>
+  <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-400">No results</div>
+  <p className="animate-fade-in text-slate-600">No components found matching &quot;{searchTerm}&quot;</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 sm:p-5">
       {/* Sort Dropdown */}
-      <div className="mb-4 flex items-center gap-4">
-        <label htmlFor="sort" className="text-sm text-gray-600">Sort by:</label>
+      <div className="mb-4 flex flex-wrap items-center gap-3 sm:gap-4">
+        <label htmlFor="sort" className="text-sm font-medium text-slate-600">Sort by:</label>
         <select
           id="sort"
           value={sortOption}
           onChange={e => setSortOption(e.target.value as typeof sortOption)}
-          className="border rounded px-2 py-1 text-sm"
+          className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
         >
           <option value="name-asc">Name (A-Z)</option>
           <option value="name-desc">Name (Z-A)</option>
@@ -132,11 +132,11 @@ export default function ComponentGrid({
       </div>
 
       {/* Component Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 auto-cols-max">
+      <div className="grid auto-cols-max grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3 sm:gap-5">
         {displayItems.map(([name, component]) => (
           <div
             key={name}
-            className="transition-all duration-500 ease-out transform hover:scale-105"
+            className="transition-all duration-300 ease-out"
             style={{ 
               animation: 'fadeInUp 0.6s ease-out forwards'
             }}
@@ -167,7 +167,7 @@ export default function ComponentGrid({
               <button
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 rounded-lg border border-gray-300 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 ←
               </button>
@@ -189,10 +189,10 @@ export default function ComponentGrid({
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`px-3 py-1 rounded-lg border transition-colors ${
+                      className={`rounded-lg border px-3 py-1 text-sm transition-colors ${
                         currentPage === pageNum
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                          ? 'border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-600/20'
+                          : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
                       }`}
                     >
                       {pageNum}
@@ -204,7 +204,7 @@ export default function ComponentGrid({
               <button
                 onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-gray-400 hover:bg-gray-50 transition-colors"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-slate-500 shadow-sm transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 →
               </button>
@@ -214,7 +214,7 @@ export default function ComponentGrid({
           {/* Expand/Collapse Button */}
           <button
             onClick={toggleExpanded}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 text-gray-400 hover:shadow-md"
+            className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-100 hover:shadow"
           >
             <span className="text-sm font-medium">
               {isExpanded ? 'Show Less' : `Show All ${totalItems} Items`}
@@ -225,7 +225,7 @@ export default function ComponentGrid({
           </button>
 
           {/* Items count info */}
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-slate-600">
             {isExpanded 
               ? `Showing all ${totalItems} items`
               : `Showing ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)} of ${totalItems} items`

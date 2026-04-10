@@ -944,7 +944,7 @@ export default function PriceTracking({ componentId, showCompact = false, onAler
                 onClick={() => setShowAlertModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                ✕
+                ×
               </button>
             </div>
             

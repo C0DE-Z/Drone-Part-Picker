@@ -41,10 +41,10 @@ const testDataService = () => {
   console.log(`\nSearch results for "HQProp": ${searchResults.length} items`);
   
   console.log('\n=== Migration Complete ===');
-  console.log('✅ JSON data successfully migrated to TypeScript');
-  console.log('✅ Calculations separated into modular components');
-  console.log('✅ Service layer implemented for data management');
-  console.log('✅ All build errors resolved');
+  console.log(' JSON data successfully migrated to TypeScript');
+  console.log(' Calculations separated into modular components');
+  console.log(' Service layer implemented for data management');
+  console.log(' All build errors resolved');
 };
 
 export default testDataService;

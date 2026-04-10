@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
       found: products.length,
       products: products.slice(0, 5), // Return first 5 for preview
       message: products.length > 0 
-        ? `✅ Successfully scraped ${products.length} products from ${vendor}!`
-        : `⚠️ No products found - may still be encountering bot protection`,
+        ? `Successfully scraped ${products.length} products from ${vendor}.`
+        : `No products found. The site may be blocking automated access.`,
       scraperType: 'enhanced-puppeteer-with-cloudflare-bypass'
     });
 
@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
       category,
       error: errorMessage,
       message: errorMessage.includes('timeout') || errorMessage.includes('challenge')
-        ? '🔄 Cloudflare challenge detected - the enhanced bypass should handle this automatically. Try again.'
-        : `❌ Scraping failed: ${errorMessage}`,
+        ? 'Cloudflare challenge detected. Retry after a short delay.'
+        : `Scraping failed: ${errorMessage}`,
       scraperType: 'enhanced-puppeteer-with-cloudflare-bypass'
     }, { status: 500 });
   }

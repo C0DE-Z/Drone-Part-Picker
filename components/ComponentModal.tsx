@@ -24,16 +24,16 @@ export default function ComponentModal({ isOpen, onClose, name, component, type,
   };
 
   const getTypeIcon = () => {
-    const iconStyle = "text-4xl";
+    const baseStyle = 'inline-flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-700';
     switch (type) {
-      case 'motor': return <span className={`${iconStyle} text-orange-500`}>⚡</span>;
-      case 'frame': return <span className={`${iconStyle} text-gray-600`}>🔧</span>;
-      case 'stack': return <span className={`${iconStyle} text-blue-600`}>💻</span>;
-      case 'camera': return <span className={`${iconStyle} text-purple-600`}>📷</span>;
-      case 'prop': return <span className={`${iconStyle} text-green-600`}>🔄</span>;
-      case 'battery': return <span className={`${iconStyle} text-red-600`}>🔋</span>;
-      case 'customWeight': return <span className={`${iconStyle} text-indigo-600`}>⚖️</span>;
-      default: return <span className={`${iconStyle} text-gray-500`}>⚙️</span>;
+      case 'motor': return <span className={baseStyle}>MTR</span>;
+      case 'frame': return <span className={baseStyle}>FRM</span>;
+      case 'stack': return <span className={baseStyle}>STK</span>;
+      case 'camera': return <span className={baseStyle}>CAM</span>;
+      case 'prop': return <span className={baseStyle}>PRP</span>;
+      case 'battery': return <span className={baseStyle}>BAT</span>;
+      case 'customWeight': return <span className={baseStyle}>WGT</span>;
+      default: return <span className={baseStyle}>PRT</span>;
     }
   };
 
@@ -105,7 +105,7 @@ export default function ComponentModal({ isOpen, onClose, name, component, type,
             {comp.brand}
           </span>
           {comp.imageUrl && (
-            <span className="text-lg text-gray-400">📷 Image Available</span>
+            <span className="text-sm text-gray-500">Image available</span>
           )}
         </div>
       );

@@ -193,15 +193,15 @@ export default function LightAdminDashboard() {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               {[
-                { id: 'overview', name: 'Overview', icon: '📊' },
-                { id: 'users', name: 'Users', icon: '👥' },
-                { id: 'reports', name: 'Reports', icon: '🚨' },
-                { id: 'products', name: 'Manage Products', icon: '📦' },
-                { id: 'variants', name: 'Split Variants', icon: '🔀' },
-                { id: 'resort', name: 'Product Resort', icon: '🔄' },
-                { id: 'classification', name: 'AI Classification', icon: '🤖' },
-                { id: 'scraper', name: 'Web Scraper', icon: '🕷️' },
-                { id: 'settings', name: 'Settings', icon: '⚙️' }
+                { id: 'overview', name: 'Overview', icon: '' },
+                { id: 'users', name: 'Users', icon: '' },
+                { id: 'reports', name: 'Reports', icon: '' },
+                { id: 'products', name: 'Manage Products', icon: '' },
+                { id: 'variants', name: 'Split Variants', icon: '' },
+                { id: 'resort', name: 'Product Resort', icon: '' },
+                { id: 'classification', name: 'AI Classification', icon: '' },
+                { id: 'scraper', name: 'Web Scraper', icon: 'SR' },
+                { id: 'settings', name: 'Settings', icon: 'CFG' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -376,63 +376,16 @@ export default function LightAdminDashboard() {
           <div className="space-y-6">
             <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">AI Classification Training</h2>
-                  <p className="mt-1 text-gray-600">
-                    Help improve our AI by verifying product classifications. Play the classification game to train our machine learning model.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setClassificationGameOpen(true)}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 flex items-center gap-2"
-                >
-                  <span className="text-xl">🤖</span>
-                  Start Classification Game
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-4 rounded-lg border bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">🎯</span>
-                    <h3 className="font-semibold text-blue-800">Accuracy Focused</h3>
-                  </div>
-                  <p className="text-sm text-blue-700">
-                    Our AI analyzes product names, descriptions, and technical specifications to categorize components accurately.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg border bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">📊</span>
-                    <h3 className="font-semibold text-green-800">Multi-Method Analysis</h3>
-                  </div>
-                  <p className="text-sm text-green-700">
-                    Combines pattern matching, keyword analysis, feature detection, and brand recognition for best results.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg border bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">🎮</span>
-                    <h3 className="font-semibold text-purple-800">Gamified Training</h3>
-                  </div>
-                  <p className="text-sm text-purple-700">
-                    Interactive card-based game makes training the AI fun while improving classification accuracy.
-                  </p>
-                </div>
-              </div>
-
               <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-3 text-gray-900">Classification Categories</h3>
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
                   {[
-                    { emoji: '⚡', name: 'Motors' },
-                    { emoji: '🔗', name: 'ESC/FC' },
-                    { emoji: '🏗️', name: 'Frames' },
-                    { emoji: '🌀', name: 'Props' },
-                    { emoji: '🔋', name: 'Batteries' },
-                    { emoji: '📷', name: 'Cameras' }
+                    { emoji: '', name: 'Motors' },
+                    { emoji: '', name: 'ESC/FC' },
+                    { emoji: '', name: 'Frames' },
+                    { emoji: '', name: 'Props' },
+                    { emoji: '', name: 'Batteries' },
+                    { emoji: '', name: 'Cameras' }
                   ].map((category) => (
                     <div key={category.name} className="flex items-center gap-2 p-2 rounded bg-gray-50 border">
                       <span>{category.emoji}</span>
@@ -442,6 +395,7 @@ export default function LightAdminDashboard() {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         )}
 
@@ -456,7 +410,7 @@ export default function LightAdminDashboard() {
                   Database Status
                 </label>
                 <div className={`text-sm ${databaseStatus?.color || 'text-gray-600'}`}>
-                  {databaseStatus?.message || '🔄 Checking database status...'}
+                  {databaseStatus?.message || 'Checking database status...'}
                 </div>
                 {databaseStatus?.details && (
                   <div className="mt-2 text-xs space-y-1 text-gray-500">

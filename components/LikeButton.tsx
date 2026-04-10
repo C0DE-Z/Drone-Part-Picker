@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
+import { Heart } from 'lucide-react';
 
 interface LikeButtonProps {
   buildId?: string;
@@ -90,9 +91,7 @@ export default function LikeButton({
           : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
       } ${className}`}
     >
-      <span className={`text-sm ${loading ? 'animate-pulse' : ''}`}>
-        {liked ? '❤️' : '🤍'}
-      </span>
+      <Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''} ${loading ? 'animate-pulse' : ''}`} />
       <span className="text-sm font-medium">
         {likeCount} {likeCount === 1 ? 'like' : 'likes'}
       </span>

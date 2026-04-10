@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Badge, { BadgeData } from './Badge';
-import { User, Calendar, MapPin, Globe, Github, Twitter } from 'lucide-react';
+import { User, Calendar, MapPin, Globe, Github, Twitter, FolderOpen } from 'lucide-react';
 
 interface UserProfileData {
   id: string;
@@ -99,19 +99,25 @@ export default function UserProfile({ username, isOwnProfile = false }: UserProf
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="rounded-2xl border border-slate-200 bg-white/90 p-8 shadow-lg shadow-slate-900/5 backdrop-blur-sm">
+          <div className="mx-auto h-14 w-14 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <p className="mt-4 text-sm font-medium text-slate-600">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">User Not Found</h1>
-          <p className="text-gray-600 mb-8">The user you&apos;re looking for doesn&apos;t exist.</p>
-          <Link href="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white/90 p-8 text-center shadow-lg shadow-slate-900/5 backdrop-blur-sm">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">User Not Found</h1>
+          <p className="mt-3 text-slate-600">The user you&apos;re looking for doesn&apos;t exist.</p>
+          <Link
+            href="/"
+            className="mt-6 inline-flex rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/25 hover:bg-blue-700"
+          >
             Go Home
           </Link>
         </div>
@@ -120,43 +126,38 @@ export default function UserProfile({ username, isOwnProfile = false }: UserProf
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header/Cover */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-48 relative">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
+    <div className="min-h-screen pb-16">
+      <div className="relative h-44 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-800 sm:h-56">
+        <div className="absolute inset-0 bg-[radial-gradient(650px_220px_at_15%_-20%,rgba(255,255,255,0.2),transparent),radial-gradient(700px_260px_at_90%_0%,rgba(59,130,246,0.35),transparent)]" />
       </div>
 
-      {/* Profile Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-          {/* Profile Header */}
+      <div className="relative z-10 mx-auto -mt-24 w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white/90 shadow-xl shadow-slate-900/10 backdrop-blur-sm">
           <div className="p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              {/* Avatar */}
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <div className="relative">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-300 flex items-center justify-center border-4 border-white shadow-lg">
+                <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-200 shadow-lg ring-1 ring-slate-200 sm:h-32 sm:w-32">
                   {user.image ? (
-                    <Image 
-                      src={user.image} 
-                      alt={user.username} 
+                    <Image
+                      src={user.image}
+                      alt={user.username}
                       width={128}
                       height={128}
-                      className="w-full h-full rounded-full object-cover" 
+                      className="h-full w-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600" />
+                    <User className="h-12 w-12 text-slate-500 sm:h-16 sm:w-16" />
                   )}
                 </div>
-                
-                {/* Role indicator */}
+
                 {user.role !== 'USER' && (
-                  <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-lg">
-                    <Badge 
+                  <div className="absolute -bottom-1 -right-1 rounded-full bg-white p-1 shadow-md">
+                    <Badge
                       badge={{
                         id: user.role,
                         name: user.role === 'ADMIN' ? 'Admin' : 'Moderator',
                         type: user.role,
-                        icon: user.role === 'ADMIN' ? '👑' : '🛡️',
+                        icon: user.role === 'ADMIN' ? '' : 'MOD',
                         color: user.role === 'ADMIN' ? '#DC2626' : '#7C3AED',
                         rarity: user.role === 'ADMIN' ? 'legendary' : 'epic'
                       }}
@@ -166,18 +167,16 @@ export default function UserProfile({ username, isOwnProfile = false }: UserProf
                 )}
               </div>
 
-              {/* Profile Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <h1 className="truncate text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
                       {user.name || user.username}
                     </h1>
-                    <p className="text-gray-600 text-lg">@{user.username}</p>
-                    
-                    {/* Badges */}
+                    <p className="text-base text-slate-600 sm:text-lg">@{user.username}</p>
+
                     {user.badges && user.badges.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
+                      <div className="mt-3 flex flex-wrap gap-2">
                         {user.badges.map((badge) => (
                           <Badge key={badge.id} badge={badge} size="md" />
                         ))}
@@ -185,26 +184,25 @@ export default function UserProfile({ username, isOwnProfile = false }: UserProf
                     )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-2 sm:justify-end">
                     {!isOwnProfile && session && (
                       <button
                         onClick={handleFollow}
                         disabled={followLoading}
-                        className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                        className={`rounded-xl px-5 py-2 text-sm font-semibold transition-all duration-200 ${
                           isFollowing
-                            ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        } disabled:opacity-50`}
+                            ? 'border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-100'
+                            : 'bg-blue-600 text-white shadow-md shadow-blue-600/20 hover:bg-blue-700'
+                        } disabled:cursor-not-allowed disabled:opacity-50`}
                       >
-                        {followLoading ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
+                        {followLoading ? 'Please wait...' : isFollowing ? 'Following' : 'Follow'}
                       </button>
                     )}
-                    
+
                     {isOwnProfile && (
                       <Link
                         href={`/profile/${username}/edit`}
-                        className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                        className="rounded-xl border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
                       >
                         Edit Profile
                       </Link>
@@ -212,60 +210,62 @@ export default function UserProfile({ username, isOwnProfile = false }: UserProf
                   </div>
                 </div>
 
-                {/* Bio */}
                 {user.bio && (
-                  <p className="text-gray-700 mt-4 text-base leading-relaxed">{user.bio}</p>
+                  <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50/80 p-3 text-sm leading-relaxed text-slate-700 sm:text-base">
+                    {user.bio}
+                  </p>
                 )}
 
-                {/* Profile Details */}
-                <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>Joined {new Date(user.createdAt).toLocaleDateString('en-US', { 
-                      month: 'long', 
-                      year: 'numeric' 
-                    })}</span>
+                <div className="mt-4 flex flex-wrap gap-2 text-sm text-slate-600">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5">
+                    <Calendar className="h-4 w-4" />
+                    <span>
+                      Joined {new Date(user.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </span>
                   </div>
-                  
+
                   {user.location && (
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5">
+                      <MapPin className="h-4 w-4" />
                       <span>{user.location}</span>
                     </div>
                   )}
-                  
+
                   {user.website && (
-                    <a 
-                      href={user.website} 
-                      target="_blank" 
+                    <a
+                      href={user.website}
+                      target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 transition-colors hover:border-blue-300 hover:text-blue-700"
                     >
-                      <Globe className="w-4 h-4" />
+                      <Globe className="h-4 w-4" />
                       <span>Website</span>
                     </a>
                   )}
-                  
+
                   {user.github && (
-                    <a 
-                      href={`https://github.com/${user.github}`} 
-                      target="_blank" 
+                    <a
+                      href={`https://github.com/${user.github}`}
+                      target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 transition-colors hover:border-blue-300 hover:text-blue-700"
                     >
-                      <Github className="w-4 h-4" />
+                      <Github className="h-4 w-4" />
                       <span>GitHub</span>
                     </a>
                   )}
-                  
+
                   {user.twitter && (
-                    <a 
-                      href={`https://twitter.com/${user.twitter}`} 
-                      target="_blank" 
+                    <a
+                      href={`https://twitter.com/${user.twitter}`}
+                      target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 transition-colors hover:border-blue-300 hover:text-blue-700"
                     >
-                      <Twitter className="w-4 h-4" />
+                      <Twitter className="h-4 w-4" />
                       <span>Twitter</span>
                     </a>
                   )}
@@ -273,42 +273,41 @@ export default function UserProfile({ username, isOwnProfile = false }: UserProf
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-8 border-t border-gray-200">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{user._count.droneBuilds}</div>
-                <div className="text-sm text-gray-600">Builds</div>
+            <div className="mt-8 grid grid-cols-2 gap-3 border-t border-slate-200 pt-6 sm:grid-cols-4 sm:gap-4">
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-center">
+                <div className="text-2xl font-semibold tracking-tight text-slate-900">{user._count.droneBuilds}</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Builds</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{user._count.likes}</div>
-                <div className="text-sm text-gray-600">Likes</div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-center">
+                <div className="text-2xl font-semibold tracking-tight text-slate-900">{user._count.likes}</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Likes</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{user._count.followers}</div>
-                <div className="text-sm text-gray-600">Followers</div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-center">
+                <div className="text-2xl font-semibold tracking-tight text-slate-900">{user._count.followers}</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Followers</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{user._count.following}</div>
-                <div className="text-sm text-gray-600">Following</div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-center">
+                <div className="text-2xl font-semibold tracking-tight text-slate-900">{user._count.following}</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Following</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* User's Builds Section */}
-        <div className="mt-8 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">
+        <div className="mt-8 rounded-2xl border border-slate-200/90 bg-white/90 p-6 shadow-lg shadow-slate-900/5 backdrop-blur-sm">
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
             {isOwnProfile ? 'Your Builds' : `${user.username}'s Builds`}
           </h2>
-          
-          {/* This will be populated with actual builds */}
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-4xl mb-4">🚁</div>
-            <p>No builds to display yet.</p>
+
+          <div className="py-12 text-center text-slate-500">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-slate-50">
+              <FolderOpen className="h-6 w-6 text-slate-400" />
+            </div>
+            <p className="text-sm sm:text-base">No builds to display yet.</p>
             {isOwnProfile && (
-              <Link 
-                href="/" 
-                className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              <Link
+                href="/"
+                className="mt-4 inline-flex rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/25 hover:bg-blue-700"
               >
                 Create Your First Build
               </Link>

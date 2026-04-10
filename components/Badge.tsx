@@ -142,42 +142,42 @@ export const BADGE_TYPES = {
   ADMIN: {
     name: 'Admin',
     description: 'Site Administrator',
-    icon: '👑',
+    icon: '',
     color: '#DC2626',
     rarity: 'legendary' as const
   },
   MODERATOR: {
     name: 'Moderator',
     description: 'Community Moderator',
-    icon: '🛡️',
+    icon: 'MOD',
     color: '#7C3AED',
     rarity: 'epic' as const
   },
   VERIFIED: {
     name: 'Verified',
     description: 'Verified Account',
-    icon: '✅',
+    icon: '',
     color: '#059669',
     rarity: 'rare' as const
   },
   EARLY_USER: {
     name: 'Early User',
     description: 'Beta Tester',
-    icon: '🚀',
+    icon: '',
     color: '#2563EB',
     rarity: 'rare' as const
   },
   TOP_CONTRIBUTOR: {
     name: 'Top Contributor',
     description: 'Highly Active Community Member',
-    icon: '⭐',
+    icon: '',
     color: '#F59E0B',
     rarity: 'epic' as const
   },
   DRONE_EXPERT: {
     name: 'Drone Expert',
     description: 'Recognized Drone Building Expert',
-    icon: '🔧',
+    icon: '',
     color: '#10B981',
     rarity: 'epic' as const
   }

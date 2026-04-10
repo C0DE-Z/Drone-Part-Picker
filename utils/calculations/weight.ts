@@ -33,7 +33,10 @@ export class WeightCalculator {
     }
     
     if (components.stack) {
-      weights.stack = this.calculateStackWeight(components.stack.data.type);
+      const explicitStackWeight = this.parseWeight((components.stack.data as unknown as { weight?: string }).weight);
+      weights.stack = explicitStackWeight > 0
+        ? explicitStackWeight
+        : this.calculateStackWeight(components.stack.data.type);
     }
     
     if (components.camera) {
@@ -62,10 +65,22 @@ export class WeightCalculator {
 
   static parseWeight(weightStr: string | undefined): number {
     if (!weightStr) return 0;
-    
-    // Extract first number from string (handles formats like "31.5g", "85g", "30.5g (with short wires)")
-    const match = weightStr.match(/(\d+\.?\d*)/);
-    return match ? parseFloat(match[1]) : 0;
+
+    const lower = weightStr.toLowerCase();
+    const match = lower.match(/(\d+\.?\d*)/);
+    if (!match) return 0;
+
+    const value = parseFloat(match[1]);
+    if (!Number.isFinite(value) || value <= 0) return 0;
+
+    // Normalize to grams for compatibility with existing APIs.
+    if (lower.includes('kg')) return value * 1000;
+    if (lower.includes('mg')) return value / 1000;
+    if (lower.includes('lb')) return value * 453.59237;
+    if (lower.includes('oz')) return value * 28.3495231;
+
+    // Default to grams.
+    return value;
   }
 
   private static calculateStackWeight(stackType: string): number {

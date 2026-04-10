@@ -25,7 +25,7 @@ export class ProductResortService {
       reason: string;
     }>;
   }> {
-    console.log('🔄 Starting product resort process...');
+    console.log(' Starting product resort process...');
     
     const products = await this.prisma.product.findMany();
     const changes: Array<{
@@ -36,7 +36,7 @@ export class ProductResortService {
       reason: string;
     }> = [];
 
-    console.log(`📦 Found ${products.length} products to analyze`);
+    console.log(` Found ${products.length} products to analyze`);
 
     for (const product of products) {
       const newCategory = this.determineCategory(product.name, product.description || '');
@@ -62,12 +62,12 @@ export class ProductResortService {
           }
         });
 
-        console.log(`🔄 Reclassified: ${product.name}`);
+        console.log(` Reclassified: ${product.name}`);
         console.log(`   ${product.category} → ${newCategory} (${reason})`);
       }
     }
 
-    console.log(`✅ Resort complete: ${changes.length} products reclassified out of ${products.length}`);
+    console.log(` Resort complete: ${changes.length} products reclassified out of ${products.length}`);
     
     return {
       totalProcessed: products.length,
@@ -87,7 +87,7 @@ export class ProductResortService {
       reason: string;
     }>;
   }> {
-    console.log(`🔄 Starting resort for brand: ${brandName}`);
+    console.log(` Starting resort for brand: ${brandName}`);
     
     const products = await this.prisma.product.findMany({
       where: {
@@ -145,7 +145,7 @@ export class ProductResortService {
       reason: string;
     }>;
   }> {
-    console.log(`🔄 Starting resort for category: ${currentCategory}`);
+    console.log(` Starting resort for category: ${currentCategory}`);
     
     const products = await this.prisma.product.findMany({
       where: {
@@ -202,7 +202,7 @@ export class ProductResortService {
     
     const enhancedResult = classificationResult.enhanced;
     
-    console.log(`🚀 Enhanced resort classification for "${productName}": ${enhancedResult.category} (${enhancedResult.confidence}%)`);
+    console.log(` Enhanced resort classification for "${productName}": ${enhancedResult.category} (${enhancedResult.confidence}%)`);
     
     // Enhanced classifier has high accuracy, use lower confidence threshold
     if (enhancedResult.confidence >= 65) {
